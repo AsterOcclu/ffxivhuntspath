@@ -4,6 +4,7 @@ class Etag {
     public static $etag_distances_hw = 'distances_hw';
     public static $etag_distances_sb = 'distances_sb';
     public static $etag_distances_shb = 'distances_shb';
+    public static $etag_distances_ew = 'distances_ew';
     
     public static $etag_fates_arr = 'fates_arr';
     public static $etag_region_arr = 'region_arr';
@@ -11,14 +12,19 @@ class Etag {
     public static $etag_zones_hw = 'zones_hw';
     public static $etag_zones_sb = 'zones_sb';
     public static $etag_zones_shb = 'zones_shb';
+    public static $etag_zones_ew = 'zones_ew';
+
     public static $etag_aetherytes_arr = 'aeth_arr';
     public static $etag_aetherytes_hw = 'aeth_hw';
     public static $etag_aetherytes_sb = 'aeth_sb';
     public static $etag_aetherytes_shb = 'aeth_shb';
+    public static $etag_aetherytes_ew = 'aeth_ew';
+
     public static $etag_mobs_arr = 'mobs_arr';
     public static $etag_mobs_hw = 'mobs_hw';
     public static $etag_mobs_sb = 'mobs_sb';
     public static $etag_mobs_shb = 'mobs_shb';
+    public static $etag_mobs_ew = 'mobs_ew';
 	
 	public static $etags = array();
 	

@@ -33,6 +33,7 @@ class WebLang {
 	public static $MSG_SB = 'Stormblood';
 	public static $MSG_ARR = 'A Realm Reborn';
 	public static $MSG_SHB = 'Shadowbringers';
+	public static $MSG_EW = 'Endwalker';
 	
 	/* Search Page */
 	public static $MSG_SEARCH_BTN = 'Search {0} mobs';
@@ -60,6 +61,7 @@ class WebLang {
 	public static $MSG_HOME_COLLAB_SMOKEY = 'Mobs location in HW expansion';
 	public static $MSG_HOME_COLLAB_MAMORU = 'Game Client Translation to Simplified Chinese in SB and HW expansions';
 	public static $MSG_HOME_COLLAB_SUMIRE = 'Game Client Translation to Simplified Chinese in SB and HW expansions';
+	public static $MSG_HOME_COLLAB_ASTER = 'Game Client Translation to Simplified Chinese in SHB and EW expansions';
 	
 	public static $MSG_HOME_COLLABORATE = 'Want to contribute translating to your language? Want to send suggestions or report bugs? You can contact us via email';
 	public static $MSG_HOME_DONATE = 'If you want to donate for this website, you can do it here';
@@ -76,7 +78,11 @@ class WebLang {
 			'Added Translation of the Game Client to Simplified Chinese in the Heavensward and Stormblood expansions thanks to '.
 			'<a href="http://na.finalfantasyxiv.com/lodestone/character/14748036/">Mamoru Akizuki (Faerie)</a> and '.
 			'<a href="http://na.finalfantasyxiv.com/lodestone/character/17035001/">Sumire Aster (Faerie)</a>';
-			
+
+	public static $MSG_HOME_UPDATES_8 = 
+			'Added Translation of the Game Client to Simplified Chinese in the Shb and Ew expansions thanks to '.
+			'<a href="https://na.finalfantasyxiv.com/lodestone/character/36279802/">Aster Occlu (Faerie)</a>';
+
 	public static $MSG_HOME_UPDATES_5 = 
 			'A <b>preliminary</b> version for ARR Hunts has been added. It\'s not definitive, since this tool was thought for the HW and SB expansions, '.
 			'in which zones you\'re able to fly and skip obstacles unlike ARR areas, so the routes calculated are not optimal, and even messy in zones which contains '.

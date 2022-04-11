@@ -416,7 +416,92 @@
 	
 		return $matrix;
 	}
-	
+
+    function getDataEw(){
+        $cache = phpFastCache(Config::$cache_mode);
+        $con = Config::getDbConnection();
+    
+        $data = array();
+    
+        $zones = array();
+        $aetherytes = array();
+        $mobs = array();
+                
+        $mobs_changed = false;
+        $aetherytes_changed = false;
+                
+        if($cache->get(Etag::$etag_mobs_ew) == null || Etag::isEtagExpired($con, Etag::$etag_mobs_ew)){
+            $mobs_result = mysqli_query($con, "SELECT * FROM mobs_ew WHERE id ORDER BY id_zone, name ASC");
+            $mobs = process_mobs($mobs_result);
+            $mobs_changed = true;
+            
+            $cache->set(Etag::$etag_mobs_ew, $mobs);
+        } else {
+            $mobs = $cache->get(Etag::$etag_mobs_ew);
+        }
+        
+        if($cache->get(Etag::$etag_aetherytes_ew) == null || Etag::isEtagExpired($con, Etag::$etag_aetherytes_ew)){
+            $aetherytes_result = mysqli_query($con, "SELECT * FROM aetherytes_ew ORDER BY id_zone ASC");
+            $aetherytes = process_aetherytes($aetherytes_result);
+            $aetherytes_changed = true;
+            
+            $cache->set(Etag::$etag_aetherytes_ew, $aetherytes);
+        } else {
+            $aetherytes = $cache->get(Etag::$etag_aetherytes_ew);
+        }       
+        
+        if($mobs_changed || $aetherytes_changed || $cache->get(Etag::$etag_zones_ew) == null || Etag::isEtagExpired($con, Etag::$etag_zones_ew)){
+            $zones_result = mysqli_query($con, "SELECT * FROM zones_ew ORDER BY id ASC");
+            $zones = process_zones($zones_result, $aetherytes, $mobs);
+            
+            $cache->set(Etag::$etag_zones_ew, $zones);
+        } else {
+            $zones = $cache->get(Etag::$etag_zones_ew);
+        }
+        
+        $data['z'] = $zones;
+        $data['a'] = $aetherytes;
+        $data['m'] = $mobs;
+        return $data;
+    }
+    
+    function getCachedDistancesEw(){
+        $cache = phpFastCache(Config::$cache_mode);
+        $con = Config::getDbConnection();
+        
+        $matrix = array();
+        if($cache->get(Etag::$etag_distances_ew) == null || Etag::isEtagExpired($con, Etag::$etag_distances_ew)){
+            // Reload Distances, info has changed
+            $data = getDataEw();
+            
+            $zones = $data['z'];
+            $aetherytes = $data['a'];
+            $mobs = $data['m'];
+                        
+            foreach($zones as $z){
+                $matrix[$z['id']] = array();
+                        
+                // Mobs of Zone i in $mobsZone;
+                foreach($z['mobs'] as $my){
+                    foreach($z['aetherytes'] as $ax){
+                        setValue($matrix[$z['id']], 'a'.$ax['id'], 'm'.$my['id'], distance2d($ax['x'], $ax['y'], $my['x'], $my['y']));
+                    }
+                    foreach($z['mobs'] as $mx){
+                        if($mx['id'] != $my['id']){
+                            setValue($matrix[$z['id']], 'm'.$mx['id'], 'm'.$my['id'], distance2d($mx['x'], $mx['y'], $my['x'], $my['y']));
+                        }
+                    }
+                }
+            }           
+            
+            $cache->set(Etag::$etag_distances_ew, $matrix);
+        } else {
+            $matrix = $cache->get(Etag::$etag_distances_ew);
+        }
+    
+        return $matrix;
+    }
+    
 	function process_fates($result){
 		$fates = array();
 		while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {

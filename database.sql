@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.4
+-- version 4.9.7
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Oct 02, 2020 at 06:35 AM
--- Server version: 5.6.48-cll-lve
--- PHP Version: 7.3.6
+-- Host: 127.0.0.1:3306
+-- Generation Time: Apr 11, 2022 at 07:29 AM
+-- Server version: 8.0.27
+-- PHP Version: 7.4.26
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -21,21 +21,21 @@ SET time_zone = "+00:00";
 --
 -- Database: `ffxiv2`
 --
+DROP DATABASE IF EXISTS `ffxiv2`;
 CREATE DATABASE IF NOT EXISTS `ffxiv2` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 USE `ffxiv2`;
 
--- --------------------------------------------------------
-
-DELIMITER //
+DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `update_etag`(IN `i` VARCHAR(20))
-BEGIN
+DROP PROCEDURE IF EXISTS `update_etag`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_etag` (IN `i` VARCHAR(20))  BEGIN
 	DECLARE e VARCHAR(14) DEFAULT DATE_FORMAT( NOW(), '%Y%m%d%k%i%s' );
 	INSERT INTO `etags` (`item`, `etag`) VALUES (i, e) 
 		ON DUPLICATE KEY UPDATE `etag` = e;
-END//
+END$$
+
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -44,66 +44,70 @@ DELIMITER ;
 -- Table structure for table `aetherytes_arr`
 --
 
-CREATE TABLE `aetherytes_arr` (
-  `id` tinyint(3) UNSIGNED NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text NOT NULL,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
-  `id_zone` tinyint(4) NOT NULL,
+DROP TABLE IF EXISTS `aetherytes_arr`;
+CREATE TABLE IF NOT EXISTS `aetherytes_arr` (
+  `id` tinyint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
   `x` decimal(3,1) UNSIGNED NOT NULL,
   `y` decimal(3,1) UNSIGNED NOT NULL,
-  `cost` decimal(3,1) UNSIGNED NOT NULL DEFAULT '0.0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `cost` decimal(3,1) UNSIGNED NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `id_zone` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `aetherytes_arr`
 --
 
 INSERT INTO `aetherytes_arr` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `cost`) VALUES
-(1, 184, 'Summerford Farms', 'Summerford Farms', 'Vergers D\'Estival', 'Sommerfurt-Höfe', 'サマーフォード庄', NULL, 1, 26.0, 16.3, 0.0),
-(2, 216, 'Wineport', 'Wineport', 'Port-aux-Vins', 'Weinhafen', 'ワインポート', NULL, 1, 18.0, 7.5, 5.2),
-(3, 770, 'Limsa Lominsa Lower Decks => Zephyr Gate (Middle L', 'Limsa Lominsa Lower Decks => Zephyr Gate (Middle L', 'Limsa Lominsa - L\'Entrepont => Noscea Centrale Via', 'Untere Decks => Zephyr-Tor (Zentrales La Noscea)', 'リムサ・ロミンサ：下甲板層 => ゼファー陸門（中央ラノシア方面）', NULL, 1, 21.4, 24.3, 5.2),
-(4, 337, 'Moraby Drydocks', 'Moraby Drydocks', 'Chantier Naval De Moraby', 'Moraby-Trockendocks', 'モラビー造船廠', NULL, 2, 24.5, 34.8, 0.0),
-(5, 1161, 'Limsa Lominsa Lower Decks => Mist', 'Limsa Lominsa Lower Decks => Mist', 'Limsa Lominsa - L\'Entrepont => Brumée', 'Untere Decks => Nebeldorf', 'リムサ・ロミンサ：下甲板層 => ミスト・ヴィレッジ', NULL, 2, 33.3, 19.1, 7.6),
-(6, 771, 'Limsa Lominsa Lower Decks => Tempest Gate (Lower L', 'Limsa Lominsa Lower Decks => Tempest Gate (Lower L', 'Limsa Lominsa - L\'Entrepont => Basse-Noscea Via La', 'Untere Decks => Sturmtor (Unteres La Noscea)', 'リムサ・ロミンサ：下甲板層 => テンペスト陸門（低地ラノシア方面）', NULL, 2, 20.9, 23.8, 5.2),
-(7, 206, 'Costa Del Sol', 'Costa Del Sol', 'Costa Del Sol', 'Sonnenküste', 'コスタ・デル・ソル', NULL, 3, 31.2, 30.9, 0.0),
-(8, 216, 'Wineport', 'Wineport', 'Port-aux-Vins', 'Weinhafen', 'ワインポート', NULL, 3, 21.1, 21.5, 0.0),
-(9, 218, 'Swiftperch', 'Swiftperch', 'Le Martinet', 'Tölpelturm-Siedlung', 'スウィフトパーチ入植地', NULL, 4, 34.5, 31.7, 0.0),
-(10, 223, 'Aleport', 'Aleport', 'Port-aux-Ales', 'Bierhafen', 'エールポート', NULL, 4, 26.7, 25.7, 0.0),
-(11, 239, 'Camp Bronze Lake', 'Camp Bronze Lake', 'Camp Du Lac D\'Airain', 'Camp Bronzesee', 'キャンプ・ブロンズレイク', NULL, 5, 30.2, 23.3, 0.0),
-(12, 223, 'Aleport', 'Aleport', 'Port-aux-Ales', 'Bierhafen', 'エールポート', NULL, 5, 12.2, 26.6, 7.6),
-(13, 237, 'Camp Overlook', 'Camp Overlook', 'Camp Du Guet', 'Camp Ausblick', 'キャンプ・オーバールック', NULL, 6, 19.1, 17.1, 0.0),
-(14, 94, 'Bentbranch Meadows', 'Bentbranch Meadows', 'Ranch De Brancharquée', 'Gut Zwieselgrund', 'ベントブランチ牧場', NULL, 7, 21.6, 22.1, 0.0),
-(15, 597, 'New Gridania => Blue Badger Gate (Central Shroud)', 'New Gridania => Blue Badger Gate (Central Shroud)', 'Nouvelle Gridania => Forêt Centrale Est Via La Por', 'Neu-Gridania => Blaudachs-Pforte (zum Tiefen Wald ', 'グリダニア：新市街 => 青狢門（中央森林東方面）', NULL, 7, 24.0, 15.4, 5.2),
-(16, 408, 'New Gridania => White Wolf Gate (Central Shroud)', 'New Gridania => White Wolf Gate (Central Shroud)', 'Nouvelle Gridania => Forêt Centrale Ouest Via La P', 'Neu-Gridania => Weißwolf-Pforte (zum Tiefen Wald /', 'グリダニア：新市街 => 白狼門（中央森林西方面）', NULL, 7, 15.3, 15.9, 5.2),
-(17, 107, 'The Hawthorne Hut', 'The Hawthorne Hut', 'Hutte Des Hawthorne', 'Jagdhütte Der Hawthornes', 'ホウソーン家の山塞', NULL, 8, 17.7, 27.3, 0.0),
-(18, 129, 'Quarrymill', 'Quarrymill', 'Moulin De La Carrière', 'Mühlenbruch', 'クォーリーミル', NULL, 9, 25.0, 20.1, 0.0),
-(19, 123, 'Camp Tranquil', 'Camp Tranquil', 'Camp Des Sentes Tranquilles', 'Camp Seelenruhe', 'キャンプ・トランキル', NULL, 9, 16.8, 28.6, 0.0),
-(20, 140, 'Fallgourd Float', 'Fallgourd Float', 'Radeau De La Calebasse', 'Herbstkürbis-See', 'フォールゴウド', NULL, 10, 20.6, 26.1, 0.0),
-(21, 598, 'New Gridania => Yellow Serpent Gate (North Shroud)', 'New Gridania => Yellow Serpent Gate (North Shroud)', 'Nouvelle Gridania => Forêt Du Nord Via La Porte De', 'Neu-Gridania => Gelbschlangen-Pforte (zum Nordwald', 'グリダニア：新市街 => 黄蛇門（北部森林方面）', NULL, 10, 30.4, 25.4, 5.2),
-(22, 271, 'Horizon', 'Horizon', 'Horizon', 'Horizont', 'ホライズン', NULL, 11, 22.7, 16.9, 0.0),
-(23, 779, 'Ul\'dah - Steps Of Nald => Gate Of The Sultana (Wes', 'Ul\'dah - Steps Of Nald => Gate Of The Sultana (Wes', 'Ul\'dah - Faubourg De Nald => Thanalan Occidental V', 'Nald-Kreuzgang => Neues Sultana-Tor (Westliches Th', 'ウルダハ：ナル回廊 => ナナモ新門（西ザナラーン方面）', NULL, 11, 30.4, 24.8, 5.2),
-(24, 781, 'Ul\'dah - Steps Of Nald => Gate Of Thal (Central Th', 'Ul\'dah - Steps Of Nald => Gate Of Thal (Central Th', 'Ul\'dah - Faubourg De Nald => Thanalan Central Sud ', 'Nald-Kreuzgang => Tor Des Thal (Zentrales Thanalan', 'ウルダハ：ナル回廊 => ザル大門（中央ザナラーン南方面）', NULL, 12, 22.2, 33.0, 5.2),
-(25, 780, 'Ul\'dah - Steps Of Nald => Gate Of Nald (Central Th', 'Ul\'dah - Steps Of Nald => Gate Of Nald (Central Th', 'Ul\'dah - Faubourg De Nald => Thanalan Central Nord', 'Nald-Kreuzgang => Tor Des Nald (Zentrales Thanalan', 'ウルダハ：ナル回廊 => ナル大門（中央ザナラーン北方面）', NULL, 12, 19.0, 27.6, 5.2),
-(26, 290, 'Black Brush Station', 'Black Brush Station', 'Gare De Roncenoire', 'Kohlenstaub-Bahnhof', 'ブラックブラッシュ停留所', NULL, 12, 21.2, 18.1, 0.0),
-(27, 325, 'Camp Bluefog', 'Camp Bluefog', 'Camp De Brumebleue', 'Camp Blauer Dunst', 'キャンプ・ブルーフォグ', NULL, 12, 20.9, 11.8, 7.6),
-(28, 300, 'Camp Drybone', 'Camp Drybone', 'Camp Des Os Desséchés', 'Camp Knochenbleich', 'キャンプ・ドライボーン', NULL, 13, 13.7, 24.3, 0.0),
-(29, 123, 'Camp Tranquil', 'Camp Tranquil', 'Camp Des Sentes Tranquilles', 'Camp Seelenruhe', 'キャンプ・トランキル', NULL, 13, 28.7, 15.7, 10.4),
-(30, 313, 'Little Ala Mhigo', 'Little Ala Mhigo', 'Petite Ala Mhigo', 'Klein-Ala Mhigo', 'リトルアラミゴ', NULL, 14, 18.3, 13.1, 0.0),
-(31, 323, 'Forgotten Springs', 'Forgotten Springs', 'Oasis Oubliée', 'Die Vergessene Oase', '忘れられたオアシス', NULL, 14, 14.9, 29.6, 0.0),
-(32, 325, 'Camp Bluefog', 'Camp Bluefog', 'Camp De Brumebleue', 'Camp Blauer Dunst', 'キャンプ・ブルーフォグ', NULL, 15, 21.8, 30.5, 0.0),
-(33, 331, 'Ceruleum Processing Plant', 'Ceruleum Processing Plant', 'Usine De Céruleum', 'Erdseim-Fabrik', '青燐精製所', NULL, 15, 20.9, 20.8, 0.0),
-(34, 411, 'Revenant\'s Toll', 'Revenant\'s Toll', 'Glas Des Revenants', 'Geisterzoll', 'レヴナンツトール', NULL, 16, 16.7, 35.1, 8.6),
-(35, 388, 'Camp Dragonhead', 'Camp Dragonhead', 'Camp De La Tête Du Dragon', 'Camp Drachenkopf', 'キャンプ・ドラゴンヘッド', NULL, 16, 26.0, 16.8, 0.0),
-(36, 411, 'Revenant\'s Toll', 'Revenant\'s Toll', 'Glas Des Revenants', 'Geisterzoll', 'レヴナンツトール', NULL, 17, 22.2, 8.1, 0.0);
+(1, 184, 'Summerford Farms', 'Summerford Farms', 'Vergers D\'Estival', 'Sommerfurt-Höfe', 'サマーフォード庄', NULL, 1, '26.0', '16.3', '0.0'),
+(2, 216, 'Wineport', 'Wineport', 'Port-aux-Vins', 'Weinhafen', 'ワインポート', NULL, 1, '18.0', '7.5', '5.2'),
+(3, 770, 'Limsa Lominsa Lower Decks => Zephyr Gate (Middle L', 'Limsa Lominsa Lower Decks => Zephyr Gate (Middle L', 'Limsa Lominsa - L\'Entrepont => Noscea Centrale Via', 'Untere Decks => Zephyr-Tor (Zentrales La Noscea)', 'リムサ・ロミンサ：下甲板層 => ゼファー陸門（中央ラノシア方面）', NULL, 1, '21.4', '24.3', '5.2'),
+(4, 337, 'Moraby Drydocks', 'Moraby Drydocks', 'Chantier Naval De Moraby', 'Moraby-Trockendocks', 'モラビー造船廠', NULL, 2, '24.5', '34.8', '0.0'),
+(5, 1161, 'Limsa Lominsa Lower Decks => Mist', 'Limsa Lominsa Lower Decks => Mist', 'Limsa Lominsa - L\'Entrepont => Brumée', 'Untere Decks => Nebeldorf', 'リムサ・ロミンサ：下甲板層 => ミスト・ヴィレッジ', NULL, 2, '33.3', '19.1', '7.6'),
+(6, 771, 'Limsa Lominsa Lower Decks => Tempest Gate (Lower L', 'Limsa Lominsa Lower Decks => Tempest Gate (Lower L', 'Limsa Lominsa - L\'Entrepont => Basse-Noscea Via La', 'Untere Decks => Sturmtor (Unteres La Noscea)', 'リムサ・ロミンサ：下甲板層 => テンペスト陸門（低地ラノシア方面）', NULL, 2, '20.9', '23.8', '5.2'),
+(7, 206, 'Costa Del Sol', 'Costa Del Sol', 'Costa Del Sol', 'Sonnenküste', 'コスタ・デル・ソル', NULL, 3, '31.2', '30.9', '0.0'),
+(8, 216, 'Wineport', 'Wineport', 'Port-aux-Vins', 'Weinhafen', 'ワインポート', NULL, 3, '21.1', '21.5', '0.0'),
+(9, 218, 'Swiftperch', 'Swiftperch', 'Le Martinet', 'Tölpelturm-Siedlung', 'スウィフトパーチ入植地', NULL, 4, '34.5', '31.7', '0.0'),
+(10, 223, 'Aleport', 'Aleport', 'Port-aux-Ales', 'Bierhafen', 'エールポート', NULL, 4, '26.7', '25.7', '0.0'),
+(11, 239, 'Camp Bronze Lake', 'Camp Bronze Lake', 'Camp Du Lac D\'Airain', 'Camp Bronzesee', 'キャンプ・ブロンズレイク', NULL, 5, '30.2', '23.3', '0.0'),
+(12, 223, 'Aleport', 'Aleport', 'Port-aux-Ales', 'Bierhafen', 'エールポート', NULL, 5, '12.2', '26.6', '7.6'),
+(13, 237, 'Camp Overlook', 'Camp Overlook', 'Camp Du Guet', 'Camp Ausblick', 'キャンプ・オーバールック', NULL, 6, '19.1', '17.1', '0.0'),
+(14, 94, 'Bentbranch Meadows', 'Bentbranch Meadows', 'Ranch De Brancharquée', 'Gut Zwieselgrund', 'ベントブランチ牧場', NULL, 7, '21.6', '22.1', '0.0'),
+(15, 597, 'New Gridania => Blue Badger Gate (Central Shroud)', 'New Gridania => Blue Badger Gate (Central Shroud)', 'Nouvelle Gridania => Forêt Centrale Est Via La Por', 'Neu-Gridania => Blaudachs-Pforte (zum Tiefen Wald ', 'グリダニア：新市街 => 青狢門（中央森林東方面）', NULL, 7, '24.0', '15.4', '5.2'),
+(16, 408, 'New Gridania => White Wolf Gate (Central Shroud)', 'New Gridania => White Wolf Gate (Central Shroud)', 'Nouvelle Gridania => Forêt Centrale Ouest Via La P', 'Neu-Gridania => Weißwolf-Pforte (zum Tiefen Wald /', 'グリダニア：新市街 => 白狼門（中央森林西方面）', NULL, 7, '15.3', '15.9', '5.2'),
+(17, 107, 'The Hawthorne Hut', 'The Hawthorne Hut', 'Hutte Des Hawthorne', 'Jagdhütte Der Hawthornes', 'ホウソーン家の山塞', NULL, 8, '17.7', '27.3', '0.0'),
+(18, 129, 'Quarrymill', 'Quarrymill', 'Moulin De La Carrière', 'Mühlenbruch', 'クォーリーミル', NULL, 9, '25.0', '20.1', '0.0'),
+(19, 123, 'Camp Tranquil', 'Camp Tranquil', 'Camp Des Sentes Tranquilles', 'Camp Seelenruhe', 'キャンプ・トランキル', NULL, 9, '16.8', '28.6', '0.0'),
+(20, 140, 'Fallgourd Float', 'Fallgourd Float', 'Radeau De La Calebasse', 'Herbstkürbis-See', 'フォールゴウド', NULL, 10, '20.6', '26.1', '0.0'),
+(21, 598, 'New Gridania => Yellow Serpent Gate (North Shroud)', 'New Gridania => Yellow Serpent Gate (North Shroud)', 'Nouvelle Gridania => Forêt Du Nord Via La Porte De', 'Neu-Gridania => Gelbschlangen-Pforte (zum Nordwald', 'グリダニア：新市街 => 黄蛇門（北部森林方面）', NULL, 10, '30.4', '25.4', '5.2'),
+(22, 271, 'Horizon', 'Horizon', 'Horizon', 'Horizont', 'ホライズン', NULL, 11, '22.7', '16.9', '0.0'),
+(23, 779, 'Ul\'dah - Steps Of Nald => Gate Of The Sultana (Wes', 'Ul\'dah - Steps Of Nald => Gate Of The Sultana (Wes', 'Ul\'dah - Faubourg De Nald => Thanalan Occidental V', 'Nald-Kreuzgang => Neues Sultana-Tor (Westliches Th', 'ウルダハ：ナル回廊 => ナナモ新門（西ザナラーン方面）', NULL, 11, '30.4', '24.8', '5.2'),
+(24, 781, 'Ul\'dah - Steps Of Nald => Gate Of Thal (Central Th', 'Ul\'dah - Steps Of Nald => Gate Of Thal (Central Th', 'Ul\'dah - Faubourg De Nald => Thanalan Central Sud ', 'Nald-Kreuzgang => Tor Des Thal (Zentrales Thanalan', 'ウルダハ：ナル回廊 => ザル大門（中央ザナラーン南方面）', NULL, 12, '22.2', '33.0', '5.2'),
+(25, 780, 'Ul\'dah - Steps Of Nald => Gate Of Nald (Central Th', 'Ul\'dah - Steps Of Nald => Gate Of Nald (Central Th', 'Ul\'dah - Faubourg De Nald => Thanalan Central Nord', 'Nald-Kreuzgang => Tor Des Nald (Zentrales Thanalan', 'ウルダハ：ナル回廊 => ナル大門（中央ザナラーン北方面）', NULL, 12, '19.0', '27.6', '5.2'),
+(26, 290, 'Black Brush Station', 'Black Brush Station', 'Gare De Roncenoire', 'Kohlenstaub-Bahnhof', 'ブラックブラッシュ停留所', NULL, 12, '21.2', '18.1', '0.0'),
+(27, 325, 'Camp Bluefog', 'Camp Bluefog', 'Camp De Brumebleue', 'Camp Blauer Dunst', 'キャンプ・ブルーフォグ', NULL, 12, '20.9', '11.8', '7.6'),
+(28, 300, 'Camp Drybone', 'Camp Drybone', 'Camp Des Os Desséchés', 'Camp Knochenbleich', 'キャンプ・ドライボーン', NULL, 13, '13.7', '24.3', '0.0'),
+(29, 123, 'Camp Tranquil', 'Camp Tranquil', 'Camp Des Sentes Tranquilles', 'Camp Seelenruhe', 'キャンプ・トランキル', NULL, 13, '28.7', '15.7', '10.4'),
+(30, 313, 'Little Ala Mhigo', 'Little Ala Mhigo', 'Petite Ala Mhigo', 'Klein-Ala Mhigo', 'リトルアラミゴ', NULL, 14, '18.3', '13.1', '0.0'),
+(31, 323, 'Forgotten Springs', 'Forgotten Springs', 'Oasis Oubliée', 'Die Vergessene Oase', '忘れられたオアシス', NULL, 14, '14.9', '29.6', '0.0'),
+(32, 325, 'Camp Bluefog', 'Camp Bluefog', 'Camp De Brumebleue', 'Camp Blauer Dunst', 'キャンプ・ブルーフォグ', NULL, 15, '21.8', '30.5', '0.0'),
+(33, 331, 'Ceruleum Processing Plant', 'Ceruleum Processing Plant', 'Usine De Céruleum', 'Erdseim-Fabrik', '青燐精製所', NULL, 15, '20.9', '20.8', '0.0'),
+(34, 411, 'Revenant\'s Toll', 'Revenant\'s Toll', 'Glas Des Revenants', 'Geisterzoll', 'レヴナンツトール', NULL, 16, '16.7', '35.1', '8.6'),
+(35, 388, 'Camp Dragonhead', 'Camp Dragonhead', 'Camp De La Tête Du Dragon', 'Camp Drachenkopf', 'キャンプ・ドラゴンヘッド', NULL, 16, '26.0', '16.8', '0.0'),
+(36, 411, 'Revenant\'s Toll', 'Revenant\'s Toll', 'Glas Des Revenants', 'Geisterzoll', 'レヴナンツトール', NULL, 17, '22.2', '8.1', '0.0');
 
 --
 -- Triggers `aetherytes_arr`
 --
+DROP TRIGGER IF EXISTS `aeth_arr_del`;
 DELIMITER $$
 CREATE TRIGGER `aeth_arr_del` AFTER DELETE ON `aetherytes_arr` FOR EACH ROW BEGIN
 	CALL update_etag('distances_arr');
@@ -111,6 +115,7 @@ CREATE TRIGGER `aeth_arr_del` AFTER DELETE ON `aetherytes_arr` FOR EACH ROW BEGI
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_arr_ins`;
 DELIMITER $$
 CREATE TRIGGER `aeth_arr_ins` AFTER INSERT ON `aetherytes_arr` FOR EACH ROW BEGIN
 	CALL update_etag('distances_arr');
@@ -118,6 +123,7 @@ CREATE TRIGGER `aeth_arr_ins` AFTER INSERT ON `aetherytes_arr` FOR EACH ROW BEGI
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_arr_upd`;
 DELIMITER $$
 CREATE TRIGGER `aeth_arr_upd` AFTER UPDATE ON `aetherytes_arr` FOR EACH ROW BEGIN
 	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.cost <> OLD.cost OR NEW.id_zone <> OLD.id_zone THEN
@@ -131,42 +137,124 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `aetherytes_ew`
+--
+
+DROP TABLE IF EXISTS `aetherytes_ew`;
+CREATE TABLE IF NOT EXISTS `aetherytes_ew` (
+  `id` tinyint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
+  `x` decimal(3,1) UNSIGNED NOT NULL,
+  `y` decimal(3,1) UNSIGNED NOT NULL,
+  `z` decimal(3,1) DEFAULT NULL,
+  `cost` decimal(3,1) UNSIGNED NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `id_zone` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
+
+--
+-- Dumping data for table `aetherytes_ew`
+--
+
+INSERT INTO `aetherytes_ew` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `z`, `cost`) VALUES
+(1, 0, 'The Archeion', 'The Archeion', 'Archéion', 'Archeion', 'アルケイオン保管院', '公堂保管院', 1, '30.4', '12.0', '0.0', '0.0'),
+(2, 0, 'Sharlayan Hamlet', 'Sharlayan Hamlet', 'Petite Sharlayan', 'Klein-Sharlayan', 'リトルシャーレアン', '小萨雷安', 1, '21.5', '20.4', '-5.0', '0.0'),
+(3, 0, 'Aporia', 'Aporia', 'L\'Aporie', 'Aporia', 'アポリア本部', '无路总部', 1, '6.9', '27.6', '0.0', '0.0'),
+(4, 0, 'Yedlihmad', 'Yedlihmad', 'Yedlihmad', 'Yedlihmad', 'イェドリマン', '新港', 2, '25.4', '34.0', '0.0', '0.0'),
+(5, 0, 'The Great Work', 'The Great Work', 'Le Grand Œuvre', 'Daemirs Werk', 'デミールの遺烈郷', '代米尔遗烈乡', 2, '10.9', '22.3', '0.0', '0.0'),
+(6, 0, 'Palaka\'s Stand', 'Palaka\'s Stand', 'Écoute Des Palaka', 'Palakas Ruh', 'パーラカの里', '波洛伽护法村', 2, '29.5', '16.7', '0.0', '0.0'),
+(7, 0, 'Camp Broken Glass', 'Camp Broken Glass', 'Camp Bris-de-glace', 'Camp Splitterglas', 'キャンプ・ブロークングラス', '破碎营地', 3, '13.4', '31.0', '0.0', '0.0'),
+(8, 0, 'Tertium', 'Tertium', 'Gare De Tertium', 'Tertium', 'テルティウム駅', '第三站', 3, '31.7', '17.8', '0.0', '0.0'),
+(9, 0, 'Sinus Lacrimarum', 'Sinus Lacrimarum', 'Sinus Lacrimarum', 'Sinus Lacrimarum', '涙の入江', '泪湾', 4, '9.9', '34.1', '0.0', '0.0'),
+(10, 0, 'Bestways Burrow', 'Bestways Burrow', 'Halot De Bestway', 'Bestways Rast', 'ベストウェイ・バロー', '最佳威兔洞', 4, '21.7', '11.2', '0.0', '0.0'),
+(11, 0, 'Anagnorisis', 'Anagnorisis', 'L\'Anagnorisis', 'Anagnorisis', 'アナグノリシス天測園', '醒悟天测园', 5, '24.5', '24.2', '0.0', '0.0'),
+(12, 0, 'The Twelve Wonders', 'The Twelve Wonders', 'Les Douze Merveilles', 'Die Zwölf Gärten', '十二節の園', '十二奇园', 5, '9.0', '32.2', '0.0', '0.0'),
+(13, 0, 'Poieten Oikos', 'Poieten Oikos', 'Poièten Oïkos', 'Poieten Oikos', 'ポイエテーン・オイコス', '创作者之家', 5, '10.7', '16.8', '0.0', '0.0'),
+(14, 0, 'Reah Tahra', 'Reah Tahra', 'Reah Tahra', 'Reah Tahra', 'リア・ターラ', '半途终旅', 6, '10.7', '26.8', '0.0', '0.0'),
+(15, 0, 'Abode of the Ea', 'Abode Of The Ea', 'Demeure Des Éas', 'Domizil Der Ea', 'イーアの里', '异亚村落', 6, '23.0', '8.3', '0.0', '0.0'),
+(16, 0, 'Base Omicron', 'Base Omicron', 'Base Des Omicrons', 'Omikron-Basis', 'オミクロンベース', '奥密克戎基地', 6, '31.4', '28.1', '0.0', '0.0');
+
+--
+-- Triggers `aetherytes_ew`
+--
+DROP TRIGGER IF EXISTS `aeth_ew_del`;
+DELIMITER $$
+CREATE TRIGGER `aeth_ew_del` AFTER DELETE ON `aetherytes_ew` FOR EACH ROW BEGIN
+	CALL update_etag('distances_ew');
+	CALL update_etag('aeth_ew');
+END
+$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_ew_ins`;
+DELIMITER $$
+CREATE TRIGGER `aeth_ew_ins` AFTER INSERT ON `aetherytes_ew` FOR EACH ROW BEGIN
+	CALL update_etag('distances_ew');
+	CALL update_etag('aeth_ew');
+END
+$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_ew_upd`;
+DELIMITER $$
+CREATE TRIGGER `aeth_ew_upd` AFTER UPDATE ON `aetherytes_ew` FOR EACH ROW BEGIN
+	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.cost <> OLD.cost OR NEW.id_zone <> OLD.id_zone THEN
+		CALL update_etag('distances_ew');
+    END IF;
+	CALL update_etag('aeth_ew');
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `aetherytes_hw`
 --
 
-CREATE TABLE `aetherytes_hw` (
-  `id` tinyint(3) UNSIGNED NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text NOT NULL,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
-  `id_zone` tinyint(4) NOT NULL,
+DROP TABLE IF EXISTS `aetherytes_hw`;
+CREATE TABLE IF NOT EXISTS `aetherytes_hw` (
+  `id` tinyint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
   `x` decimal(3,1) UNSIGNED NOT NULL,
   `y` decimal(3,1) UNSIGNED NOT NULL,
-  `cost` decimal(3,1) UNSIGNED NOT NULL DEFAULT '0.0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `cost` decimal(3,1) UNSIGNED NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `PK_ID_AETH` (`id`) USING BTREE,
+  KEY `FK_ZONE_AETH` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `aetherytes_hw`
 --
 
 INSERT INTO `aetherytes_hw` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `cost`) VALUES
-(1, 2204, 'Falcon\'s Nest', 'Falcon\'s Nest', 'Nid Du Faucon', 'Falkenhorst', 'ファルコンネスト', '隼巢', 1, 32.1, 36.6, 0.0),
-(2, 2116, 'Camp Cloudtop', 'Camp Cloudtop', 'Camp De Cime-des-nuages', 'Camp Wolkenwipfel', 'キャンプ・クラウドトップ', '云顶营地', 2, 10.3, 33.5, 0.0),
-(3, 2123, 'Ok\' Zundu', 'Ok\' Zundu', 'Ok\' Zundu', 'Ok\' Zundo', 'オク・ズンド', '尊杜集落', 2, 10.4, 14.1, 0.0),
-(4, 2018, 'Tailfeather', 'Tailfeather', 'La Penne', 'Fiederhag', 'テイルフェザー', '尾羽集落', 3, 33.2, 23.1, 0.0),
-(5, 2025, 'Anyx Trine', 'Anyx Trine', 'Annexe Trine', 'Trinär-Annex', '不浄の三塔', '不洁三塔', 3, 16.4, 23.2, 0.0),
-(6, 2042, 'Moghome', 'Moghome', 'Nid-Mog', 'Moglingen', 'モグモグホーム', '莫古力之家', 4, 27.6, 34.4, 0.0),
-(7, 2046, 'Zenith', 'Zenith', 'Zénith', 'Kreidetempel', '白亜の宮殿', '天极白垩宫', 4, 10.9, 28.9, 0.0),
-(8, 2082, 'Idyllshire', 'Idyllshire', 'Idyllée', 'Frohehalde', 'イディルシャイア', '田园郡', 5, 14.0, 11.0, 5.2),
-(9, 2131, 'Helix', 'Helix', 'Hélice', 'Helix', 'ポート・ヘリックス', '螺旋港', 6, 8.0, 10.5, 0.0);
+(1, 2204, 'Falcon\'s Nest', 'Falcon\'s Nest', 'Nid Du Faucon', 'Falkenhorst', 'ファルコンネスト', '隼巢', 1, '32.1', '36.6', '0.0'),
+(2, 2116, 'Camp Cloudtop', 'Camp Cloudtop', 'Camp De Cime-des-nuages', 'Camp Wolkenwipfel', 'キャンプ・クラウドトップ', '云顶营地', 2, '10.3', '33.5', '0.0'),
+(3, 2123, 'Ok\' Zundu', 'Ok\' Zundu', 'Ok\' Zundu', 'Ok\' Zundo', 'オク・ズンド', '尊杜集落', 2, '10.4', '14.1', '0.0'),
+(4, 2018, 'Tailfeather', 'Tailfeather', 'La Penne', 'Fiederhag', 'テイルフェザー', '尾羽集落', 3, '33.2', '23.1', '0.0'),
+(5, 2025, 'Anyx Trine', 'Anyx Trine', 'Annexe Trine', 'Trinär-Annex', '不浄の三塔', '不洁三塔', 3, '16.4', '23.2', '0.0'),
+(6, 2042, 'Moghome', 'Moghome', 'Nid-Mog', 'Moglingen', 'モグモグホーム', '莫古力之家', 4, '27.6', '34.4', '0.0'),
+(7, 2046, 'Zenith', 'Zenith', 'Zénith', 'Kreidetempel', '白亜の宮殿', '天极白垩宫', 4, '10.9', '28.9', '0.0'),
+(8, 2082, 'Idyllshire', 'Idyllshire', 'Idyllée', 'Frohehalde', 'イディルシャイア', '田园郡', 5, '14.0', '11.0', '5.2'),
+(9, 2131, 'Helix', 'Helix', 'Hélice', 'Helix', 'ポート・ヘリックス', '螺旋港', 6, '8.0', '10.5', '0.0');
 
 --
 -- Triggers `aetherytes_hw`
 --
+DROP TRIGGER IF EXISTS `aeth_hw_del`;
 DELIMITER $$
 CREATE TRIGGER `aeth_hw_del` AFTER DELETE ON `aetherytes_hw` FOR EACH ROW BEGIN
 	CALL update_etag('distances_hw');
@@ -174,6 +262,7 @@ CREATE TRIGGER `aeth_hw_del` AFTER DELETE ON `aetherytes_hw` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_hw_ins`;
 DELIMITER $$
 CREATE TRIGGER `aeth_hw_ins` AFTER INSERT ON `aetherytes_hw` FOR EACH ROW BEGIN
 	CALL update_etag('distances_hw');
@@ -181,6 +270,7 @@ CREATE TRIGGER `aeth_hw_ins` AFTER INSERT ON `aetherytes_hw` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_hw_upd`;
 DELIMITER $$
 CREATE TRIGGER `aeth_hw_upd` AFTER UPDATE ON `aetherytes_hw` FOR EACH ROW BEGIN
 	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.cost <> OLD.cost OR NEW.id_zone <> OLD.id_zone THEN
@@ -197,46 +287,51 @@ DELIMITER ;
 -- Table structure for table `aetherytes_sb`
 --
 
-CREATE TABLE `aetherytes_sb` (
-  `id` tinyint(3) UNSIGNED NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
-  `id_zone` tinyint(4) NOT NULL,
+DROP TABLE IF EXISTS `aetherytes_sb`;
+CREATE TABLE IF NOT EXISTS `aetherytes_sb` (
+  `id` tinyint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
   `x` decimal(3,1) UNSIGNED NOT NULL,
   `y` decimal(3,1) UNSIGNED NOT NULL,
-  `cost` decimal(3,1) UNSIGNED NOT NULL DEFAULT '0.0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `cost` decimal(3,1) UNSIGNED NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `PK_ID_AETH` (`id`) USING BTREE,
+  KEY `FK_ZONE_AETH` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `aetherytes_sb`
 --
 
 INSERT INTO `aetherytes_sb` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `cost`) VALUES
-(1, 2613, 'Castrum Oriens', 'Castrum Oriens', 'Castrum Oriens', 'Castrum Oriens', 'カストルム・オリエンス', '帝国东方堡', 1, 8.8, 11.3, 0.0),
-(2, 2634, 'The Peering Stones', 'The Peering Stones', 'Rochers D\'aguet', 'Die Spähenden Steine', 'ピーリングストーンズ', '对等石', 1, 29.8, 26.5, 0.0),
-(3, 2504, 'Rhalgr\'s Reach', 'Rhalgr\'s Reach', 'Temple Du Poing (entrée)', 'Rhalgrs Wacht', 'ラールガーズリーチ', '神拳痕', 1, 30.5, 10.7, 5.2),
-(4, 2646, 'Ala Gannha', 'Ala Gannha', 'Ala Gannha', 'Ala Gannha', 'アラガーナ', '阿拉加纳', 2, 23.8, 6.5, 0.0),
-(5, 2660, 'Ala Ghiri', 'Ala Ghiri', 'Ala Ghiri', 'Ala Ghiri', 'アラギリ', '阿拉基利', 2, 16.0, 36.3, 0.0),
-(6, 2504, 'Rhalgr\'s Reach', 'Rhalgr\'s Reach', 'Temple Du Poing (entrée)', 'Rhalgrs Wacht', 'ラールガーズリーチ', '神拳痕', 2, 9.0, 7.0, 5.2),
-(7, 2404, 'Kugane', 'Kugane', 'Kugane', 'Kugane', 'クガネ', '黄金港', 3, 38.4, 38.3, 5.2),
-(8, 2773, 'Onokoro', 'Onokoro', 'Onokoro', 'Onokoro', 'オノコロ島', '自凝岛', 3, 23.2, 9.7, 0.0),
-(9, 2769, 'Tamamizu', 'Tamamizu', 'Tamamizu', 'Tamamizu', '碧のタマミズ', '碧玉水', 3, 28.6, 16.2, 5.2),
-(10, 2793, 'Namai', 'Namai', 'Namai', 'Namai', 'ナマイ村', '茨菰村', 4, 30.1, 19.6, 0.0),
-(11, 2805, 'The House of the Fierce', 'The House of the Fierce', 'Cercle Des Intrépides', 'Klause Der Grimmigen', '烈士庵', '烈士庵', 4, 26.3, 13.3, 0.0),
-(12, 2814, 'Reunion', 'Reunion', 'Ralliement', 'Reunion', '再会の市', '重逢集市', 5, 32.5, 28.2, 0.0),
-(13, 2822, 'The Dawn Throne', 'The Dawn Throne', 'Trône De L\'Aube', 'Morgenthron', '明けの玉座', '晨曦王座', 5, 23.0, 22.1, 0.0),
-(14, 2670, 'Porta Praetoria', 'Porta Praetoria', 'Porta Praetoria', 'Porta Praetoria', 'ポルタ・プレトリア', '天营门', 6, 8.4, 21.1, 0.0),
-(15, 2693, 'The Ala Mhigan Quarter', 'The Ala Mhigan Quarter', 'Faubourg Mhigois', 'Mhigisches Wohnviertel', 'アラミガン・クォーター', '阿拉米格人居住区', 6, 34.0, 34.0, 0.0),
-(16, 2850, 'Dhoro Iloh', 'Dhoro Iloh', 'Dhoro Iloh', 'Dhoro Iloh', 'ドーロ・イロー', 'Dhoro Iloh', 5, 6.4, 23.8, 0.0);
+(1, 2613, 'Castrum Oriens', 'Castrum Oriens', 'Castrum Oriens', 'Castrum Oriens', 'カストルム・オリエンス', '帝国东方堡', 1, '8.8', '11.3', '0.0'),
+(2, 2634, 'The Peering Stones', 'The Peering Stones', 'Rochers D\'aguet', 'Die Spähenden Steine', 'ピーリングストーンズ', '对等石', 1, '29.8', '26.5', '0.0'),
+(3, 2504, 'Rhalgr\'s Reach', 'Rhalgr\'s Reach', 'Temple Du Poing (entrée)', 'Rhalgrs Wacht', 'ラールガーズリーチ', '神拳痕', 1, '30.5', '10.7', '5.2'),
+(4, 2646, 'Ala Gannha', 'Ala Gannha', 'Ala Gannha', 'Ala Gannha', 'アラガーナ', '阿拉加纳', 2, '23.8', '6.5', '0.0'),
+(5, 2660, 'Ala Ghiri', 'Ala Ghiri', 'Ala Ghiri', 'Ala Ghiri', 'アラギリ', '阿拉基利', 2, '16.0', '36.3', '0.0'),
+(6, 2504, 'Rhalgr\'s Reach', 'Rhalgr\'s Reach', 'Temple Du Poing (entrée)', 'Rhalgrs Wacht', 'ラールガーズリーチ', '神拳痕', 2, '9.0', '7.0', '5.2'),
+(7, 2404, 'Kugane', 'Kugane', 'Kugane', 'Kugane', 'クガネ', '黄金港', 3, '38.4', '38.3', '5.2'),
+(8, 2773, 'Onokoro', 'Onokoro', 'Onokoro', 'Onokoro', 'オノコロ島', '自凝岛', 3, '23.2', '9.7', '0.0'),
+(9, 2769, 'Tamamizu', 'Tamamizu', 'Tamamizu', 'Tamamizu', '碧のタマミズ', '碧玉水', 3, '28.6', '16.2', '5.2'),
+(10, 2793, 'Namai', 'Namai', 'Namai', 'Namai', 'ナマイ村', '茨菰村', 4, '30.1', '19.6', '0.0'),
+(11, 2805, 'The House of the Fierce', 'The House of the Fierce', 'Cercle Des Intrépides', 'Klause Der Grimmigen', '烈士庵', '烈士庵', 4, '26.3', '13.3', '0.0'),
+(12, 2814, 'Reunion', 'Reunion', 'Ralliement', 'Reunion', '再会の市', '重逢集市', 5, '32.5', '28.2', '0.0'),
+(13, 2822, 'The Dawn Throne', 'The Dawn Throne', 'Trône De L\'Aube', 'Morgenthron', '明けの玉座', '晨曦王座', 5, '23.0', '22.1', '0.0'),
+(14, 2670, 'Porta Praetoria', 'Porta Praetoria', 'Porta Praetoria', 'Porta Praetoria', 'ポルタ・プレトリア', '天营门', 6, '8.4', '21.1', '0.0'),
+(15, 2693, 'The Ala Mhigan Quarter', 'The Ala Mhigan Quarter', 'Faubourg Mhigois', 'Mhigisches Wohnviertel', 'アラミガン・クォーター', '阿拉米格人居住区', 6, '34.0', '34.0', '0.0'),
+(16, 2850, 'Dhoro Iloh', 'Dhoro Iloh', 'Dhoro Iloh', 'Dhoro Iloh', 'ドーロ・イロー', 'Dhoro Iloh', 5, '6.4', '23.8', '0.0');
 
 --
 -- Triggers `aetherytes_sb`
 --
+DROP TRIGGER IF EXISTS `aeth_sb_del`;
 DELIMITER $$
 CREATE TRIGGER `aeth_sb_del` AFTER DELETE ON `aetherytes_sb` FOR EACH ROW BEGIN
 	CALL update_etag('distances_sb');
@@ -244,6 +339,7 @@ CREATE TRIGGER `aeth_sb_del` AFTER DELETE ON `aetherytes_sb` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_sb_ins`;
 DELIMITER $$
 CREATE TRIGGER `aeth_sb_ins` AFTER INSERT ON `aetherytes_sb` FOR EACH ROW BEGIN
 	CALL update_etag('distances_sb');
@@ -251,6 +347,7 @@ CREATE TRIGGER `aeth_sb_ins` AFTER INSERT ON `aetherytes_sb` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_sb_upd`;
 DELIMITER $$
 CREATE TRIGGER `aeth_sb_upd` AFTER UPDATE ON `aetherytes_sb` FOR EACH ROW BEGIN
 	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.cost <> OLD.cost OR NEW.id_zone <> OLD.id_zone THEN
@@ -267,48 +364,52 @@ DELIMITER ;
 -- Table structure for table `aetherytes_shb`
 --
 
-CREATE TABLE `aetherytes_shb` (
-  `id` tinyint(3) UNSIGNED NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text NOT NULL,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
-  `id_zone` tinyint(4) NOT NULL,
+DROP TABLE IF EXISTS `aetherytes_shb`;
+CREATE TABLE IF NOT EXISTS `aetherytes_shb` (
+  `id` tinyint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
   `x` decimal(3,1) UNSIGNED NOT NULL,
   `y` decimal(3,1) UNSIGNED NOT NULL,
   `z` decimal(3,1) DEFAULT NULL,
-  `cost` decimal(3,1) UNSIGNED NOT NULL DEFAULT '0.0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `cost` decimal(3,1) UNSIGNED NOT NULL DEFAULT '0.0',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `id_zone` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `aetherytes_shb`
 --
 
 INSERT INTO `aetherytes_shb` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `z`, `cost`) VALUES
-(1, 3335, 'The Crystarium => Tessellation (Lakeland)', 'The Crystarium => Tessellation (Lakeland)', 'Cristarium => Le Pavage', 'Crystarium => Mosaikbrücke (ins Seenland)', 'クリスタリウム => テセレーション鉄橋（レイクランド方面）', NULL, 1, 38.0, 29.6, 0.3, 5.2),
-(2, 3044, 'Fort Jobb', 'Fort Jobb', 'Fort Jobb', 'Jobb-Feste', 'ジョッブ砦', '乔布要塞', 1, 36.5, 20.9, 0.2, 0.0),
-(3, 3057, 'The Ostall Imperative', 'The Ostall Imperative', 'L\'Impératif d\'Ostall', 'Ostalls Befehl', 'オスタル厳命城', '奥斯塔尔严命城', 1, 6.7, 16.8, 0.5, 0.0),
-(4, 3351, 'Eulmore => The Path to Glory (Kholusia)', 'Eulmore => The Path to Glory (Kholusia)', 'Eulmore => Marches de la Gloire (Kholusia)', 'Eulmore => Pfad zum Ruhm (Kholusia)', 'ユールモア => 栄光の道（コルシア島方面）', NULL, 2, 24.9, 38.4, 0.5, 5.2),
-(5, 3075, 'Stilltide', 'Stilltide', 'Douceonde', 'Stillwasser', 'スティルタイド', '滞潮村', 2, 34.8, 27.2, 0.2, 0.0),
-(6, 3094, 'Wright', 'Wright', 'Cherpant', 'Werfting', 'ライト村', '工匠村', 2, 16.6, 29.1, 0.1, 0.0),
-(7, 3105, 'Tomra', 'Tomra', 'Tomra', 'Tomra', 'トメラの村', '图姆拉村', 2, 12.9, 8.9, 4.1, 0.0),
-(8, 3122, 'Mord Souq', 'Mord Souq', 'Mord Souq', 'Mordh Souq', 'モルド・スーク', '鼹灵集市', 3, 26.4, 17.0, 1.2, 0.0),
-(9, 3129, 'The Inn At Journey\'s Head', 'The Inn At Journey\'s Head', 'Auberge du Grand Départ', 'Ruhstatt vor der Langen Reise', '旅立ちの宿', '上路客店', 3, 29.4, 27.6, 0.9, 0.0),
-(10, 3135, 'Twine', 'Twine', 'Queues-liées', 'Pfotenschlag', 'トゥワイン', '络尾聚落', 3, 11.2, 17.1, 1.6, 0.0),
-(11, 3147, 'Lydha Lran', 'Lydha Lran', 'Lydha Lran', 'Lydha Lran', 'リダ・ラーン', '群花馆', 4, 14.5, 31.6, 0.4, 0.0),
-(12, 3156, 'Pla Enni', 'Pla Enni', 'Pla Enni', 'Pla Enni', 'プラ・エンニ茸窟', NULL, 4, 20.0, 4.3, 1.0, 6.4),
-(13, 3157, 'Wolekdorf', 'Wolekdorf', 'Wolekdorf', 'Wolekdorf', 'ヴォレクドルフ', '云村', 4, 29.1, 7.7, 0.8, 0.0),
-(14, 3170, 'Slitherbough', 'Slitherbough', 'Serpentige', 'Schlangenzweig', 'スリザーバウ', '蛇行枝', 5, 19.3, 27.4, -0.2, 0.0),
-(15, 3179, 'Fanow', 'Fanow', 'Fanow', 'Fanow', 'ファノヴの里', '法诺村', 5, 29.1, 17.6, 0.2, 0.0),
-(16, 3195, 'The Ondo Cups', 'The Ondo Cups', 'Baïne', 'Ondo-Becken', 'オンドの潮溜まり', '鳍人潮池', 6, 32.6, 17.4, -2.0, 0.0),
-(17, 3205, 'The Macarenses Angle', 'The Macarenses Angle', 'Carré macarien', 'Macarenses-Forum', 'マカレンサス広場', '马克连萨斯广场', 6, 18.6, 25.9, -8.3, 0.0);
+(1, 3335, 'The Crystarium => Tessellation (Lakeland)', 'The Crystarium => Tessellation (Lakeland)', 'Cristarium => Le Pavage', 'Crystarium => Mosaikbrücke (ins Seenland)', 'クリスタリウム => テセレーション鉄橋（レイクランド方面）', NULL, 1, '38.0', '29.6', '0.3', '5.2'),
+(2, 3044, 'Fort Jobb', 'Fort Jobb', 'Fort Jobb', 'Jobb-Feste', 'ジョッブ砦', '乔布要塞', 1, '36.5', '20.9', '0.2', '0.0'),
+(3, 3057, 'The Ostall Imperative', 'The Ostall Imperative', 'L\'Impératif d\'Ostall', 'Ostalls Befehl', 'オスタル厳命城', '奥斯塔尔严命城', 1, '6.7', '16.8', '0.5', '0.0'),
+(4, 3351, 'Eulmore => The Path to Glory (Kholusia)', 'Eulmore => The Path to Glory (Kholusia)', 'Eulmore => Marches de la Gloire (Kholusia)', 'Eulmore => Pfad zum Ruhm (Kholusia)', 'ユールモア => 栄光の道（コルシア島方面）', NULL, 2, '24.9', '38.4', '0.5', '5.2'),
+(5, 3075, 'Stilltide', 'Stilltide', 'Douceonde', 'Stillwasser', 'スティルタイド', '滞潮村', 2, '34.8', '27.2', '0.2', '0.0'),
+(6, 3094, 'Wright', 'Wright', 'Cherpant', 'Werfting', 'ライト村', '工匠村', 2, '16.6', '29.1', '0.1', '0.0'),
+(7, 3105, 'Tomra', 'Tomra', 'Tomra', 'Tomra', 'トメラの村', '图姆拉村', 2, '12.9', '8.9', '4.1', '0.0'),
+(8, 3122, 'Mord Souq', 'Mord Souq', 'Mord Souq', 'Mordh Souq', 'モルド・スーク', '鼹灵集市', 3, '26.4', '17.0', '1.2', '0.0'),
+(9, 3129, 'The Inn At Journey\'s Head', 'The Inn At Journey\'s Head', 'Auberge du Grand Départ', 'Ruhstatt vor der Langen Reise', '旅立ちの宿', '上路客店', 3, '29.4', '27.6', '0.9', '0.0'),
+(10, 3135, 'Twine', 'Twine', 'Queues-liées', 'Pfotenschlag', 'トゥワイン', '络尾聚落', 3, '11.2', '17.1', '1.6', '0.0'),
+(11, 3147, 'Lydha Lran', 'Lydha Lran', 'Lydha Lran', 'Lydha Lran', 'リダ・ラーン', '群花馆', 4, '14.5', '31.6', '0.4', '0.0'),
+(12, 3156, 'Pla Enni', 'Pla Enni', 'Pla Enni', 'Pla Enni', 'プラ・エンニ茸窟', NULL, 4, '20.0', '4.3', '1.0', '6.4'),
+(13, 3157, 'Wolekdorf', 'Wolekdorf', 'Wolekdorf', 'Wolekdorf', 'ヴォレクドルフ', '云村', 4, '29.1', '7.7', '0.8', '0.0'),
+(14, 3170, 'Slitherbough', 'Slitherbough', 'Serpentige', 'Schlangenzweig', 'スリザーバウ', '蛇行枝', 5, '19.3', '27.4', '-0.2', '0.0'),
+(15, 3179, 'Fanow', 'Fanow', 'Fanow', 'Fanow', 'ファノヴの里', '法诺村', 5, '29.1', '17.6', '0.2', '0.0'),
+(16, 3195, 'The Ondo Cups', 'The Ondo Cups', 'Baïne', 'Ondo-Becken', 'オンドの潮溜まり', '鳍人潮池', 6, '32.6', '17.4', '-2.0', '0.0'),
+(17, 3205, 'The Macarenses Angle', 'The Macarenses Angle', 'Carré macarien', 'Macarenses-Forum', 'マカレンサス広場', '马克连萨斯广场', 6, '18.6', '25.9', '-8.3', '0.0');
 
 --
 -- Triggers `aetherytes_shb`
 --
+DROP TRIGGER IF EXISTS `aeth_shb_del`;
 DELIMITER $$
 CREATE TRIGGER `aeth_shb_del` AFTER DELETE ON `aetherytes_shb` FOR EACH ROW BEGIN
 	CALL update_etag('distances_shb');
@@ -316,6 +417,7 @@ CREATE TRIGGER `aeth_shb_del` AFTER DELETE ON `aetherytes_shb` FOR EACH ROW BEGI
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_shb_ins`;
 DELIMITER $$
 CREATE TRIGGER `aeth_shb_ins` AFTER INSERT ON `aetherytes_shb` FOR EACH ROW BEGIN
 	CALL update_etag('distances_shb');
@@ -323,6 +425,7 @@ CREATE TRIGGER `aeth_shb_ins` AFTER INSERT ON `aetherytes_shb` FOR EACH ROW BEGI
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `aeth_shb_upd`;
 DELIMITER $$
 CREATE TRIGGER `aeth_shb_upd` AFTER UPDATE ON `aetherytes_shb` FOR EACH ROW BEGIN
 	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.cost <> OLD.cost OR NEW.id_zone <> OLD.id_zone THEN
@@ -339,10 +442,12 @@ DELIMITER ;
 -- Table structure for table `etags`
 --
 
-CREATE TABLE `etags` (
-  `item` varchar(20) NOT NULL,
-  `etag` varchar(14) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `etags`;
+CREATE TABLE IF NOT EXISTS `etags` (
+  `item` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `etag` varchar(14) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  PRIMARY KEY (`item`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `etags`
@@ -365,8 +470,12 @@ INSERT INTO `etags` (`item`, `etag`) VALUES
 ('zones_sb', '2020020272512'),
 ('zones_shb', '2020020272512'),
 ('distances_shb', '2020020272512'),
-('aeth_shb', '2020020272510'),
-('mobs_shb', '2020020273245');
+('aeth_shb', '2020020272512'),
+('mobs_shb', '2020020272512'),
+('zones_ew', '2022041171305'),
+('distances_ew', '2022041171305'),
+('aeth_ew', '2022041171305'),
+('mobs_ew', '2022041171305');
 
 -- --------------------------------------------------------
 
@@ -374,16 +483,18 @@ INSERT INTO `etags` (`item`, `etag`) VALUES
 -- Table structure for table `fates_arr`
 --
 
-CREATE TABLE `fates_arr` (
-  `id` int(10) NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `fates_arr`;
+CREATE TABLE IF NOT EXISTS `fates_arr` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=959 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `fates_arr`
@@ -1357,962 +1468,966 @@ INSERT INTO `fates_arr` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_d
 -- Table structure for table `mobs_arr`
 --
 
-CREATE TABLE `mobs_arr` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
-  `id_zone` tinyint(4) NOT NULL,
+DROP TABLE IF EXISTS `mobs_arr`;
+CREATE TABLE IF NOT EXISTS `mobs_arr` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
   `x` decimal(3,1) UNSIGNED DEFAULT NULL,
   `y` decimal(3,1) UNSIGNED DEFAULT NULL,
-  `lvl` tinyint(3) DEFAULT NULL,
-  `slain` tinyint(2) DEFAULT NULL,
+  `lvl` tinyint DEFAULT NULL,
+  `slain` tinyint DEFAULT NULL,
   `is_fate` tinyint(1) DEFAULT '0',
-  `id_fate` smallint(5) UNSIGNED DEFAULT NULL,
-  `is_visible` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `is_multiple` tinyint(1) UNSIGNED NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `id_fate` smallint UNSIGNED DEFAULT NULL,
+  `is_visible` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  `is_multiple` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `id_zone` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=1003 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `mobs_arr`
 --
 
 INSERT INTO `mobs_arr` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `lvl`, `slain`, `is_fate`, `id_fate`, `is_visible`, `is_multiple`) VALUES
-(1, 395, 'Bee Cloud', 'Bee Cloud', 'Nuage D\'avettes', 'Bienenwolke', 'ビー・クラウド', NULL, 1, 24.2, 17.1, 7, NULL, 0, NULL, 0, 0),
-(2, 404, 'Bogy', 'Bogy', 'épouvantôme', 'Spukgespenst', 'ボギー', NULL, 1, 20.5, 18.6, 7, NULL, 0, NULL, 0, 0),
-(3, 419, 'Captain Petyr Pigeontoe', 'Captain Petyr Pigeontoe', 'Capitaine Petyr Peton-d\'oie', 'Kapitän Petyr Pigeontoe', 'キャプテン・ピーター', NULL, 1, 20.4, 17.0, 11, NULL, 0, NULL, 0, 0),
-(5, 1320, 'Farmer In Need', 'Farmer In Need', 'Fermier Ennuyé', 'Hilfsbedürftig[a] Bauer', '助けを求める農夫', NULL, 1, 21.8, 15.4, 9, NULL, 1, NULL, 0, 0),
-(6, 953, 'Flower Wespe', 'Flower Wespe', 'Frelon Des Vergers', 'Blumen-Vespula', 'フラワー・ヴェスパ', NULL, 1, 23.0, 17.9, 6, NULL, 0, NULL, 0, 0),
-(7, 367, 'Goblin Fisher', 'Goblin Fisher', 'Pêcheur Gobelin', 'Goblin-Fischer', 'ゴブリン・フィッシャー', NULL, 1, 23.9, 21.8, 5, NULL, 0, NULL, 0, 0),
-(8, 3099, 'Goblin Gambler', 'Goblin Gambler', 'Parieur Gobelin', 'Goblin-Glücksspieler', 'ゴブリン・ギャンブラー', NULL, 1, 23.6, 21.5, 7, NULL, 0, NULL, 0, 0),
-(9, 421, 'Grounded Pirate', 'Grounded Pirate', 'Pirate échoué', 'Gestrandet[a] Pirat', 'グラウンデッド・パイレーツ', NULL, 1, 20.1, 17.1, 9, NULL, 0, NULL, 0, 0),
-(10, 418, 'Grounded Raider', 'Grounded Raider', 'Maraudeur échoué', 'Gestrandet[a] Räuber', 'グラウンデッド・レイダー', NULL, 1, 20.3, 16.8, 5, NULL, 0, NULL, 0, 0),
-(11, 893, 'King Wespe', 'King Wespe', 'Frelon Royal', 'Vespula-Königin', 'キング・ヴェスパ', NULL, 1, 14.1, 14.8, 13, NULL, 1, NULL, 0, 0),
-(12, 392, 'Lost Lamb', 'Lost Lamb', 'Agneau égaré', 'Schaf', 'シープ', NULL, 1, 22.5, 25.3, 4, NULL, 0, NULL, 0, 0),
-(13, 561, 'Megalocrab', 'Megalocrab', 'Mégalocrabe', 'Megalokrabbe', 'メガロクラブ', NULL, 1, 21.2, 37.6, 13, NULL, 0, NULL, 0, 1),
-(14, 354, 'Mossless Goobbue', 'Mossless Goobbue', 'Goobbue Dépouillé', 'Flechten-Goobbue', 'モスレスグゥーブー', NULL, 1, 20.4, 16.2, 12, NULL, 0, NULL, 0, 1),
-(15, 833, 'Pack Jackal', 'Pack Jackal', 'Chacal En Meute', 'Rottenschakal', 'パックジャッカル', NULL, 1, 17.5, 9.4, 11, NULL, 1, NULL, 0, 0),
-(16, 640, 'Pugil', 'Pugil', 'Pugil', 'Pugil', 'プギル', NULL, 1, 23.7, 22.1, 4, NULL, 0, NULL, 0, 0),
-(17, 401, 'Puk Hatchling', 'Puk Hatchling', 'Jeune Puk', 'Jung[a] Puk', 'プーク・ハッチリング', NULL, 1, 20.8, 22.1, 4, NULL, 0, NULL, 0, 0),
-(18, 3183, 'Qiqirn Plucker', 'Qiqirn Plucker', 'Qiqirn Plumeur', 'Qiqirn-Pflücker', 'キキルン・プラッカー', NULL, 1, 21.6, 15.5, 20, NULL, 0, NULL, 0, 0),
-(19, 3184, 'Qiqirn Roostkeep', 'Qiqirn Roostkeep', 'Qiqirn Garde-poulailler', 'Qiqirn-Hühnerhirte', 'キキルン・ルーストキープ', NULL, 1, 21.7, 15.5, 20, NULL, 0, NULL, 0, 0),
-(20, 850, 'Shearing Sheridan', 'Shearing Sheridan', 'Sheridan Le Découpeur', 'Sheridan', 'シアリング・シェリダン', NULL, 1, 16.3, 14.3, 10, NULL, 1, NULL, 0, 0),
-(22, 1331, 'Storm Sergeant', 'Storm Sergeant', 'Sergent Des Tempêtes', 'Mahlstrom-Maat', '黒渦団甲軍曹', NULL, 1, 17.5, 8.8, 14, NULL, 1, NULL, 0, 0),
-(23, 405, 'Tiny Mandragora', 'Tiny Mandragora', 'Mini-mandragore', 'Winzig[a] Mandragora', 'タイニー・マンドラゴラ', NULL, 1, 18.3, 16.3, 7, NULL, 0, NULL, 0, 1),
-(24, 641, 'Wespe', 'Wespe', 'Frelon', 'Vespula', 'ヴェスパ', NULL, 1, 14.5, 14.4, 12, NULL, 0, NULL, 0, 0),
-(25, 358, 'Wounded Aurochs', 'Wounded Aurochs', 'Auroch Blessé', 'Verwundet[a] Auerochse', 'ウーンデッド・オーロックス', NULL, 1, 18.9, 17.2, 8, NULL, 0, NULL, 0, 0),
-(26, 853, 'Ahctstymm Shadowlurker', 'Ahctstymm Shadowlurker', 'Ahctstymm Le Clandestin', 'Ahctstymm', '密航のアクトシュティム', NULL, 2, 21.5, 37.8, 11, NULL, 1, NULL, 0, 0),
-(27, 563, 'Aurelia', 'Aurelia', 'Aurélie', 'Aurelia', 'オーレリア', NULL, 2, 25.3, 22.6, 3, NULL, 0, NULL, 0, 1),
-(29, 895, 'Cane Toad', 'Cane Toad', 'Crapaud Buffle', 'Aga-Kröte', 'ケーントード', NULL, 2, 23.7, 22.4, 2, NULL, 1, NULL, 0, 0),
-(30, 364, 'Cave Bat', 'Cave Bat', 'Chauve-souris Cavernicole', 'Höhlenfledermaus', 'ケーブバット', NULL, 2, 27.0, 15.9, 7, NULL, 0, NULL, 0, 0),
-(31, 408, 'Galago', 'Galago', 'Galago', 'Galago', 'ガラゴ', NULL, 2, 30.7, 14.6, 8, NULL, 0, NULL, 0, 0),
-(32, 368, 'Kobold Dustman', 'Kobold Dustman', 'éboueur Kobold', 'Kobold-Schuttfeger', 'コボルド・ダストマン', NULL, 2, 31.9, 12.3, 9, NULL, 0, NULL, 0, 0),
-(33, 378, 'Kobold Potman', 'Kobold Potman', 'Serviteur Kobold', 'Kobold-Kollektor', 'コボルド・ポットマン', NULL, 2, 32.3, 12.7, 9, NULL, 1, NULL, 0, 0),
-(34, 372, 'Kobold Supplicant', 'Kobold Supplicant', 'Suppliant Kobold', 'Kobold-Bittsteller', 'コボルド・サプリカント', NULL, 2, 31.6, 13.2, 7, NULL, 0, NULL, 0, 0),
-(35, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 2, 18.8, 34.7, 30, NULL, 0, NULL, 0, 1),
-(36, 1357, 'Mandragora Prince', 'Mandragora Prince', 'Prince Mandragore', 'Mandra-Prinz', 'マンドラプリンス', NULL, 2, 20.1, 37.4, 13, 1, 1, 19, 1, 0),
-(37, 409, 'Moraby Mole', 'Moraby Mole', 'Taupe De Moraby', 'Moraby-Mull', 'モラビーモール', NULL, 2, 20.3, 34.9, 12, NULL, 0, NULL, 0, 0),
-(38, 299, 'Nesting Buzzard', 'Nesting Buzzard', 'Jeune Busard', 'Nistend[a] Bussard', 'ネストリング・バザード', NULL, 2, 32.7, 17.0, 6, NULL, 0, NULL, 0, 1),
-(39, 857, 'Padfoot', 'Padfoot', 'Patte-molle', 'Plattfuß', 'パッドフット', NULL, 2, 20.5, 33.5, 10, 1, 1, 23, 1, 0),
-(40, 350, 'Qiqirn Eggdigger', 'Qiqirn Eggdigger', 'Qiqirn Déterre-œuf', 'Qiqirn-Strandguträuber', 'キキルン・ビーチコンバー', NULL, 2, 18.2, 34.9, 13, NULL, 0, NULL, 0, 0),
-(41, 1334, 'Red Rooster Tiller', 'Red Rooster Tiller', 'Métayer Du Coq Rouge', 'Gockelburg-Bauer', 'レッドルースター農場の農夫', NULL, 2, 27.2, 17.9, 1, NULL, 1, NULL, 0, 0),
-(42, 349, 'Rivertoad', 'Rivertoad', 'Crapaud De Rivière', 'Flusskröte', 'リバートード', NULL, 2, 23.8, 21.6, 4, NULL, 0, NULL, 0, 0),
-(43, 201, 'Syrphid Cloud', 'Syrphid Cloud', 'Nuage De Syrphes', 'Mistfliegenwolke', 'サーフィド・クラウド', NULL, 2, 20.2, 15.2, 9, NULL, 0, NULL, 0, 1),
-(781, 1517, 'Metshaldjas', 'Metshaldjas', 'Metshaldjas', 'Metshaldjas', 'メツハルジャス', NULL, 3, 18.0, 25.0, 32, 1, 1, 20, 1, 0),
-(45, 1272, 'Yellowjacket Patrol', 'Yellowjacket Patrol', 'Casaque Jaune', 'Gelbjacken-Wache', 'イエロージャケット警備兵', NULL, 2, 20.8, 30.6, 35, NULL, 0, NULL, 0, 1),
-(46, 1337, 'Yellowjacket Veteran', 'Yellowjacket Veteran', 'Vétéran Des Casaques Jaunes', 'Gelbjacken-Veteran', '熟練の警備兵', NULL, 2, 21.3, 38.5, 11, NULL, 1, NULL, 0, 0),
-(47, 1823, '2nd Cohort Eques', '2nd Cohort Eques', 'Eques De La 2e Cohorte', 'Eques[p] Der II. Kohorte', 'IIコホルス・エクエス', NULL, 3, 27.8, 20.9, 49, 3, 0, NULL, 1, 0),
-(48, 1821, '2nd Cohort Hoplomachus', '2nd Cohort Hoplomachus', 'Hoplomachus De La 2e Cohorte', 'Hoplomachus[p] Der II. Kohorte', 'IIコホルス・ホプロマクス', NULL, 3, 28.9, 21.1, 49, NULL, 0, NULL, 0, 0),
-(49, 1822, '2nd Cohort Laquearius', '2nd Cohort Laquearius', 'Laquearius De La 2e Cohorte', 'Laquearius[p] Der II. Kohorte', 'IIコホルス・ラクエリウス', NULL, 3, 25.6, 20.9, 49, 3, 0, NULL, 1, 0),
-(50, 1824, '2nd Cohort Secutor', '2nd Cohort Secutor', 'Secutor De La 2e Cohorte', 'Secutor[p] Der II. Kohorte', 'IIコホルス・セクトール', NULL, 3, 27.6, 21.2, 49, NULL, 0, NULL, 0, 0),
-(51, 1825, '2nd Cohort Signifer', '2nd Cohort Signifer', 'Signifer De La 2e Cohorte', 'Signifer[p] Der II. Kohorte', 'IIコホルス・シグニフェル', NULL, 3, 28.7, 20.9, 49, 3, 0, NULL, 1, 0),
-(52, 1826, '2nd Cohort Vanguard', '2nd Cohort Vanguard', 'Avant-garde De La 2e Cohorte', 'Frontbrecher[p] Der II. Kohorte', 'IIコホルス・ヴァンガード', NULL, 3, 29.3, 20.6, 50, 3, 0, NULL, 1, 0),
-(53, 1201, 'Acubens', 'Acubens', 'Acubens', 'Acubens', 'アクベンス', NULL, 3, 31.1, 35.4, 30, NULL, 1, NULL, 0, 0),
-(770, 1506, 'Cindersoot Pegujj Chah', 'Cindersoot Pegujj Chah', 'Pegujj Chah Le Fuligineux', 'Zunderruß Pegujj Chah', '黒煙のペグジ・チャー', NULL, 14, 24.0, 26.0, 49, 1, 1, 6, 1, 0),
-(55, 341, 'Apkallu', 'Apkallu', 'Apkallu', 'Apkallu', 'アプカル', NULL, 3, 27.5, 35.7, 30, 4, 0, NULL, 1, 0),
-(56, 361, 'Bloodshore Bell', 'Bloodshore Bell', 'Cloche Des Rives Sanglantes', 'Rotgischt-Helmqualle', 'ブラッドショア・ベル', NULL, 3, 31.1, 26.6, 33, 3, 0, NULL, 1, 0),
-(780, 2367, 'Kafre', 'Kafre', 'Kafre', 'Kafre', 'カフレ', NULL, 8, 23.0, 18.0, 49, 1, 1, 15, 1, 0),
-(58, 1608, 'Butting Buffalo', 'Butting Buffalo', 'Buffle Rueur', 'Angriffslustig[a] Büffel', 'バッティング・バッファロー', NULL, 3, 28.2, 28.5, 28, NULL, 1, NULL, 0, 0),
-(59, 1200, 'Cancer', 'Cancer', 'Cancer', 'Cancer', 'キャンサー', NULL, 3, 31.2, 35.5, 32, NULL, 1, NULL, 0, 0),
-(60, 1732, 'Cluster Mantis', 'Cluster Mantis', 'Bébé Mante Rouge', 'Schwarmmantis', 'タイニー・レッドマンティス', NULL, 3, 15.7, 28.1, 30, NULL, 1, NULL, 0, 0),
-(61, 1869, 'Clutch Pelican', 'Clutch Pelican', 'Pélican Rafleur', 'Klauen-Pelikan', 'クラッチ・ペリカン', NULL, 3, 21.8, 31.8, 29, NULL, 1, NULL, 0, 0),
-(62, 1092, 'Coastal Mandragora', 'Coastal Mandragora', 'Mandragore Des Côtes', 'Küsten-Mandragora', 'コスタル・マンドラゴラ', NULL, 3, 30.2, 27.6, 23, NULL, 0, NULL, 0, 0),
-(63, 639, 'Colibri', 'Colibri', 'Colibri', 'Kolibri', 'コリブリ', NULL, 3, 31.9, 25.2, 33, 4, 0, NULL, 1, 0),
-(64, 684, 'Cork Bulb', 'Cork Bulb', 'Bulbe De Liège', 'Korkknolle', 'コルク・バルブ', NULL, 3, 19.6, 25.1, 32, NULL, 0, NULL, 0, 0),
-(65, 396, 'Dung Midge Swarm', 'Dung Midge Swarm', 'Nuée De Moucherons Bousiers', 'Dungmückenschwarm', 'ダンミッヂ・スウォーム', NULL, 3, 16.7, 31.3, 33, NULL, 0, NULL, 0, 0),
-(66, 1274, 'Gegeruju Manor Guard', 'Gegeruju Manor Guard', 'Garde Privé De Gegeruju', 'Gegeruju-Wächter', 'ゲゲルジュ氏の私兵', NULL, 3, 30.8, 29.2, 35, NULL, 0, NULL, 0, 0),
-(67, 366, 'Giant Pelican', 'Giant Pelican', 'Pélican Géant', 'Riesenpelikan', 'ジャイアントペリカン', NULL, 3, 20.5, 33.0, 32, NULL, 0, NULL, 0, 0),
-(68, 26, 'Gigantoad', 'Gigantoad', 'Crapaud Géant', 'Karpfenkröte', 'ギガントード', NULL, 3, 19.1, 26.2, 33, 3, 0, NULL, 1, 0),
-(69, 353, 'Goobbue', 'Goobbue', 'Goobbue', 'Goobbue', 'グゥーブー', NULL, 3, 18.3, 33.9, 33, 3, 0, NULL, 1, 0),
-(70, 411, 'Grass Raptor', 'Grass Raptor', 'Raptor Des Plaines', 'Gras-Raptor', 'グラスラプトル', NULL, 3, 23.0, 21.3, 32, 4, 0, NULL, 1, 0),
-(779, 1520, 'Karkinos', 'Karkinos', 'Karkinos', 'Karkinos', 'カルキノス', NULL, 5, 13.0, 24.0, 21, 1, 1, 16, 1, 0),
-(72, 687, 'Hoary Goobbue', 'Hoary Goobbue', 'Goobbue Chenu', 'Ergraut[a] Goobbue', 'ホアリーグゥーブー', NULL, 3, 22.0, 31.3, 50, NULL, 0, NULL, 0, 0),
-(73, 1855, 'Jijiroon Of The Silver Clutch', 'Jijiroon Of The Silver Clutch', 'Jijiroon Le Pique-argent', 'Jijiroon', '銀卵のジジルン', NULL, 3, 20.5, 31.0, 33, NULL, 1, NULL, 0, 0),
-(74, 352, 'Jungle Coeurl', 'Jungle Coeurl', 'Coeurl Des Jungles', 'Dschungel-Coeurl', 'ジャングルクァール', NULL, 3, 17.8, 28.4, 34, 4, 0, NULL, 1, 0),
-(75, 373, 'Kobold Missionary', 'Kobold Missionary', 'Missionnaire Kobold', 'Kobold-Missionar', 'コボルド・ミッションアリー', NULL, 3, 27.7, 25.5, 34, 4, 0, NULL, 1, 0),
-(76, 369, 'Kobold Pitman', 'Kobold Pitman', 'Mineur Kobold', 'Kobold-Steiger', 'コボルド・ピットマン', NULL, 3, 27.8, 25.9, 34, 4, 0, NULL, 1, 1),
-(77, 858, 'Kokoroon Quickfingers', 'Kokoroon Quickfingers', 'Kokoroon Doigtvifs', 'Kokoroon Drecksgriffel', '弾指のココルン', NULL, 3, 26.3, 32.9, 32, 1, 1, 17, 1, 0),
-(78, 1313, 'Large Buffalo', 'Large Buffalo', 'Buffle', 'Groß[a] Büffel', 'バッファロー', NULL, 3, 30.6, 32.3, 31, 3, 0, NULL, 1, 0),
-(79, 414, 'Mamool Ja Breeder', 'Mamool Ja Breeder', 'éleveur Mamool Ja', 'Mamool Ja-Brüter', 'マムージャ・ブリーダー', NULL, 3, 23.8, 19.9, 31, 3, 0, NULL, 1, 1),
-(80, 415, 'Mamool Ja Sophist', 'Mamool Ja Sophist', 'Sophiste Mamool Ja', 'Mamool Ja-Sophist', 'マムージャ・ソフィスト', NULL, 3, 24.2, 20.4, 29, NULL, 0, NULL, 0, 1),
-(81, 355, 'Mildewed Goobbue', 'Mildewed Goobbue', 'Goobbue Mildiousé', 'Mehltau-Goobbue', 'ミルデューグゥーブー', NULL, 3, 16.9, 32.5, 34, NULL, 0, NULL, 0, 0),
-(82, 1660, 'Off-duty Porter', 'Off-duty Porter', 'Livreur Rentrant Du Travail', 'Träger[p] Außer Dienst', '仕事帰りの荷運び人', NULL, 3, 18.1, 32.1, 37, NULL, 1, NULL, 0, 0),
-(83, 1363, 'Oyster Hunter', 'Oyster Hunter', 'Cueilleuse D\'huîtres', 'Austernsammlerin', '虹蝶貝を探す女', NULL, 3, 31.9, 24.5, 50, NULL, 1, NULL, 0, 0),
-(84, 351, 'Qiqirn Gullroaster', 'Qiqirn Gullroaster', 'Qiqirn Grille-mouette', 'Qiqirn-Möwenbrater', 'キキルン・ガルロースター', NULL, 3, 26.2, 32.2, 32, 3, 0, NULL, 1, 0),
-(85, 2011, 'Restless Harrier', 'Restless Harrier', 'Harceleur Agité', 'Rastlos[a] Plünderer', 'レストレス・ハリアー', NULL, 3, 23.3, 20.3, 40, NULL, 0, NULL, 0, 0),
-(86, 2012, 'Restless Raptor', 'Restless Raptor', 'Raptor Agité', 'Rastlos[a] Raptor', 'レストレス・ラプトル', NULL, 3, 23.4, 20.3, 30, NULL, 0, NULL, 0, 0),
-(87, 894, 'Rutting Buffalo', 'Rutting Buffalo', 'Buffle En Rut', 'Brunftig[a] Büffel', 'ラッティング・バッファロー', NULL, 3, 27.3, 29.5, 28, NULL, 1, NULL, 0, 0),
-(88, 560, 'Snipper', 'Snipper', 'Cisailleur', 'Schnippler', 'スニッパー', NULL, 3, 30.8, 35.5, 32, 4, 0, NULL, 1, 0),
-(90, 1339, 'Thrill-seeking Milksop', 'Thrill-seeking Milksop', 'Homme Craignant Les Fantômes', 'Abergläubisch[a] Angsthase', '亡霊を恐れる男', NULL, 3, 29.7, 30.1, 1, NULL, 1, NULL, 0, 0),
-(91, 1340, 'Thrill-seeking Skeptic', 'Thrill-seeking Skeptic', 'Homme Incrédule', 'Abenteuerlustig[a] Skeptiker', '亡霊を信じない男', NULL, 3, 29.7, 30.1, 1, NULL, 1, NULL, 0, 0),
-(92, 981, 'Yellowjacket', 'Yellowjacket', 'Casaque Jaune', 'Gelbjacken-Seesoldat', 'イエロージャケット陸戦兵', NULL, 3, 23.9, 20.3, 2, NULL, 1, NULL, 0, 1),
-(93, 357, 'Aurochs', 'Aurochs', 'Auroch', 'Auerochse', 'オーロックス', NULL, 4, 29.7, 25.9, 12, NULL, 1, NULL, 0, 0),
-(94, 1831, 'Axolotl', 'Axolotl', 'Axolotl', 'Drakolurch', 'アクソロトル', NULL, 4, 14.1, 15.4, 48, NULL, 0, NULL, 0, 0),
-(95, 1078, 'Bloodsucker Bat', 'Bloodsucker Bat', 'Chauve-souris Suce-sang', 'Blutsauger-Fledermaus', 'ブラッドサッカー・バット', NULL, 4, 28.1, 24.4, 15, NULL, 0, NULL, 0, 0),
-(96, 3133, 'Captain Jacke', 'Captain Jacke', 'Capitaine Jacke', 'Meisterschurke Jack', '双刃のジャック', NULL, 4, 33.4, 27.8, 30, NULL, 0, NULL, 0, 0),
-(97, 1315, 'Cattle Tyrant', 'Cattle Tyrant', 'Moucherolle Querelleur', 'Rinder-Tyrann', 'キャトル・タイラント', NULL, 4, 27.4, 24.5, 18, NULL, 0, NULL, 0, 0),
-(778, 451, 'Yabi Two-tails', 'Yabi Two-tails', 'Yabi Kaatapoh Deux-queues', 'Yabi Zweischwanz', '双尾のヤビ・カータポ', NULL, 9, 14.0, 33.0, 32, 1, 1, 35, 1, 0),
-(99, 1854, 'Dead Man\'s Moan', 'Dead Man\'s Moan', 'Mort Gémissant', 'Totenkläger', 'デッドマン', NULL, 4, 14.6, 36.0, 42, NULL, 0, NULL, 0, 0),
-(100, 363, 'Dusk Bat', 'Dusk Bat', 'Chauve-souris Crépusculaire', 'Dämmerfledermaus', 'ダスクバット', NULL, 4, 27.0, 23.5, 15, NULL, 0, NULL, 0, 0),
-(101, 1027, 'Evenfall Firefly', 'Evenfall Firefly', 'Luciole Du Crépuscule', 'Abendstern-Leuchtkäfer', 'イブンフォール・ファイアフライ', NULL, 4, 27.5, 23.0, 16, NULL, 0, NULL, 0, 0),
-(102, 394, 'Fat Dodo', 'Fat Dodo', 'Dodo Dodu', 'Fett[a] Dodo', 'ファットドードー', NULL, 4, 33.9, 28.7, 12, NULL, 0, NULL, 0, 0),
-(103, 1087, 'Feral Dodo', 'Feral Dodo', 'Dodo Sauvage', 'Verwildert[a] Dodo', 'フェラル・ドードー', NULL, 4, 33.8, 31.1, 11, NULL, 0, NULL, 0, 0),
-(104, 129, 'Firefly', 'Firefly', 'Luciole', 'Leuchtkäfer', 'ファイアフライ', NULL, 4, 23.1, 20.3, 19, NULL, 0, NULL, 0, 1),
-(105, 2531, 'Fresh Whelk Ballista', 'Fresh Whelk Ballista', 'Baliste De Bulot Frais', 'Neuartig[a] Wellhorn-Balliste', 'フレッシュユミール・バリスタ', NULL, 4, 15.6, 14.3, 46, NULL, 0, NULL, 0, 0),
-(106, 1173, 'Galeborn Buccaneer', 'Galeborn Buccaneer', 'Boucanier Des Rafales Cinglantes', 'Sturmgeboren[a] Seeräuber', 'ゲイルボーン・バッカニア', NULL, 4, 32.0, 29.5, 18, NULL, 0, NULL, 0, 0),
-(107, 3142, 'Game Fowl', 'Game Fowl', 'Gibier à Plumes', 'Wildhenne', 'ゲームファウル', NULL, 4, 33.0, 28.0, 15, NULL, 0, NULL, 0, 0),
-(108, 225, 'Goblin Hunter', 'Goblin Hunter', 'Chasseur Gobelin', 'Goblin-Jäger', 'ゴブリン・ハンター', NULL, 4, 26.4, 22.7, 11, NULL, 0, NULL, 0, 1),
-(109, 1360, 'Goblin Trader', 'Goblin Trader', 'Négociant Gobelin', 'Goblin-Händler', 'ゴブリン・トレーダー', NULL, 4, 26.5, 22.7, 18, NULL, 1, NULL, 0, 0),
-(110, 403, 'Hedgemole', 'Hedgemole', 'Héritaupe', 'Stachelmull', 'ヘッジモール', NULL, 4, 26.4, 23.7, 15, NULL, 0, NULL, 0, 0),
-(111, 1369, 'Hysterical Hawker', 'Hysterical Hawker', 'Marchand Contrarié', 'Hysterisch[a] Krämer', '困り果てた商人', NULL, 4, 29.9, 26.0, 15, NULL, 1, NULL, 0, 0),
-(112, 3140, 'Jolly Merchant Barber', 'Jolly Merchant Barber', 'Barbier Du Camelot Fringant', 'Schiffsarzt[p] Der Schädelbande', 'クフサド商船団の船医', NULL, 4, 33.2, 27.8, 15, NULL, 0, NULL, 0, 0),
-(113, 3139, 'Jolly Merchant Lodesman', 'Jolly Merchant Lodesman', 'Pilote Du Camelot Fringant', 'Steuermann[p] Der Schädelbande', 'クフサド商船団の航海士', NULL, 4, 33.3, 27.8, 16, NULL, 0, NULL, 0, 0),
-(114, 3141, 'Jolly Merchant Waister', 'Jolly Merchant Waister', 'Marin Du Camelot Fringant', 'Matrose[p] Der Schädelbande', 'クフサド商船団の甲板員', NULL, 4, 33.1, 27.9, 15, NULL, 0, NULL, 0, 0),
-(115, 644, 'Killer Mantis', 'Killer Mantis', 'Mante Tueuse', 'Killermantis', 'キラーマンティス', NULL, 4, 22.3, 20.7, 16, NULL, 0, NULL, 0, 0),
-(116, 1853, 'Lammergeyer', 'Lammergeyer', 'Gypaète', 'Bartgeier', 'ラマーガイアー', NULL, 4, 12.4, 36.3, 41, NULL, 0, NULL, 1, 0),
-(117, 1062, 'Memeroon', 'Memeroon', 'Memeroon La Nantie', 'Memeroon', '金主のメメルン', NULL, 4, 27.7, 25.6, 19, NULL, 0, NULL, 0, 0),
-(118, 1701, 'Mouu The Puller', 'Mouu The Puller', 'Mouu Le Refluant', 'Mouu [t] Zieher', '引潮のモォウ', NULL, 4, 18.7, 21.8, 45, NULL, 1, NULL, 0, 0),
-(120, 1060, 'O\'adebh Whitemane', 'O\'adebh Whitemane', 'O\'adebh Blanche-chevelure', 'O\'adebh Weißmähne', '白髪のオ・アデブ', NULL, 4, 30.8, 27.5, 18, NULL, 0, NULL, 0, 0),
-(121, 3138, 'Perimu Haurimu Underfoot', 'Perimu Haurimu Underfoot', 'Perimu Haurimu Le Coursier', 'Perimu Haurimu', '追廻のペリム・ハウリム', NULL, 4, 32.9, 27.8, 30, NULL, 0, NULL, 0, 0),
-(122, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 4, 16.5, 31.6, 34, 4, 0, NULL, 1, 1),
-(123, 1852, 'Preying Mantis', 'Preying Mantis', 'Mante Prédatrice', 'Mantis-Dämon', 'マンティスデビル', NULL, 4, 14.2, 35.4, 40, 3, 0, NULL, 1, 0),
-(124, 402, 'Puk Hatchling', 'Puk Hatchling', 'Puk', 'Puk', 'プーク', NULL, 4, 29.8, 25.7, 15, NULL, 0, NULL, 0, 0),
-(125, 2532, 'Reinforced Whelk Ballista', 'Reinforced Whelk Ballista', 'Baliste De Bulot Renforcée', 'Verstärkt[a] Wellhorn-Balliste', '強化ユミール・バリスタ', NULL, 4, 13.0, 14.1, 48, NULL, 0, NULL, 0, 0),
-(126, 420, 'Rhotano Buccaneer', 'Rhotano Buccaneer', 'Boucanier De Rhotano', 'Rhotano-Seeräuber', 'ロータノ・バッカニア', NULL, 4, 33.8, 27.4, 14, NULL, 0, NULL, 0, 0),
-(127, 1171, 'Rope-burned Buccaneer', 'Rope-burned Buccaneer', 'Boucanier Encordé', 'Striemen-Seeräuber', 'ロープボーンド・バッカニア', NULL, 4, 28.6, 23.1, 18, NULL, 0, NULL, 0, 0),
-(128, 400, 'Roseling', 'Roseling', 'Callisia', 'Rösling', 'ローズリング', NULL, 4, 35.1, 30.2, 10, NULL, 0, NULL, 0, 0),
-(129, 1181, 'Rothlyt Pelican', 'Rothlyt Pelican', 'Pélican De Rothlyt', 'Rothlyt-Pelikan', 'ロズリトペリカン', NULL, 4, 23.9, 24.6, 16, NULL, 0, NULL, 0, 0),
-(130, 2165, 'Sahagin Sapper', 'Sahagin Sapper', 'Piquier Sahuagin', 'Sahagin-Sappeur', 'サハギン・サパー', NULL, 4, 21.1, 19.5, 41, NULL, 1, NULL, 0, 0),
-(131, 2166, 'Sahagin Skirmisher', 'Sahagin Skirmisher', 'Escarmoucheur Sahuagin', 'Sahagin-Hellebardier', 'サハギン・スカーミッシャー', NULL, 4, 18.5, 21.9, 42, NULL, 1, NULL, 0, 0),
-(132, 1075, 'Sanguinary Buccaneer', 'Sanguinary Buccaneer', 'Boucanier Sanguinaire', 'Blutrünstig[a] Seeräuber', 'サングイナリィ・バッカニア', NULL, 4, 28.2, 24.8, 18, NULL, 0, NULL, 0, 0),
-(133, 2527, 'Sapsa Elbst', 'Sapsa Elbst', 'Elbst De Sapsa', 'Sapsa-Elbst', 'サプサ・エルブスト', NULL, 4, 16.5, 15.0, 46, NULL, 0, NULL, 0, 0),
-(134, 1828, 'Sapsa Shelfclaw', 'Sapsa Shelfclaw', 'Griffe-des-profondeurs De Sapsa', 'Sapsa-Panzerklaue', 'サプサ・シェルフクロウ', NULL, 4, 14.3, 13.2, 49, 3, 0, NULL, 1, 0),
-(135, 1827, 'Sapsa Shelfscale', 'Sapsa Shelfscale', 'écaille-des-profondeurs De Sapsa', 'Sapsa-Panzerschuppe', 'サプサ・シェルフスケール', NULL, 4, 14.7, 14.3, 49, NULL, 0, NULL, 0, 0),
-(136, 1829, 'Sapsa Shelfspine', 'Sapsa Shelfspine', 'épine-des-profondeurs De Sapsa', 'Sapsa-Panzerdorn', 'サプサ・シェルフスパイン', NULL, 4, 15.6, 14.2, 49, 3, 0, NULL, 1, 0),
-(137, 1830, 'Sapsa Shelftooth', 'Sapsa Shelftooth', 'Dent-des-profondeurs De Sapsa', 'Sapsa-Panzerzahn', 'サプサ・シェルフトゥース', NULL, 4, 14.5, 13.6, 47, 3, 0, NULL, 1, 0),
-(138, 360, 'Sea Wasp', 'Sea Wasp', 'Guêpe Des Mers', 'Seewespe', 'シーワスプ', NULL, 4, 13.6, 17.4, 48, 3, 0, NULL, 1, 0),
-(140, 410, 'Sewer Mole', 'Sewer Mole', 'Taupe D\'égout', 'Kloaken-Mull', 'シュアモール', NULL, 4, 33.3, 28.5, 11, NULL, 0, NULL, 0, 0),
-(141, 342, 'Shallowtail Reaver', 'Shallowtail Reaver', 'Queue Des Pillards Du Serpent', 'Flachflossen-Plünderer', '海蛇の尾', NULL, 4, 24.5, 23.7, 15, NULL, 0, NULL, 0, 0),
-(142, 345, 'Shelfclaw Reaver', 'Shelfclaw Reaver', 'Aiguillon Des Pillards Du Serpent', 'Seichtklauen-Plünderer', '海蛇の赤き爪', NULL, 4, 13.6, 17.1, 48, NULL, 0, NULL, 0, 0),
-(143, 384, 'Shelfclaw Sahagin', 'Shelfclaw Sahagin', 'Sahuagin Griffe-des-profondeurs', 'Panzerklauen-Sahagin', 'シェルフクロウ・サハギン', NULL, 4, 17.7, 19.1, 44, 4, 0, NULL, 1, 0),
-(144, 2675, 'Shelfclaw Sentry', 'Shelfclaw Sentry', 'Sentinelle Griffe-des-profondeurs', 'Panzerklauen-Wache', 'シェルフクロウ・セントリー', NULL, 4, 19.1, 18.5, 50, NULL, 0, NULL, 0, 0),
-(145, 559, 'Shelfeye Reaver', 'Shelfeye Reaver', 'Prunelle Des Pillards Du Serpent', 'Seichtaugen-Plünderer', '海蛇の赤き目', NULL, 4, 12.6, 17.1, 48, 3, 0, NULL, 1, 0),
-(146, 347, 'Shelfscale Reaver', 'Shelfscale Reaver', 'Scutelle Des Pillards Du Serpent', 'Seichtschuppen-Plünderer', '海蛇の赤き鱗', NULL, 4, 12.9, 17.1, 48, NULL, 0, NULL, 0, 0),
-(147, 386, 'Shelfscale Sahagin', 'Shelfscale Sahagin', 'Sahuagin écaille-des-profondeurs', 'Panzerschuppen-Sahagin', 'シェルフスケール・サハギン', NULL, 4, 20.7, 18.4, 44, 3, 0, NULL, 1, 0),
-(148, 389, 'Shelfspine Sahagin', 'Shelfspine Sahagin', 'Sahuagin épine-des-profondeurs', 'Panzerdorn-Sahagin', 'シェルフスパイン・サハギン', NULL, 4, 19.7, 19.0, 44, NULL, 0, NULL, 0, 0),
-(149, 2524, 'Shoalclaw Sahagin', 'Shoalclaw Sahagin', 'Sahuagin Griffe-d\'écueil', 'Schwarmklauen-Sahagin', 'ショアルクロウ・サハギン', NULL, 4, 18.6, 15.7, 46, NULL, 0, NULL, 0, 0),
-(150, 2525, 'Shoalscale Sahagin', 'Shoalscale Sahagin', 'Sahuagin écaille-d\'écueil', 'Schwarmschuppen-Sahagin', 'ショアルスケール・サハギン', NULL, 4, 18.1, 15.7, 46, NULL, 0, NULL, 0, 0),
-(151, 2523, 'Shoalspine Sahagin', 'Shoalspine Sahagin', 'Sahuagin épine-d\'écueil', 'Schwarmdorn-Sahagin', 'ショアルスパイン・サハギン', NULL, 4, 16.6, 17.9, 46, NULL, 0, NULL, 0, 0),
-(152, 2526, 'Shoaltooth Sahagin', 'Shoaltooth Sahagin', 'Sahuagin Dent-d\'écueil', 'Schwarmfang-Sahagin', 'ショアルトゥース・サハギン', NULL, 4, 17.3, 15.9, 46, NULL, 0, NULL, 0, 0),
-(153, 1370, 'Sleepless Citizen', 'Sleepless Citizen', 'Citadine Apeurée', 'Verängstigt[a] Bürgerin', '魔物に怯える市民', NULL, 4, 28.7, 25.6, 15, NULL, 1, NULL, 0, 0),
-(154, 1346, 'Storm Courier', 'Storm Courier', 'Coursière Du Maelstrom', 'Mahlstrom-Botin', '黒渦団の輸送兵', NULL, 4, 26.0, 25.7, 13, NULL, 1, NULL, 0, 0),
-(155, 1332, 'Storm Private', 'Storm Private', 'Soldat 3e Classe Des Tempêtes', 'Sturmmariner', '黒渦団二等甲兵', NULL, 4, 18.5, 21.9, 40, NULL, 1, NULL, 0, 1),
-(156, 1172, 'Tar-stained Buccaneer', 'Tar-stained Buccaneer', 'Boucanier Taché De Goudron', 'Teerbefleckt[a] Seeräuber', 'タールステイン・バッカニア', NULL, 4, 28.1, 23.8, 17, NULL, 0, NULL, 0, 0),
-(157, 565, 'Trenchtooth Sahagin', 'Trenchtooth Sahagin', 'Sahuagin Dent-des-fosses', 'Grabenzahn-Sahagin', 'トレンチトゥース・サハギン', NULL, 4, 20.1, 19.8, 48, 3, 0, NULL, 1, 0),
-(158, 3129, 'V\'kebbe The Stray', 'V\'kebbe The Stray', 'V\'kebbe L\'errante', 'V\'kebbe [t] Streunerin', '野良猫のヴァ・ケビ', NULL, 4, 32.9, 27.8, 30, NULL, 0, NULL, 0, 0),
-(159, 1518, 'Voll The Sharkskinned', 'Voll The Sharkskinned', 'Voll Peau De Requin', 'Voll [t] Haihäutig[a]', '鮫肌のヴォル', NULL, 4, 18.6, 18.9, 44, 1, 1, 32, 1, 0),
-(160, 2167, 'Voll\'s Fang', 'Voll\'s Fang', 'Croc De Voll', 'Volls Fang[p]', 'ヴォルの鮫牙', NULL, 4, 18.7, 19.2, 41, NULL, 1, NULL, 0, 0),
-(161, 1056, 'Warren Warden', 'Warren Warden', 'Gardien De Garenne', 'Stollenjäger', '賞金首：ウォーレン・ワーデン', NULL, 4, 33.8, 29.9, 14, NULL, 0, NULL, 0, 0),
-(162, 2530, 'Whelk Ballista', 'Whelk Ballista', 'Baliste De Bulot', 'Wellhorn-Balliste', 'ユミール・バリスタ', NULL, 4, 19.8, 19.3, 44, NULL, 0, NULL, 0, 0),
-(163, 393, 'Wild Dodo', 'Wild Dodo', 'Dodo', 'Dodo', 'ドードー', NULL, 4, 28.8, 20.4, 7, NULL, 0, NULL, 0, 1),
-(164, 399, 'Wild Jackal', 'Wild Jackal', 'Chacal Sauvage', 'Wild[a] Schakal', 'ジャッカル', NULL, 4, 21.0, 32.7, 10, NULL, 0, NULL, 0, 1),
-(165, 2356, 'Yarr The Wavefiend', 'Yarr The Wavefiend', 'Yarr', 'Wellenteufel Yarr', '水鬼のヤァル', NULL, 4, 11.5, 14.0, 49, 1, 1, 317, 1, 0),
-(166, 1043, 'Yarzon Lurker', 'Yarzon Lurker', 'Yarzon Rôdeur', 'Lauernd[a] Yarzon', 'ヤーゾン・ラーカー', NULL, 4, 34.8, 29.9, 14, NULL, 0, NULL, 0, 0),
-(167, 1359, 'Yellowjacket Captain', 'Yellowjacket Captain', 'Capitaine D\'infanterie Des Casaques', 'Gelbjacken-Hauptmann', 'イエロージャケット陸士長', NULL, 4, 27.2, 23.7, 16, NULL, 1, NULL, 0, 0),
-(168, 28, 'Coeurl Pup', 'Coeurl Pup', 'Jeune Coeurl', 'Coeurl-Jungtier', 'クァール・パップ', NULL, 5, 9.0, 21.5, 23, NULL, 0, NULL, 0, 0),
-(169, 381, 'Forest Yarzon', 'Forest Yarzon', 'Yarzon Des Forêts', 'Wald-Yarzon', 'フォレスト・ヤーゾン', NULL, 5, 11.0, 21.3, 22, NULL, 0, NULL, 0, 0),
-(170, 380, 'Kobold Footman', 'Kobold Footman', 'Fantassin Kobold', 'Kobold-Fußsoldat', 'コボルド・フットマン', NULL, 5, 11.8, 22.0, 24, NULL, 0, NULL, 0, 0),
-(171, 379, 'Kobold Patrolman', 'Kobold Patrolman', 'Patrouilleur Kobold', 'Kobold-Grenzsoldat', 'コボルド・パトロールマン', NULL, 5, 28.3, 18.5, 34, NULL, 0, NULL, 0, 1),
-(172, 370, 'Kobold Pickman', 'Kobold Pickman', 'Piocheur Kobold', 'Kobold-Hauer', 'コボルド・ピックマン', NULL, 5, 12.0, 22.1, 24, NULL, 0, NULL, 0, 0),
-(173, 376, 'Kobold Sidesman', 'Kobold Sidesman', 'Bedeau Kobold', 'Kobold-Diener', 'コボルド・サイズマン', NULL, 5, 26.7, 19.6, 34, 4, 0, NULL, 1, 0),
-(174, 413, 'Mamool Ja Executioner', 'Mamool Ja Executioner', 'Exécuteur Mamool Ja', 'Mamool Ja-Henker', 'マムージャ・エクスキューショナー', NULL, 5, 32.0, 24.7, 33, 4, 0, NULL, 1, 1),
-(175, 416, 'Mamool Ja Infiltrator', 'Mamool Ja Infiltrator', 'Infiltrateur Mamool Ja', 'Mamool Ja-Spion', 'マムージャ・インフィルトレーター', NULL, 5, 33.2, 25.7, 33, NULL, 0, NULL, 0, 0),
-(177, 642, 'Mud Pugil', 'Mud Pugil', 'Pugil Vaseux', 'Schmodder-Pugil', 'マッドプギル', NULL, 5, 32.9, 25.6, 30, NULL, 0, NULL, 0, 0),
-(768, 859, 'Gluttonous Gertrude', 'Gluttonous Gertrude', 'Gertrude La Gloutonne', 'Gierschlund Gertrude', 'グルタナスガーティ', NULL, 4, 32.0, 28.0, 12, 1, 1, 10, 1, 0),
-(180, 1519, 'Oannes', 'Oannes', 'Oannes', 'Oannes', 'オアンネス', NULL, 5, 34.3, 24.2, 30, 1, 1, 22, 1, 0),
-(181, 1238, 'Rabid Ratata', 'Rabid Ratata', 'Ratata L\'enragée', 'Ratata [t] Wüterin[p]', '狂犬のラタタ', NULL, 5, 10.4, 23.6, 21, NULL, 1, NULL, 0, 0),
-(182, 391, 'Salamander', 'Salamander', 'Salamandre', 'Salamander', 'サラマンダー', NULL, 5, 27.4, 22.3, 34, 4, 0, NULL, 1, 0),
-(183, 1239, 'Salthound Boatswain', 'Salthound Boatswain', 'Matelot Des Dogues De Mer', 'Meeresköter-Bootsmann', '猟犬同盟の甲板員', NULL, 5, 12.5, 25.3, 17, NULL, 1, NULL, 0, 0),
-(184, 1240, 'Salthound Gunner', 'Salthound Gunner', 'Pilote Des Dogues De Mer', 'Meeresköter-Navigator', '猟犬同盟の航海士', NULL, 5, 11.2, 22.8, 17, NULL, 1, NULL, 0, 0),
-(185, 638, 'Stoneshell', 'Stoneshell', 'Coquepierre', 'Steinschale', 'ストーンシェル', NULL, 5, 13.6, 24.3, 21, NULL, 0, NULL, 0, 0),
-(186, 39, 'Tree Slug', 'Tree Slug', 'Limace Arboricole', 'Baumschnecke', 'ツリースラッグ', NULL, 5, 12.9, 26.1, 10, NULL, 0, NULL, 0, 1),
-(187, 643, 'Uragnite', 'Uragnite', 'Uragnite', 'Uragnit', 'ウラグナイト', NULL, 5, 28.8, 22.1, 31, 4, 0, NULL, 1, 0),
-(188, 1180, 'Wild Wolf', 'Wild Wolf', 'Loup Sauvage', 'Wildwolf', 'ワイルドウルフ', NULL, 5, 14.0, 25.3, 20, NULL, 0, NULL, 0, 0),
-(189, 1521, 'Zoredonite', 'Zoredonite', 'Zoredonite', 'Zoredonit', 'ゾレドナイト', NULL, 5, 28.6, 24.5, 31, 1, 1, 36, 1, 0),
-(190, 1670, '59th Order Bedesman Bi Go', '59th Order Bedesman Bi Go', 'Bi Go Prieur Du 59e Ordre', 'Fürbeter[p] Bi Go Vom 59. Orden', 'ビーズマン59 ビ・ゴ', NULL, 6, 24.5, 6.5, 49, 1, 1, 327, 1, 0),
-(191, 1524, '59th Order Pickman Be Ze', '59th Order Pickman Be Ze', 'Be Ze Piocheur Du 59e Ordre', 'Hauer[p] Be Ze Vom 59. Orden', 'ピックマン59 ベ・ゼ', NULL, 6, 22.9, 11.8, 44, 1, 1, 321, 1, 0),
-(192, 2516, '59th Order Roundsman Ge Ga', '59th Order Roundsman Ge Ga', 'Ge Ga Livreur Du 59e Ordre', 'Laufbursche Ge Ga Vom 59. Orden', 'ラウンズマン59 ゲ・ガ', NULL, 6, 22.4, 6.4, 47, 1, 1, 408, 1, 0),
-(193, 2357, '5th Order Patriarch Ze Bu', '5th Order Patriarch Ze Bu', 'Ze Bu Patriarche Du 5e Ordre', 'Ze Bu Vom 5. Orden', 'ペイトリアーク05 ゼ・ブ', NULL, 6, 22.5, 8.3, 47, 1, 1, 2, 1, 0),
-(195, 1671, 'Asbestos Coblyn', 'Asbestos Coblyn', 'Doblyn D\'asbeste', 'Asbest-Kobalos', 'アスベスト・ドブラン', NULL, 6, 24.7, 6.4, 45, NULL, 1, NULL, 0, 0),
-(196, 1528, 'Balidet', 'Balidet', 'Balidet', 'Balidet', 'バリデト', NULL, 6, 21.7, 5.8, 47, NULL, 1, NULL, 0, 0),
-(197, 365, 'Basalt Golem', 'Basalt Golem', 'Golem De Basalte', 'Basaltgolem', 'バサルトゴーレム', NULL, 6, 17.1, 16.2, 31, NULL, 0, NULL, 0, 0),
-(198, 2699, 'Big Shrapnel', 'Big Shrapnel', 'Shrapnelo Géant', 'Groß[a] Schrapnell', 'ビッグ・シュラプネル', NULL, 6, 25.8, 9.9, 44, NULL, 0, NULL, 0, 0),
-(199, 2528, 'Bomb Incubator', 'Bomb Incubator', 'Bombocubateur', 'Bomber-Brutofen', 'ボム培養炉', NULL, 6, 22.5, 11.3, 44, NULL, 0, NULL, 0, 0),
-(200, 106, 'Coeurl', 'Coeurl', 'Coeurl', 'Coeurl', 'クァール', NULL, 6, 14.9, 11.1, 34, 3, 0, NULL, 1, 0),
-(201, 1723, 'Cowering Coachman', 'Cowering Coachman', 'Fourrier Embarrassé', 'Gestrandet[a] Ladenbesitzer', '困り果てた御者', NULL, 6, 21.1, 17.3, 31, NULL, 1, NULL, 0, 0),
-(202, 2708, 'Dazzling Bomb', 'Dazzling Bomb', 'Bombo étincelant', 'Gleißend[a] Bomber', 'ブリリアント・ボム', NULL, 6, 27.1, 5.4, 48, NULL, 0, NULL, 0, 0),
-(203, 2521, 'Elite Bedesman', 'Elite Bedesman', 'Prieur D\'élite', 'Elite-Fürbeter', 'エリート・ビーズマン', NULL, 6, 25.0, 5.9, 49, NULL, 0, NULL, 0, 0),
-(204, 2520, 'Elite Priest', 'Elite Priest', 'Prêtre D\'élite', 'Elite-Priester', 'エリート・プリースト', NULL, 6, 26.7, 5.4, 49, NULL, 0, NULL, 0, 0),
-(205, 2519, 'Elite Quarryman', 'Elite Quarryman', 'Terrassier D\'élite', 'Elite-Steinschlepper', 'エリート・クォーリーマン', NULL, 6, 26.0, 8.4, 49, NULL, 0, NULL, 0, 0),
-(206, 2518, 'Elite Roundsman', 'Elite Roundsman', 'Livreur D\'élite', 'Elite-Laufbursche', 'エリート・ラウンズマン', NULL, 6, 25.1, 8.4, 49, NULL, 0, NULL, 0, 0),
-(207, 2707, 'Glowing Bomb', 'Glowing Bomb', 'Bombo Incandescent', 'Leuchtend[a] Bomber', 'ブライト・ボム', NULL, 6, 27.1, 5.6, 48, NULL, 0, NULL, 0, 0),
-(208, 398, 'Highland Condor', 'Highland Condor', 'Condor Des Hautes Terres', 'Hochland-Kondor', 'ハイランド・コンドル', NULL, 6, 16.6, 17.8, 34, NULL, 0, NULL, 0, 0),
-(209, 375, 'Kobold Bedesman', 'Kobold Bedesman', 'Prieur Kobold', 'Kobold-Fürbeter', 'コボルド・ビーズマン', NULL, 6, 22.9, 12.4, 41, 4, 0, NULL, 1, 0),
-(210, 374, 'Kobold Deacon', 'Kobold Deacon', 'Aruspice Kobold', 'Kobold-Diakon', 'コボルド・ディーコン', NULL, 6, 22.1, 6.0, 44, NULL, 1, NULL, 0, 0),
-(211, 371, 'Kobold Priest', 'Kobold Priest', 'Prêtre Kobold', 'Kobold-Priester', 'コボルド・プリースト', NULL, 6, 23.4, 12.1, 41, 4, 0, NULL, 1, 0),
-(212, 562, 'Kobold Quarryman', 'Kobold Quarryman', 'Terrassier Kobold', 'Kobold-Steinschlepper', 'コボルド・クォーリーマン', NULL, 6, 21.4, 15.1, 31, 4, 0, NULL, 1, 0),
-(213, 377, 'Kobold Roundsman', 'Kobold Roundsman', 'Livreur Kobold', 'Kobold-Laufbursche', 'コボルド・ラウンズマン', NULL, 6, 22.8, 15.2, 41, 4, 0, NULL, 1, 0),
-(214, 1856, 'Lost Lalafell', 'Lost Lalafell', 'Lalafell égaré', 'Verirrt[a] Lalafell', '迷い込んだ冒険者', NULL, 6, 15.6, 10.7, 1, NULL, 1, NULL, 0, 0),
-(215, 2749, 'Mark II Limpet Bomb', 'Mark II Limpet Bomb', 'Bombo Collant évolué', 'Brandneu[a] Haft-Bomber', '新式リムペットボム', NULL, 6, 23.6, 8.7, 48, NULL, 0, NULL, 0, 0),
-(216, 1604, 'Pack Chocobo', 'Pack Chocobo', 'Chocobo De Bât', 'Karawanen-Chocobo', '荷運びチョコボ', NULL, 6, 22.1, 17.4, 1, NULL, 1, NULL, 0, 1),
-(217, 2529, 'Prototype Bomb Incubator', 'Prototype Bomb Incubator', 'Bombocubateur évolué', 'Brandneu[a] Bomber-Brutofen', '新式ボム培養炉', NULL, 6, 27.1, 5.1, 48, NULL, 0, NULL, 0, 0),
-(218, 62, 'Pteroc', 'Pteroc', 'Ptéroc Des Embruns', 'Pterosaurus', 'テロック', NULL, 6, 15.0, 19.0, 30, NULL, 0, NULL, 0, 0),
-(219, 1863, 'Restless Raptor', 'Restless Raptor', 'Raptor Agité', 'Rastlos[a] Raptor', 'レストレス・ラプトル', NULL, 6, 17.7, 16.2, 31, NULL, 1, NULL, 0, 0),
-(220, 407, 'Ringtail', 'Ringtail', 'Galago à Queue Annelée', 'Katzenfrett', 'リングテイル', NULL, 6, 15.7, 11.0, 34, NULL, 0, NULL, 0, 0),
-(221, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 6, 18.3, 15.8, 46, NULL, 0, NULL, 0, 1),
-(222, 1836, 'Synthetic Doblyn', 'Synthetic Doblyn', 'Doblyn Synthétique', 'Synthetisch[a] Dobalos', 'シンセティック・ドブラン', NULL, 6, 21.9, 9.3, 48, 3, 0, NULL, 1, 0),
-(223, 1834, 'U\'Ghamaro Bedesman', 'U\'Ghamaro Bedesman', 'Prieur D\'U\'Ghamaro', 'U\'Ghamaro-Fürbeter', 'ウ・ガマロ・ビーズマン', NULL, 6, 22.6, 7.2, 48, 3, 0, NULL, 1, 0),
-(224, 2522, 'U\'Ghamaro Golem', 'U\'Ghamaro Golem', 'Golem D\'U\'Ghamaro', 'U\'Ghamaro-Golem', 'ウ・ガマロ・ゴーレム', NULL, 6, 27.2, 7.4, 49, NULL, 0, NULL, 0, 0),
-(225, 2715, 'U\'Ghamaro Patrolman', 'U\'Ghamaro Patrolman', 'Patrouilleur D\'U\'Ghamaro', 'U\'Ghamaro-Grenzsoldat', 'ウ・ガマロ・パトロールマン', NULL, 6, 23.5, 8.6, 48, NULL, 0, NULL, 0, 0),
-(226, 1835, 'U\'Ghamaro Priest', 'U\'Ghamaro Priest', 'Prêtre D\'U\'Ghamaro', 'U\'Ghamaro-Priester', 'ウ・ガマロ・プリースト', NULL, 6, 22.1, 6.3, 48, 3, 0, NULL, 1, 0),
-(227, 1833, 'U\'Ghamaro Quarryman', 'U\'Ghamaro Quarryman', 'Terrassier D\'U\'Ghamaro', 'U\'Ghamaro-Steinschlepper', 'ウ・ガマロ・クォリーマン', NULL, 6, 23.7, 6.5, 48, 3, 0, NULL, 1, 0),
-(228, 1832, 'U\'Ghamaro Roundsman', 'U\'Ghamaro Roundsman', 'Livreur D\'U\'Ghamaro', 'U\'Ghamaro-Laufbursche', 'ウ・ガマロ・ラウンズマン', NULL, 6, 22.5, 9.9, 48, 4, 0, NULL, 1, 0),
-(229, 412, 'Velociraptor', 'Velociraptor', 'Velociraptor', 'Velociraptor', 'ヴェロキラプトル', NULL, 6, 20.3, 15.4, 34, 3, 0, NULL, 1, 0),
-(231, 2192, 'Young Coeurl', 'Young Coeurl', 'Coeurl Pubère', 'Jung[a] Coeurl', 'ヤング・クァール', NULL, 6, 16.1, 15.1, 34, NULL, 0, NULL, 0, 0),
-(232, 120, 'Anole', 'Anole', 'Anolis', 'Anolis', 'アノール', NULL, 7, 30.4, 19.3, 9, NULL, 0, NULL, 0, 0),
-(233, 511, 'Barricade', 'Barricade', 'Barricade', 'Barriere', 'バリケード', NULL, 7, 19.1, 20.5, 25, NULL, 0, NULL, 0, 0),
-(234, 196, 'Black Eft', 'Black Eft', 'Jeune Triton Noir', 'Schwarzmolch', 'ブラックエフト', NULL, 7, 25.8, 21.9, 6, NULL, 0, NULL, 0, 0),
-(235, 197, 'Bog Yarzon', 'Bog Yarzon', 'Yarzon Des Marais', 'Sumpf-Yarzon', 'ボッグヤーゾン', NULL, 7, 22.4, 20.7, 7, NULL, 0, NULL, 0, 0),
-(236, 1385, 'Bomb', 'Bomb', 'Bombe', 'Bombe', '爆弾', NULL, 7, 19.2, 20.5, 50, NULL, 0, NULL, 0, 0),
-(237, 221, 'Brood Ziz', 'Brood Ziz', 'Ziz Poussin', 'Brütend[a] Ziz', 'ブルード・ジズ', NULL, 7, 15.4, 20.5, 30, NULL, 0, NULL, 0, 0),
-(238, 181, 'Carrion Chigoe', 'Carrion Chigoe', 'Chigoe Charognard', 'Aasmücke', 'キャリオンチゴー', NULL, 7, 21.5, 20.2, 10, NULL, 0, NULL, 0, 0),
-(239, 131, 'Crater Golem', 'Crater Golem', 'Golem Des Cratères', 'Krater-Golem', 'クレーターゴーレム', NULL, 7, 9.8, 18.3, 43, 3, 0, NULL, 1, 0),
-(240, 55, 'Deathgaze', 'Deathgaze', 'Mortalis', 'Thanatos', 'デスゲイズ', NULL, 7, 17.8, 22.2, 33, 4, 0, NULL, 1, 0),
-(241, 10, 'Diremite', 'Diremite', 'Acarus', 'Schaudermilbe', 'ダイアマイト', NULL, 7, 20.2, 18.2, 12, NULL, 0, NULL, 0, 0),
-(242, 1328, 'Entomophobic Woodcutter', 'Entomophobic Woodcutter', 'Bûcheron Entomophobe', 'Insekten Hassend[a] Holzfäller', '蟲嫌いの木こり', NULL, 7, 28.2, 21.6, 6, NULL, 1, NULL, 0, 0),
-(243, 207, 'Floating Eye', 'Floating Eye', 'œil Flottant', 'Schwebauge', 'フローティングアイ', NULL, 7, 10.9, 23.5, 31, 4, 0, NULL, 1, 0),
-(244, 47, 'Forest Funguar', 'Forest Funguar', 'Fungus Des Forêts', 'Forst-Fungus', 'フォレストファンガー', NULL, 7, 24.2, 18.6, 4, NULL, 0, NULL, 0, 0),
-(245, 464, 'Goblin Outlaw', 'Goblin Outlaw', 'Hors-la-loi Gobelin', 'Goblin-Bandit', 'ゴブリン・アウトロー', NULL, 7, 19.8, 20.3, 25, NULL, 0, NULL, 0, 0),
-(246, 519, 'Greatloam Farmer', 'Greatloam Farmer', 'Botaniste Du Courtil', 'Erntehelfer', '収穫に来た園芸師', NULL, 7, 14.7, 17.9, 1, NULL, 1, NULL, 0, 0),
-(247, 2057, 'Halitostroper', 'Halitostroper', 'Halitostoroper', 'Halit-Todesweide', 'ハリトストローパー', NULL, 7, 15.0, 21.3, 31, NULL, 0, NULL, 0, 0),
-(248, 195, 'Hoglet', 'Hoglet', 'Goret', 'Schweinchen', 'ホグレット', NULL, 7, 29.0, 23.3, 8, NULL, 0, NULL, 0, 0),
-(249, 54, 'Hornet Swarm', 'Hornet Swarm', 'Nuée De Frelons', 'Hornissenschwarm', 'ホーネット・スウォーム', NULL, 7, 11.3, 23.9, 14, NULL, 0, NULL, 0, 1),
-(250, 1329, 'Jaded Jody', 'Jaded Jody', 'Jody L\'aigrie', 'Satt[a] Susi', 'ジェイデッド・ジョディ', NULL, 7, 13.3, 22.4, 31, 1, 1, 14, 1, 0),
-(251, 178, 'Leafbleed Mite', 'Leafbleed Mite', 'Mite Feuillesang', 'Blattblutmilbe', 'リーフブリード・マイト', NULL, 7, 19.0, 19.1, 8, NULL, 0, NULL, 0, 0),
-(252, 180, 'Leafbleed Roseling', 'Leafbleed Roseling', 'Roselette Feuillesang', 'Blattblut-Rösling', 'リーフブリード・ローズレット', NULL, 7, 18.9, 20.8, 12, NULL, 0, NULL, 0, 1),
-(253, 177, 'Leafbleed Slug', 'Leafbleed Slug', 'Limace Feuillesang', 'Blattblutschnecke', 'リーフブリード・スラッグ', NULL, 7, 18.5, 19.5, 10, NULL, 0, NULL, 0, 0),
-(254, 2190, 'Lightning Spark', 'Lightning Spark', 'éclair Fulgurant', 'Blitzfunken', 'ライトニングスパーク', NULL, 7, 15.7, 17.9, 29, NULL, 0, NULL, 0, 0),
-(255, 130, 'Lindwurm', 'Lindwurm', 'Lindwurm', 'Lindwurm', 'リンドヴルム', NULL, 7, 14.5, 18.4, 33, 3, 0, NULL, 1, 0),
-(256, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 7, 25.0, 18.3, 2, NULL, 0, NULL, 0, 1),
-(257, 448, 'Lou Carcolh', 'Lou Carcolh', 'Lou Carcolh', 'Lou Carcolh', 'ル・カルコル', NULL, 7, 14.7, 25.4, 14, 1, 1, 57, 1, 0),
-(258, 592, 'Lumber Toad', 'Lumber Toad', 'Crapaud Bûcheron', 'Holzkröte', 'ランバートード', NULL, 7, 24.7, 31.3, 13, NULL, 0, NULL, 0, 0),
-(259, 20, 'Magicked Bones', 'Magicked Bones', 'Squelette Maudit', 'Verhext[a] Gerippe', 'マジックドボーンズ', NULL, 7, 19.5, 27.8, 13, NULL, 0, NULL, 0, 0),
-(260, 517, 'Miraudont The Madder', 'Miraudont The Madder', 'Miraudont Le Furieux', 'Manisch[a] Miraudont', '激高のミロードン', NULL, 7, 24.1, 19.7, 5, NULL, 1, NULL, 0, 0),
-(261, 2175, 'Nameless Conjurer', 'Nameless Conjurer', 'élémentaliste Curieuse', 'Wissbegierig[a] Seher', '謎に挑む道士', NULL, 7, 12.5, 16.5, 1, NULL, 1, NULL, 0, 0),
-(262, 218, 'Qiqirn Scrambler', 'Qiqirn Scrambler', 'Qiqirn Farfouilleur', 'Qiqirn-Störenfried', 'キキルン・スクランブラー', NULL, 7, 17.8, 19.8, 10, NULL, 0, NULL, 0, 0),
-(263, 22, 'Roselet', 'Roselet', 'Roselette', 'Rösling', 'ローズレット', NULL, 7, 20.6, 30.3, 10, NULL, 0, NULL, 0, 0),
-(264, 188, 'Saprophagous Slug', 'Saprophagous Slug', 'Limace Nécrophage', 'Saprophage', 'ネクロファガス・スラッグ', NULL, 7, 19.6, 31.1, 10, NULL, 0, NULL, 0, 0),
-(265, 518, 'Serpent Recruit', 'Serpent Recruit', 'Jeune Recrue Des Deux Vipères', 'Neu[a] Rekrut', '双蛇党の新兵', NULL, 7, 24.4, 20.0, 3, NULL, 1, NULL, 0, 0),
-(266, 2996, 'Slate Golem', 'Slate Golem', 'Golem D\'ardoise', 'Tongolem', 'スレートゴーレム', NULL, 7, 11.8, 17.3, 30, NULL, 1, NULL, 0, 0),
-(267, 91, 'Spriggan', 'Spriggan', 'Spriggan', 'Spriggan', 'スプリガン', NULL, 7, 12.5, 16.7, 33, 4, 0, NULL, 1, 0),
-(268, 445, 'Stagnant Water Sprite', 'Stagnant Water Sprite', 'élémentaire Stagnant', 'Anomal[a] Wasser-Exergon', 'スタグナントスプライト', NULL, 7, 23.8, 24.1, 8, 1, 1, 45, 1, 0),
-(269, 465, 'Stikflix Grumblytoss', 'Stikflix Grumblytoss', 'Stikflix Le Grincheux', 'Stickflix Grummeltoss', '仏頂面のスティックフリックス', NULL, 7, 17.1, 18.2, 28, NULL, 0, NULL, 0, 0),
-(270, 199, 'Stumbling Funguar', 'Stumbling Funguar', 'Fungus Trébuchant', 'Stolper-Fungus', 'スタンブリング・ファンガー', NULL, 7, 22.6, 24.4, 19, NULL, 0, NULL, 0, 1),
-(271, 41, 'Syrphid Swarm', 'Syrphid Swarm', 'Nuée De Syrphes', 'Mistfliegenschwarm', 'サーフィド・スウォーム', NULL, 7, 26.3, 25.1, 8, NULL, 0, NULL, 0, 0),
-(272, 48, 'Toadstool', 'Toadstool', 'Vesse-de-crapaud', 'Krötenstuhl', 'トードスツール', NULL, 7, 15.5, 18.2, 29, NULL, 0, NULL, 0, 0),
-(273, 492, 'Trickster Imp', 'Trickster Imp', 'Imp Farceur', 'Gauner-Imp', 'トリックスター', NULL, 7, 19.0, 18.9, 15, NULL, 0, NULL, 0, 0),
-(274, 21, 'Trickster Imp', 'Trickster Imp', 'Imp', 'Gauner-Imp', 'インプ', NULL, 7, 27.2, 25.2, 9, NULL, 0, NULL, 0, 0),
-(275, 491, 'Wandering Wisp', 'Wandering Wisp', 'Feu Follet Errant', 'Umherstreifend[a] Irrlicht', 'ワンダリング・ウィスプ', NULL, 7, 18.6, 20.8, 13, NULL, 0, NULL, 0, 0),
-(769, 1522, 'Scarface Bugaal Ja', 'Scarface Bugaal Ja', 'Bugaal Ja Le Balafré', 'Narbengesicht Bugaal Ja', '美男のブガージャ', NULL, 5, 28.0, 23.0, 33, 1, 1, 26, 1, 0),
-(278, 2173, '3rd Cohort Optio', '3rd Cohort Optio', 'Optio De La 3e Cohorte', 'Optio[p] Der III. Kohorte', 'IIIコホルス・オプティオ', NULL, 8, 32.5, 20.4, 41, NULL, 1, NULL, 0, 0),
-(279, 1663, 'Aulus Rem Vulso', 'Aulus Rem Vulso', 'Aulus Rem Vulso', 'Aulus Rem Vulso', 'アウルス・レム・ヴルソ', NULL, 8, 32.4, 20.5, 44, NULL, 1, NULL, 0, 0),
-(280, 2314, 'Banestool', 'Banestool', 'Vesse-de-fléau', 'Fluchhut', 'ドクキリタケ', NULL, 8, 27.1, 22.5, 41, NULL, 0, NULL, 0, 0),
-(281, 38, 'Black Bat', 'Black Bat', 'Chauve-souris Noire', 'Schwarz[a] Fledermaus', 'ブラックバット', NULL, 8, 16.5, 22.8, 20, NULL, 0, NULL, 0, 0),
-(282, 612, 'Blood Bat', 'Blood Bat', 'Chauve-souris Vampire', 'Blutfledermaus', 'ブラッドバット', NULL, 8, 22.3, 28.2, 15, NULL, 0, NULL, 0, 0),
-(283, 240, 'Boar Poacher', 'Boar Poacher', 'Braconnière De Sangliers', 'Keiler-Wilderin', 'ボア・ポーチャー', NULL, 8, 19.7, 30.1, 18, NULL, 0, NULL, 0, 0),
-(284, 36, 'Boring Weevil', 'Boring Weevil', 'Hanneton', 'Rüsselkäfer', 'ウィーヴィル', NULL, 8, 23.9, 30.2, 16, NULL, 0, NULL, 0, 0),
-(285, 524, 'Bothered Beekeeper', 'Bothered Beekeeper', 'Apiculteur En Colère', 'Verdrossen[a] Imker', '怒れる養蜂家', NULL, 8, 11.8, 24.7, 8, NULL, 1, NULL, 0, 0),
-(286, 1662, 'Capricious Cassie', 'Capricious Cassie', 'Cassie La Capricieuse', 'Kapriziös[a] Cassie', 'カプリシャス・キャシー', NULL, 8, 23.2, 20.6, 43, 1, 1, 336, 1, 0),
-(287, 1664, 'Daxio Of The Dawn', 'Daxio Of The Dawn', 'Daxio', 'Daxio', '覚醒のダキシオ', NULL, 8, 32.1, 14.2, 47, 1, 1, 9, 1, 0),
-(288, 232, 'Diseased Treant', 'Diseased Treant', 'Tréant Malade', 'Krank[a] Baumschrat', 'ディズィーズ・トレント', NULL, 8, 16.4, 22.7, 21, NULL, 0, NULL, 0, 0),
-(289, 164, 'Dreamtoad', 'Dreamtoad', 'Crapaud Rêveur', 'Traumkröte', 'ドリームトード', NULL, 8, 28.2, 17.7, 46, 3, 0, NULL, 1, 0),
-(290, 220, 'Faerie Funguar', 'Faerie Funguar', 'Fungus Fée', 'Feen-Fungus', 'フェアリーファンガー', NULL, 8, 18.5, 28.5, 16, NULL, 0, NULL, 0, 0),
-(291, 1203, 'Fruiting Fungus', 'Fruiting Fungus', 'Fungus Fructifiant', 'Frucht-Fungus', 'フルーティング・ファンガー', NULL, 8, 23.3, 30.1, 18, NULL, 1, NULL, 0, 0),
-(292, 2157, 'Gall Gnat', 'Gall Gnat', 'Taon Galeux', 'Gallenschnake', 'ガルナット', NULL, 8, 22.3, 30.9, 21, NULL, 0, NULL, 0, 0),
-(293, 77, 'Gelmorran Cogfinder', 'Gelmorran Cogfinder', 'Quêteuse De Rouages De Gelmorra', 'Gelmorrisch[a] Zahnrädlerin', 'コッグファインダー', NULL, 8, 17.6, 28.9, 17, NULL, 0, NULL, 0, 0),
-(294, 2316, 'Giant Banestool', 'Giant Banestool', 'Vesse-de-fléau Géante', 'Beseelt[a] Fluchhut', '特大ドクキリタケ', NULL, 8, 23.9, 15.0, 48, NULL, 0, NULL, 0, 0),
-(295, 7, 'Giant Gnat', 'Giant Gnat', 'Taon Géant', 'Dämonenschnake', 'ナット', NULL, 8, 19.5, 26.5, 16, NULL, 0, NULL, 0, 0),
-(296, 2876, 'Giant Treant', 'Giant Treant', 'Tréant Géant', 'Riesenbaumschrat', 'ジャイアント・トレント', NULL, 8, 32.0, 15.0, 50, NULL, 0, NULL, 0, 0),
-(297, 211, 'Glowfly', 'Glowfly', 'Lampyre', 'Glühwürmchen', 'グロウフライ', NULL, 8, 16.1, 21.2, 24, NULL, 0, NULL, 0, 0),
-(298, 1136, 'Gnarled Treant', 'Gnarled Treant', 'Tréant Noueux', 'Knorrig[a] Baumschrat', 'ナールド・トレント', NULL, 8, 17.9, 28.3, 26, NULL, 0, NULL, 0, 0),
-(299, 621, 'Gods\' Quiver Bow', 'Gods\' Quiver Bow', 'Flèche Divine', 'Soldat[p] Von Nophicas Schar', '神勇隊の隊士 ', NULL, 8, 21.2, 29.7, 13, NULL, 1, NULL, 0, 0),
-(300, 2315, 'Greater Banestool', 'Greater Banestool', 'Grosse Vesse-de-fléau', 'Groß[a] Fluchhut', '大ぶりドクキリタケ', NULL, 8, 27.2, 15.6, 44, NULL, 0, NULL, 0, 0),
-(301, 553, 'Honeybee Swarm', 'Honeybee Swarm', 'Nuée D\'abeilles', 'Honigbienenschwarm', 'ハニービー・スウォーム', NULL, 8, 11.3, 22.2, 8, NULL, 0, NULL, 0, 0),
-(302, 2757, 'Hungry Buzzard', 'Hungry Buzzard', 'Busard Affamé', 'Hungrig[a] Bussard', 'ハングリー・バザード', NULL, 8, 20.4, 27.4, 16, NULL, 0, NULL, 0, 0),
-(303, 449, 'Jackanapes', 'Jackanapes', 'Zigoto', 'Naseweis', 'ジャッカネイプス', NULL, 8, 21.1, 29.9, 19, 1, 1, 63, 1, 0),
-(304, 535, 'Jackanapes\'s Bean-bearer', 'Jackanapes\'s Bean-bearer', 'Sbire De Zigoto', 'Naseweis-Gefolgsmann', 'ジャッカネイプスの手下', NULL, 8, 21.1, 29.9, 17, NULL, 1, NULL, 0, 0),
-(305, 44, 'Jumping Djigga', 'Jumping Djigga', 'Djigga Sautilleur', 'Hopsend[a] Haarmücke', 'ヂッガ', NULL, 8, 16.2, 20.8, 24, NULL, 0, NULL, 0, 0),
-(306, 1202, 'Lazy Laurence', 'Lazy Laurence', 'Laurence La Lambine', 'Faul[a] Laurence', 'レジー・ローレンス', NULL, 8, 23.4, 29.8, 20, NULL, 1, NULL, 0, 0),
-(307, 203, 'Leathervine Microchu', 'Leathervine Microchu', 'Microtyugh à Sarment', 'Lederranken-Mikrochu', 'レザーヴァイン・コチュー', NULL, 8, 17.5, 29.1, 18, NULL, 0, NULL, 0, 0),
-(308, 1143, 'Lefquene The Mystic', 'Lefquene The Mystic', 'Milburh La Mystique', 'Milburh', '魔性のレフケン', NULL, 8, 18.4, 28.0, 24, NULL, 0, NULL, 0, 0),
-(309, 6, 'Lemur', 'Lemur', 'Lémur', 'Lori', 'レミュー', NULL, 8, 21.5, 27.8, 18, NULL, 0, NULL, 0, 0),
-(310, 531, 'Little Solace Sylph', 'Little Solace Sylph', 'Sylphe Du Refuge', 'Zufluchts-Sylphe', '仮宿のシルフ', NULL, 8, 21.7, 26.3, 16, NULL, 1, NULL, 0, 0),
-(311, 1144, 'Long-winded Lemur', 'Long-winded Lemur', 'Lémur Prolixe', 'Langatmig[a] Lori', 'ロングウィンド・レミュー', NULL, 8, 18.1, 28.3, 24, NULL, 0, NULL, 0, 0),
-(312, 107, 'Mandragora', 'Mandragora', 'Mandragore', 'Mandragora', 'マンドラゴラ', NULL, 8, 14.0, 25.7, 13, NULL, 0, NULL, 0, 0),
-(313, 1330, 'Mead-porting Midlander', 'Mead-porting Midlander', 'Livreur D\'hydromel', 'Met Schleppend[a] Wiesländer[p]', '蜂蜜酒の運び人', NULL, 8, 17.8, 27.0, 18, NULL, 1, NULL, 0, 0),
-(315, 1729, 'Mianne Thousandmalm', 'Mianne Thousandmalm', 'Mianne', 'Mianne Tausendmalm', '千里眼のミアヌ', NULL, 8, 28.3, 20.3, 40, NULL, 1, NULL, 0, 0),
-(316, 165, 'Milkroot Cluster', 'Milkroot Cluster', 'Grappe De Tuberculait', 'Milchwurzel-Knöterich', 'ミルクルート・クラスター', NULL, 8, 24.0, 16.6, 48, 3, 0, NULL, 1, 0),
-(317, 162, 'Milkroot Sapling', 'Milkroot Sapling', 'Pousse De Tuberculait', 'Milchwurzel-Schössling', 'ミルクルート・サップリング', NULL, 8, 23.4, 14.7, 48, 3, 0, NULL, 1, 0),
-(318, 222, 'Molted Ziz', 'Molted Ziz', 'Ziz Déplumé', 'Gehäutet[a] Ziz', 'モルテッド・ジズ', NULL, 8, 27.0, 24.2, 40, 3, 0, NULL, 1, 0),
-(319, 237, 'Morbol', 'Morbol', 'Morbol', 'Morbol', 'モルボル', NULL, 8, 23.0, 20.7, 43, 3, 0, NULL, 1, 1),
-(320, 183, 'North Shroud Lemur', 'North Shroud Lemur', 'Lémur De La Forêt Du Nord', 'Nordwald-Lori', 'ノースシュラウド・レミュー', NULL, 8, 15.8, 26.7, 15, NULL, 0, NULL, 0, 0),
-(321, 12, 'Northern Vulture', 'Northern Vulture', 'Vautour', 'Kapgeier', 'ヴァルチャー', NULL, 8, 14.4, 26.3, 13, NULL, 0, NULL, 0, 0),
-(322, 33, 'Ochu', 'Ochu', 'Otyugh', 'Ochu', 'オチュー', NULL, 8, 25.5, 24.6, 44, NULL, 0, NULL, 0, 0),
-(323, 233, 'Old-growth Treant', 'Old-growth Treant', 'Tréant Centenaire', 'Alt[a] Baumschrat', 'オールドグロウス・トレント', NULL, 8, 25.6, 20.8, 41, 3, 0, NULL, 1, 0),
-(324, 507, 'Orphaned Sylph', 'Orphaned Sylph', 'Sylphe Orphelin', 'Sylphen-Waise', '孤児シルフ', NULL, 8, 21.2, 27.1, 19, NULL, 0, NULL, 0, 0),
-(325, 214, 'Overgrown Ivy', 'Overgrown Ivy', 'Lierre Envahissant', 'Wuchernd[a] Efeuranke', 'オーバーグロウン・アイビー', NULL, 8, 20.8, 29.7, 21, NULL, 0, NULL, 0, 0),
-(326, 1137, 'Pannixia Of The Woven Wing', 'Pannixia Of The Woven Wing', 'Pannixia à L\'aile Tissée', 'Pannixia', '大羽のパニシア', NULL, 8, 18.2, 27.6, 29, NULL, 0, NULL, 0, 0),
-(327, 513, 'Prince Of Pestilence', 'Prince Of Pestilence', 'Prince De La Pestilence', 'Pestilenzio', 'プリンス・オブ・ペスト', NULL, 8, 19.1, 27.6, 16, 1, 1, 59, 1, 0),
-(328, 125, 'Pus Gnat', 'Pus Gnat', 'Taon Pyophage', 'Eiterdämonenschnake', 'パスナット', NULL, 8, 19.1, 28.1, 17, NULL, 0, NULL, 0, 0),
-(329, 239, 'Raptor Poacher', 'Raptor Poacher', 'Braconnière De Raptors', 'Raptoren-Wilderin', 'ラプトル・ポーチャー', NULL, 8, 19.8, 30.1, 18, NULL, 0, NULL, 0, 0),
-(330, 474, 'Seven-year Gnat', 'Seven-year Gnat', 'Gnat De Sept Ans', 'Verflixt[a] Dämonenschnake', '賞金首：セブンイヤー・ナット', NULL, 8, 15.9, 27.6, 18, NULL, 0, NULL, 0, 0),
-(331, 179, 'Shroudbee Swarm', 'Shroudbee Swarm', 'Nuée D\'abeilles De Sombrelinceul', 'Waldbienenschwarm', 'シュラウドビー・スウォーム', NULL, 8, 16.4, 28.3, 17, NULL, 0, NULL, 0, 0),
-(332, 184, 'South Shroud Opo-opo', 'South Shroud Opo-opo', 'Opo-opo De La Forêt Du Sud', 'Südwald-Opo-Opo', 'サウスシュラウド・オポオポ', NULL, 8, 17.9, 29.0, 13, NULL, 0, NULL, 0, 0),
-(334, 2187, 'Swollen Djigga', 'Swollen Djigga', 'Djigga Boursouflé', 'Schwell-Haarmücke', 'スウォーレン・ヂッガ', NULL, 8, 15.7, 21.3, 24, NULL, 0, NULL, 0, 0),
-(335, 166, 'Sylph Bonnet', 'Sylph Bonnet', 'Chapeau Sylphe', 'Sylphenkappe', 'シルフボンネット', NULL, 8, 26.6, 13.5, 48, 3, 0, NULL, 1, 0),
-(336, 67, 'Sylpheed Screech', 'Sylpheed Screech', 'Crieur Sylphe', 'Sylphen-Kreischerin', 'シルフィード・スクリーチ', NULL, 8, 30.0, 11.9, 47, 3, 0, NULL, 1, 0),
-(337, 68, 'Sylpheed Sigh', 'Sylpheed Sigh', 'Soupireur Sylphe', 'Sylphen-Seufzerin', 'シルフィード・サイ', NULL, 8, 28.7, 16.9, 45, 3, 0, NULL, 1, 0),
-(338, 69, 'Sylpheed Snarl', 'Sylpheed Snarl', 'Grondeur Sylphe', 'Sylphen-Keiferin', 'シルフィード・スナール', NULL, 8, 28.5, 16.3, 45, 3, 0, NULL, 1, 0),
-(339, 567, 'Sylphlands Condor', 'Sylphlands Condor', 'Condor Des Terres Sylphes', 'Sylphenland-Kondor', 'シルフランド・コンドル', NULL, 8, 28.2, 17.0, 46, 3, 0, NULL, 1, 0),
-(340, 163, 'Sylphlands Sentinel', 'Sylphlands Sentinel', 'Sentinelle Des Terres Sylphes', 'Sylphenland-Wächter', 'シルフランド・センチネル', NULL, 8, 21.3, 10.5, 48, 3, 0, NULL, 1, 0),
-(341, 231, 'Sylvan Groan', 'Sylvan Groan', 'Gémisseur Sylvain', 'Silvanisch[a] Ächzerin', 'シルヴァン・グローン', NULL, 8, 20.0, 21.8, 23, NULL, 1, NULL, 0, 0),
-(342, 229, 'Sylvan Scream', 'Sylvan Scream', 'Hurleur Sylvain', 'Silvanisch[a] Schreierin', 'シルヴァン・スクリーム', NULL, 8, 18.8, 21.4, 23, NULL, 1, NULL, 0, 0),
-(343, 64, 'Sylvan Screech', 'Sylvan Screech', 'Crieur Sylvain', 'Silvanisch[a] Kreischerin', 'シルヴァン・スクリーチ', NULL, 8, 23.8, 20.6, 43, 4, 0, NULL, 1, 0),
-(344, 65, 'Sylvan Sigh', 'Sylvan Sigh', 'Soupireur Sylvain', 'Silvanisch[a] Seufzerin', 'シルヴァン・サイ', NULL, 8, 25.0, 21.4, 43, NULL, 0, NULL, 1, 0),
-(345, 66, 'Sylvan Snarl', 'Sylvan Snarl', 'Grondeur Sylvain', 'Silvanisch[a] Keiferin', 'シルヴァン・スナール', NULL, 8, 28.5, 20.5, 43, 4, 0, NULL, 1, 0),
-(346, 230, 'Sylvan Sough', 'Sylvan Sough', 'Murmureur Sylvain', 'Silvanisch[a] Heulerin', 'シルヴァン・サウ', NULL, 8, 18.7, 21.4, 23, NULL, 1, NULL, 0, 0),
-(347, 136, 'Tainted Water Sprite', 'Tainted Water Sprite', 'élémentaire D\'eau Corrompu', 'Unrein[a] Wasser-Exergon', '淀んだウォータースプライト', NULL, 8, 16.0, 28.8, 15, NULL, 0, NULL, 0, 0),
-(348, 538, 'Tempered Sylph', 'Tempered Sylph', 'Sylphe Subjugué', 'Besessen[a] Sylphe', 'テンパード・シルフ', NULL, 8, 19.6, 21.9, 23, NULL, 1, NULL, 0, 0),
-(349, 2312, 'Tipsy Sylph', 'Tipsy Sylph', 'Sylphe Brindezingue', 'Halluzinierend[a] Sylphe', '酩酊したシルフ', NULL, 8, 20.5, 28.2, 45, NULL, 0, NULL, 0, 0),
-(351, 128, 'Treant Sapling', 'Treant Sapling', 'Pousse De Tréant', 'Baumschrat-Ableger', 'トレント・サップリング', NULL, 8, 13.6, 25.6, 14, NULL, 0, NULL, 0, 1),
-(352, 1028, 'Trickster Imp', 'Trickster Imp', 'Imp Farceur', 'Scharlatan-Imp', 'トリックスター・インプ', NULL, 8, 18.5, 27.7, 25, NULL, 0, NULL, 0, 0),
-(353, 1975, 'Tusked Hog', 'Tusked Hog', 'Verrat à Défenses', 'Eber', 'タスケッド・ホッグ', NULL, 8, 20.1, 25.2, 21, NULL, 0, NULL, 0, 0),
-(354, 2319, 'Violet Screech', 'Violet Screech', 'Crieur Violet', 'Violett[a] Kreischerin', 'ヴァイオレット・スクリーチ', NULL, 8, 23.8, 15.0, 49, NULL, 0, NULL, 0, 0),
-(355, 2317, 'Violet Sigh', 'Violet Sigh', 'Soupireur Violet', 'Violett[a] Seufzerin', 'ヴァイオレット・サイ', NULL, 8, 23.9, 15.5, 49, NULL, 0, NULL, 0, 0),
-(356, 2318, 'Violet Snarl', 'Violet Snarl', 'Grondeur Violet', 'Violett[a] Keiferin', 'ヴァイオレット・スナール', NULL, 8, 23.8, 17.6, 49, NULL, 0, NULL, 0, 0),
-(357, 1141, 'Vodoriga Cur', 'Vodoriga Cur', 'Vodoriga Croisée', 'Vodoriga-Köter', 'ヴォドリガ・カー', NULL, 8, 18.4, 28.0, 20, NULL, 0, NULL, 0, 0);
+(1, 395, 'Bee Cloud', 'Bee Cloud', 'Nuage D\'avettes', 'Bienenwolke', 'ビー・クラウド', NULL, 1, '24.2', '17.1', 7, NULL, 0, NULL, 0, 0),
+(2, 404, 'Bogy', 'Bogy', 'épouvantôme', 'Spukgespenst', 'ボギー', NULL, 1, '20.5', '18.6', 7, NULL, 0, NULL, 0, 0),
+(3, 419, 'Captain Petyr Pigeontoe', 'Captain Petyr Pigeontoe', 'Capitaine Petyr Peton-d\'oie', 'Kapitän Petyr Pigeontoe', 'キャプテン・ピーター', NULL, 1, '20.4', '17.0', 11, NULL, 0, NULL, 0, 0),
+(5, 1320, 'Farmer In Need', 'Farmer In Need', 'Fermier Ennuyé', 'Hilfsbedürftig[a] Bauer', '助けを求める農夫', NULL, 1, '21.8', '15.4', 9, NULL, 1, NULL, 0, 0),
+(6, 953, 'Flower Wespe', 'Flower Wespe', 'Frelon Des Vergers', 'Blumen-Vespula', 'フラワー・ヴェスパ', NULL, 1, '23.0', '17.9', 6, NULL, 0, NULL, 0, 0),
+(7, 367, 'Goblin Fisher', 'Goblin Fisher', 'Pêcheur Gobelin', 'Goblin-Fischer', 'ゴブリン・フィッシャー', NULL, 1, '23.9', '21.8', 5, NULL, 0, NULL, 0, 0),
+(8, 3099, 'Goblin Gambler', 'Goblin Gambler', 'Parieur Gobelin', 'Goblin-Glücksspieler', 'ゴブリン・ギャンブラー', NULL, 1, '23.6', '21.5', 7, NULL, 0, NULL, 0, 0),
+(9, 421, 'Grounded Pirate', 'Grounded Pirate', 'Pirate échoué', 'Gestrandet[a] Pirat', 'グラウンデッド・パイレーツ', NULL, 1, '20.1', '17.1', 9, NULL, 0, NULL, 0, 0),
+(10, 418, 'Grounded Raider', 'Grounded Raider', 'Maraudeur échoué', 'Gestrandet[a] Räuber', 'グラウンデッド・レイダー', NULL, 1, '20.3', '16.8', 5, NULL, 0, NULL, 0, 0),
+(11, 893, 'King Wespe', 'King Wespe', 'Frelon Royal', 'Vespula-Königin', 'キング・ヴェスパ', NULL, 1, '14.1', '14.8', 13, NULL, 1, NULL, 0, 0),
+(12, 392, 'Lost Lamb', 'Lost Lamb', 'Agneau égaré', 'Schaf', 'シープ', NULL, 1, '22.5', '25.3', 4, NULL, 0, NULL, 0, 0),
+(13, 561, 'Megalocrab', 'Megalocrab', 'Mégalocrabe', 'Megalokrabbe', 'メガロクラブ', NULL, 1, '21.2', '37.6', 13, NULL, 0, NULL, 0, 1),
+(14, 354, 'Mossless Goobbue', 'Mossless Goobbue', 'Goobbue Dépouillé', 'Flechten-Goobbue', 'モスレスグゥーブー', NULL, 1, '20.4', '16.2', 12, NULL, 0, NULL, 0, 1),
+(15, 833, 'Pack Jackal', 'Pack Jackal', 'Chacal En Meute', 'Rottenschakal', 'パックジャッカル', NULL, 1, '17.5', '9.4', 11, NULL, 1, NULL, 0, 0),
+(16, 640, 'Pugil', 'Pugil', 'Pugil', 'Pugil', 'プギル', NULL, 1, '23.7', '22.1', 4, NULL, 0, NULL, 0, 0),
+(17, 401, 'Puk Hatchling', 'Puk Hatchling', 'Jeune Puk', 'Jung[a] Puk', 'プーク・ハッチリング', NULL, 1, '20.8', '22.1', 4, NULL, 0, NULL, 0, 0),
+(18, 3183, 'Qiqirn Plucker', 'Qiqirn Plucker', 'Qiqirn Plumeur', 'Qiqirn-Pflücker', 'キキルン・プラッカー', NULL, 1, '21.6', '15.5', 20, NULL, 0, NULL, 0, 0),
+(19, 3184, 'Qiqirn Roostkeep', 'Qiqirn Roostkeep', 'Qiqirn Garde-poulailler', 'Qiqirn-Hühnerhirte', 'キキルン・ルーストキープ', NULL, 1, '21.7', '15.5', 20, NULL, 0, NULL, 0, 0),
+(20, 850, 'Shearing Sheridan', 'Shearing Sheridan', 'Sheridan Le Découpeur', 'Sheridan', 'シアリング・シェリダン', NULL, 1, '16.3', '14.3', 10, NULL, 1, NULL, 0, 0),
+(22, 1331, 'Storm Sergeant', 'Storm Sergeant', 'Sergent Des Tempêtes', 'Mahlstrom-Maat', '黒渦団甲軍曹', NULL, 1, '17.5', '8.8', 14, NULL, 1, NULL, 0, 0),
+(23, 405, 'Tiny Mandragora', 'Tiny Mandragora', 'Mini-mandragore', 'Winzig[a] Mandragora', 'タイニー・マンドラゴラ', NULL, 1, '18.3', '16.3', 7, NULL, 0, NULL, 0, 1),
+(24, 641, 'Wespe', 'Wespe', 'Frelon', 'Vespula', 'ヴェスパ', NULL, 1, '14.5', '14.4', 12, NULL, 0, NULL, 0, 0),
+(25, 358, 'Wounded Aurochs', 'Wounded Aurochs', 'Auroch Blessé', 'Verwundet[a] Auerochse', 'ウーンデッド・オーロックス', NULL, 1, '18.9', '17.2', 8, NULL, 0, NULL, 0, 0),
+(26, 853, 'Ahctstymm Shadowlurker', 'Ahctstymm Shadowlurker', 'Ahctstymm Le Clandestin', 'Ahctstymm', '密航のアクトシュティム', NULL, 2, '21.5', '37.8', 11, NULL, 1, NULL, 0, 0),
+(27, 563, 'Aurelia', 'Aurelia', 'Aurélie', 'Aurelia', 'オーレリア', NULL, 2, '25.3', '22.6', 3, NULL, 0, NULL, 0, 1),
+(29, 895, 'Cane Toad', 'Cane Toad', 'Crapaud Buffle', 'Aga-Kröte', 'ケーントード', NULL, 2, '23.7', '22.4', 2, NULL, 1, NULL, 0, 0),
+(30, 364, 'Cave Bat', 'Cave Bat', 'Chauve-souris Cavernicole', 'Höhlenfledermaus', 'ケーブバット', NULL, 2, '27.0', '15.9', 7, NULL, 0, NULL, 0, 0),
+(31, 408, 'Galago', 'Galago', 'Galago', 'Galago', 'ガラゴ', NULL, 2, '30.7', '14.6', 8, NULL, 0, NULL, 0, 0),
+(32, 368, 'Kobold Dustman', 'Kobold Dustman', 'éboueur Kobold', 'Kobold-Schuttfeger', 'コボルド・ダストマン', NULL, 2, '31.9', '12.3', 9, NULL, 0, NULL, 0, 0),
+(33, 378, 'Kobold Potman', 'Kobold Potman', 'Serviteur Kobold', 'Kobold-Kollektor', 'コボルド・ポットマン', NULL, 2, '32.3', '12.7', 9, NULL, 1, NULL, 0, 0),
+(34, 372, 'Kobold Supplicant', 'Kobold Supplicant', 'Suppliant Kobold', 'Kobold-Bittsteller', 'コボルド・サプリカント', NULL, 2, '31.6', '13.2', 7, NULL, 0, NULL, 0, 0),
+(35, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 2, '18.8', '34.7', 30, NULL, 0, NULL, 0, 1),
+(36, 1357, 'Mandragora Prince', 'Mandragora Prince', 'Prince Mandragore', 'Mandra-Prinz', 'マンドラプリンス', NULL, 2, '20.1', '37.4', 13, 1, 1, 19, 1, 0),
+(37, 409, 'Moraby Mole', 'Moraby Mole', 'Taupe De Moraby', 'Moraby-Mull', 'モラビーモール', NULL, 2, '20.3', '34.9', 12, NULL, 0, NULL, 0, 0),
+(38, 299, 'Nesting Buzzard', 'Nesting Buzzard', 'Jeune Busard', 'Nistend[a] Bussard', 'ネストリング・バザード', NULL, 2, '32.7', '17.0', 6, NULL, 0, NULL, 0, 1),
+(39, 857, 'Padfoot', 'Padfoot', 'Patte-molle', 'Plattfuß', 'パッドフット', NULL, 2, '20.5', '33.5', 10, 1, 1, 23, 1, 0),
+(40, 350, 'Qiqirn Eggdigger', 'Qiqirn Eggdigger', 'Qiqirn Déterre-œuf', 'Qiqirn-Strandguträuber', 'キキルン・ビーチコンバー', NULL, 2, '18.2', '34.9', 13, NULL, 0, NULL, 0, 0),
+(41, 1334, 'Red Rooster Tiller', 'Red Rooster Tiller', 'Métayer Du Coq Rouge', 'Gockelburg-Bauer', 'レッドルースター農場の農夫', NULL, 2, '27.2', '17.9', 1, NULL, 1, NULL, 0, 0),
+(42, 349, 'Rivertoad', 'Rivertoad', 'Crapaud De Rivière', 'Flusskröte', 'リバートード', NULL, 2, '23.8', '21.6', 4, NULL, 0, NULL, 0, 0),
+(43, 201, 'Syrphid Cloud', 'Syrphid Cloud', 'Nuage De Syrphes', 'Mistfliegenwolke', 'サーフィド・クラウド', NULL, 2, '20.2', '15.2', 9, NULL, 0, NULL, 0, 1),
+(781, 1517, 'Metshaldjas', 'Metshaldjas', 'Metshaldjas', 'Metshaldjas', 'メツハルジャス', NULL, 3, '18.0', '25.0', 32, 1, 1, 20, 1, 0),
+(45, 1272, 'Yellowjacket Patrol', 'Yellowjacket Patrol', 'Casaque Jaune', 'Gelbjacken-Wache', 'イエロージャケット警備兵', NULL, 2, '20.8', '30.6', 35, NULL, 0, NULL, 0, 1),
+(46, 1337, 'Yellowjacket Veteran', 'Yellowjacket Veteran', 'Vétéran Des Casaques Jaunes', 'Gelbjacken-Veteran', '熟練の警備兵', NULL, 2, '21.3', '38.5', 11, NULL, 1, NULL, 0, 0),
+(47, 1823, '2nd Cohort Eques', '2nd Cohort Eques', 'Eques De La 2e Cohorte', 'Eques[p] Der II. Kohorte', 'IIコホルス・エクエス', NULL, 3, '27.8', '20.9', 49, 3, 0, NULL, 1, 0),
+(48, 1821, '2nd Cohort Hoplomachus', '2nd Cohort Hoplomachus', 'Hoplomachus De La 2e Cohorte', 'Hoplomachus[p] Der II. Kohorte', 'IIコホルス・ホプロマクス', NULL, 3, '28.9', '21.1', 49, NULL, 0, NULL, 0, 0),
+(49, 1822, '2nd Cohort Laquearius', '2nd Cohort Laquearius', 'Laquearius De La 2e Cohorte', 'Laquearius[p] Der II. Kohorte', 'IIコホルス・ラクエリウス', NULL, 3, '25.6', '20.9', 49, 3, 0, NULL, 1, 0),
+(50, 1824, '2nd Cohort Secutor', '2nd Cohort Secutor', 'Secutor De La 2e Cohorte', 'Secutor[p] Der II. Kohorte', 'IIコホルス・セクトール', NULL, 3, '27.6', '21.2', 49, NULL, 0, NULL, 0, 0),
+(51, 1825, '2nd Cohort Signifer', '2nd Cohort Signifer', 'Signifer De La 2e Cohorte', 'Signifer[p] Der II. Kohorte', 'IIコホルス・シグニフェル', NULL, 3, '28.7', '20.9', 49, 3, 0, NULL, 1, 0),
+(52, 1826, '2nd Cohort Vanguard', '2nd Cohort Vanguard', 'Avant-garde De La 2e Cohorte', 'Frontbrecher[p] Der II. Kohorte', 'IIコホルス・ヴァンガード', NULL, 3, '29.3', '20.6', 50, 3, 0, NULL, 1, 0),
+(53, 1201, 'Acubens', 'Acubens', 'Acubens', 'Acubens', 'アクベンス', NULL, 3, '31.1', '35.4', 30, NULL, 1, NULL, 0, 0),
+(770, 1506, 'Cindersoot Pegujj Chah', 'Cindersoot Pegujj Chah', 'Pegujj Chah Le Fuligineux', 'Zunderruß Pegujj Chah', '黒煙のペグジ・チャー', NULL, 14, '24.0', '26.0', 49, 1, 1, 6, 1, 0),
+(55, 341, 'Apkallu', 'Apkallu', 'Apkallu', 'Apkallu', 'アプカル', NULL, 3, '27.5', '35.7', 30, 4, 0, NULL, 1, 0),
+(56, 361, 'Bloodshore Bell', 'Bloodshore Bell', 'Cloche Des Rives Sanglantes', 'Rotgischt-Helmqualle', 'ブラッドショア・ベル', NULL, 3, '31.1', '26.6', 33, 3, 0, NULL, 1, 0),
+(780, 2367, 'Kafre', 'Kafre', 'Kafre', 'Kafre', 'カフレ', NULL, 8, '23.0', '18.0', 49, 1, 1, 15, 1, 0),
+(58, 1608, 'Butting Buffalo', 'Butting Buffalo', 'Buffle Rueur', 'Angriffslustig[a] Büffel', 'バッティング・バッファロー', NULL, 3, '28.2', '28.5', 28, NULL, 1, NULL, 0, 0),
+(59, 1200, 'Cancer', 'Cancer', 'Cancer', 'Cancer', 'キャンサー', NULL, 3, '31.2', '35.5', 32, NULL, 1, NULL, 0, 0),
+(60, 1732, 'Cluster Mantis', 'Cluster Mantis', 'Bébé Mante Rouge', 'Schwarmmantis', 'タイニー・レッドマンティス', NULL, 3, '15.7', '28.1', 30, NULL, 1, NULL, 0, 0),
+(61, 1869, 'Clutch Pelican', 'Clutch Pelican', 'Pélican Rafleur', 'Klauen-Pelikan', 'クラッチ・ペリカン', NULL, 3, '21.8', '31.8', 29, NULL, 1, NULL, 0, 0),
+(62, 1092, 'Coastal Mandragora', 'Coastal Mandragora', 'Mandragore Des Côtes', 'Küsten-Mandragora', 'コスタル・マンドラゴラ', NULL, 3, '30.2', '27.6', 23, NULL, 0, NULL, 0, 0),
+(63, 639, 'Colibri', 'Colibri', 'Colibri', 'Kolibri', 'コリブリ', NULL, 3, '31.9', '25.2', 33, 4, 0, NULL, 1, 0),
+(64, 684, 'Cork Bulb', 'Cork Bulb', 'Bulbe De Liège', 'Korkknolle', 'コルク・バルブ', NULL, 3, '19.6', '25.1', 32, NULL, 0, NULL, 0, 0),
+(65, 396, 'Dung Midge Swarm', 'Dung Midge Swarm', 'Nuée De Moucherons Bousiers', 'Dungmückenschwarm', 'ダンミッヂ・スウォーム', NULL, 3, '16.7', '31.3', 33, NULL, 0, NULL, 0, 0),
+(66, 1274, 'Gegeruju Manor Guard', 'Gegeruju Manor Guard', 'Garde Privé De Gegeruju', 'Gegeruju-Wächter', 'ゲゲルジュ氏の私兵', NULL, 3, '30.8', '29.2', 35, NULL, 0, NULL, 0, 0),
+(67, 366, 'Giant Pelican', 'Giant Pelican', 'Pélican Géant', 'Riesenpelikan', 'ジャイアントペリカン', NULL, 3, '20.5', '33.0', 32, NULL, 0, NULL, 0, 0),
+(68, 26, 'Gigantoad', 'Gigantoad', 'Crapaud Géant', 'Karpfenkröte', 'ギガントード', NULL, 3, '19.1', '26.2', 33, 3, 0, NULL, 1, 0),
+(69, 353, 'Goobbue', 'Goobbue', 'Goobbue', 'Goobbue', 'グゥーブー', NULL, 3, '18.3', '33.9', 33, 3, 0, NULL, 1, 0),
+(70, 411, 'Grass Raptor', 'Grass Raptor', 'Raptor Des Plaines', 'Gras-Raptor', 'グラスラプトル', NULL, 3, '23.0', '21.3', 32, 4, 0, NULL, 1, 0),
+(779, 1520, 'Karkinos', 'Karkinos', 'Karkinos', 'Karkinos', 'カルキノス', NULL, 5, '13.0', '24.0', 21, 1, 1, 16, 1, 0),
+(72, 687, 'Hoary Goobbue', 'Hoary Goobbue', 'Goobbue Chenu', 'Ergraut[a] Goobbue', 'ホアリーグゥーブー', NULL, 3, '22.0', '31.3', 50, NULL, 0, NULL, 0, 0),
+(73, 1855, 'Jijiroon Of The Silver Clutch', 'Jijiroon Of The Silver Clutch', 'Jijiroon Le Pique-argent', 'Jijiroon', '銀卵のジジルン', NULL, 3, '20.5', '31.0', 33, NULL, 1, NULL, 0, 0),
+(74, 352, 'Jungle Coeurl', 'Jungle Coeurl', 'Coeurl Des Jungles', 'Dschungel-Coeurl', 'ジャングルクァール', NULL, 3, '17.8', '28.4', 34, 4, 0, NULL, 1, 0),
+(75, 373, 'Kobold Missionary', 'Kobold Missionary', 'Missionnaire Kobold', 'Kobold-Missionar', 'コボルド・ミッションアリー', NULL, 3, '27.7', '25.5', 34, 4, 0, NULL, 1, 0),
+(76, 369, 'Kobold Pitman', 'Kobold Pitman', 'Mineur Kobold', 'Kobold-Steiger', 'コボルド・ピットマン', NULL, 3, '27.8', '25.9', 34, 4, 0, NULL, 1, 1),
+(77, 858, 'Kokoroon Quickfingers', 'Kokoroon Quickfingers', 'Kokoroon Doigtvifs', 'Kokoroon Drecksgriffel', '弾指のココルン', NULL, 3, '26.3', '32.9', 32, 1, 1, 17, 1, 0),
+(78, 1313, 'Large Buffalo', 'Large Buffalo', 'Buffle', 'Groß[a] Büffel', 'バッファロー', NULL, 3, '30.6', '32.3', 31, 3, 0, NULL, 1, 0),
+(79, 414, 'Mamool Ja Breeder', 'Mamool Ja Breeder', 'éleveur Mamool Ja', 'Mamool Ja-Brüter', 'マムージャ・ブリーダー', NULL, 3, '23.8', '19.9', 31, 3, 0, NULL, 1, 1),
+(80, 415, 'Mamool Ja Sophist', 'Mamool Ja Sophist', 'Sophiste Mamool Ja', 'Mamool Ja-Sophist', 'マムージャ・ソフィスト', NULL, 3, '24.2', '20.4', 29, NULL, 0, NULL, 0, 1),
+(81, 355, 'Mildewed Goobbue', 'Mildewed Goobbue', 'Goobbue Mildiousé', 'Mehltau-Goobbue', 'ミルデューグゥーブー', NULL, 3, '16.9', '32.5', 34, NULL, 0, NULL, 0, 0),
+(82, 1660, 'Off-duty Porter', 'Off-duty Porter', 'Livreur Rentrant Du Travail', 'Träger[p] Außer Dienst', '仕事帰りの荷運び人', NULL, 3, '18.1', '32.1', 37, NULL, 1, NULL, 0, 0),
+(83, 1363, 'Oyster Hunter', 'Oyster Hunter', 'Cueilleuse D\'huîtres', 'Austernsammlerin', '虹蝶貝を探す女', NULL, 3, '31.9', '24.5', 50, NULL, 1, NULL, 0, 0),
+(84, 351, 'Qiqirn Gullroaster', 'Qiqirn Gullroaster', 'Qiqirn Grille-mouette', 'Qiqirn-Möwenbrater', 'キキルン・ガルロースター', NULL, 3, '26.2', '32.2', 32, 3, 0, NULL, 1, 0),
+(85, 2011, 'Restless Harrier', 'Restless Harrier', 'Harceleur Agité', 'Rastlos[a] Plünderer', 'レストレス・ハリアー', NULL, 3, '23.3', '20.3', 40, NULL, 0, NULL, 0, 0),
+(86, 2012, 'Restless Raptor', 'Restless Raptor', 'Raptor Agité', 'Rastlos[a] Raptor', 'レストレス・ラプトル', NULL, 3, '23.4', '20.3', 30, NULL, 0, NULL, 0, 0),
+(87, 894, 'Rutting Buffalo', 'Rutting Buffalo', 'Buffle En Rut', 'Brunftig[a] Büffel', 'ラッティング・バッファロー', NULL, 3, '27.3', '29.5', 28, NULL, 1, NULL, 0, 0),
+(88, 560, 'Snipper', 'Snipper', 'Cisailleur', 'Schnippler', 'スニッパー', NULL, 3, '30.8', '35.5', 32, 4, 0, NULL, 1, 0),
+(90, 1339, 'Thrill-seeking Milksop', 'Thrill-seeking Milksop', 'Homme Craignant Les Fantômes', 'Abergläubisch[a] Angsthase', '亡霊を恐れる男', NULL, 3, '29.7', '30.1', 1, NULL, 1, NULL, 0, 0),
+(91, 1340, 'Thrill-seeking Skeptic', 'Thrill-seeking Skeptic', 'Homme Incrédule', 'Abenteuerlustig[a] Skeptiker', '亡霊を信じない男', NULL, 3, '29.7', '30.1', 1, NULL, 1, NULL, 0, 0),
+(92, 981, 'Yellowjacket', 'Yellowjacket', 'Casaque Jaune', 'Gelbjacken-Seesoldat', 'イエロージャケット陸戦兵', NULL, 3, '23.9', '20.3', 2, NULL, 1, NULL, 0, 1),
+(93, 357, 'Aurochs', 'Aurochs', 'Auroch', 'Auerochse', 'オーロックス', NULL, 4, '29.7', '25.9', 12, NULL, 1, NULL, 0, 0),
+(94, 1831, 'Axolotl', 'Axolotl', 'Axolotl', 'Drakolurch', 'アクソロトル', NULL, 4, '14.1', '15.4', 48, NULL, 0, NULL, 0, 0),
+(95, 1078, 'Bloodsucker Bat', 'Bloodsucker Bat', 'Chauve-souris Suce-sang', 'Blutsauger-Fledermaus', 'ブラッドサッカー・バット', NULL, 4, '28.1', '24.4', 15, NULL, 0, NULL, 0, 0),
+(96, 3133, 'Captain Jacke', 'Captain Jacke', 'Capitaine Jacke', 'Meisterschurke Jack', '双刃のジャック', NULL, 4, '33.4', '27.8', 30, NULL, 0, NULL, 0, 0),
+(97, 1315, 'Cattle Tyrant', 'Cattle Tyrant', 'Moucherolle Querelleur', 'Rinder-Tyrann', 'キャトル・タイラント', NULL, 4, '27.4', '24.5', 18, NULL, 0, NULL, 0, 0),
+(778, 451, 'Yabi Two-tails', 'Yabi Two-tails', 'Yabi Kaatapoh Deux-queues', 'Yabi Zweischwanz', '双尾のヤビ・カータポ', NULL, 9, '14.0', '33.0', 32, 1, 1, 35, 1, 0),
+(99, 1854, 'Dead Man\'s Moan', 'Dead Man\'s Moan', 'Mort Gémissant', 'Totenkläger', 'デッドマン', NULL, 4, '14.6', '36.0', 42, NULL, 0, NULL, 0, 0),
+(100, 363, 'Dusk Bat', 'Dusk Bat', 'Chauve-souris Crépusculaire', 'Dämmerfledermaus', 'ダスクバット', NULL, 4, '27.0', '23.5', 15, NULL, 0, NULL, 0, 0),
+(101, 1027, 'Evenfall Firefly', 'Evenfall Firefly', 'Luciole Du Crépuscule', 'Abendstern-Leuchtkäfer', 'イブンフォール・ファイアフライ', NULL, 4, '27.5', '23.0', 16, NULL, 0, NULL, 0, 0),
+(102, 394, 'Fat Dodo', 'Fat Dodo', 'Dodo Dodu', 'Fett[a] Dodo', 'ファットドードー', NULL, 4, '33.9', '28.7', 12, NULL, 0, NULL, 0, 0),
+(103, 1087, 'Feral Dodo', 'Feral Dodo', 'Dodo Sauvage', 'Verwildert[a] Dodo', 'フェラル・ドードー', NULL, 4, '33.8', '31.1', 11, NULL, 0, NULL, 0, 0),
+(104, 129, 'Firefly', 'Firefly', 'Luciole', 'Leuchtkäfer', 'ファイアフライ', NULL, 4, '23.1', '20.3', 19, NULL, 0, NULL, 0, 1),
+(105, 2531, 'Fresh Whelk Ballista', 'Fresh Whelk Ballista', 'Baliste De Bulot Frais', 'Neuartig[a] Wellhorn-Balliste', 'フレッシュユミール・バリスタ', NULL, 4, '15.6', '14.3', 46, NULL, 0, NULL, 0, 0),
+(106, 1173, 'Galeborn Buccaneer', 'Galeborn Buccaneer', 'Boucanier Des Rafales Cinglantes', 'Sturmgeboren[a] Seeräuber', 'ゲイルボーン・バッカニア', NULL, 4, '32.0', '29.5', 18, NULL, 0, NULL, 0, 0),
+(107, 3142, 'Game Fowl', 'Game Fowl', 'Gibier à Plumes', 'Wildhenne', 'ゲームファウル', NULL, 4, '33.0', '28.0', 15, NULL, 0, NULL, 0, 0),
+(108, 225, 'Goblin Hunter', 'Goblin Hunter', 'Chasseur Gobelin', 'Goblin-Jäger', 'ゴブリン・ハンター', NULL, 4, '26.4', '22.7', 11, NULL, 0, NULL, 0, 1),
+(109, 1360, 'Goblin Trader', 'Goblin Trader', 'Négociant Gobelin', 'Goblin-Händler', 'ゴブリン・トレーダー', NULL, 4, '26.5', '22.7', 18, NULL, 1, NULL, 0, 0),
+(110, 403, 'Hedgemole', 'Hedgemole', 'Héritaupe', 'Stachelmull', 'ヘッジモール', NULL, 4, '26.4', '23.7', 15, NULL, 0, NULL, 0, 0),
+(111, 1369, 'Hysterical Hawker', 'Hysterical Hawker', 'Marchand Contrarié', 'Hysterisch[a] Krämer', '困り果てた商人', NULL, 4, '29.9', '26.0', 15, NULL, 1, NULL, 0, 0),
+(112, 3140, 'Jolly Merchant Barber', 'Jolly Merchant Barber', 'Barbier Du Camelot Fringant', 'Schiffsarzt[p] Der Schädelbande', 'クフサド商船団の船医', NULL, 4, '33.2', '27.8', 15, NULL, 0, NULL, 0, 0),
+(113, 3139, 'Jolly Merchant Lodesman', 'Jolly Merchant Lodesman', 'Pilote Du Camelot Fringant', 'Steuermann[p] Der Schädelbande', 'クフサド商船団の航海士', NULL, 4, '33.3', '27.8', 16, NULL, 0, NULL, 0, 0),
+(114, 3141, 'Jolly Merchant Waister', 'Jolly Merchant Waister', 'Marin Du Camelot Fringant', 'Matrose[p] Der Schädelbande', 'クフサド商船団の甲板員', NULL, 4, '33.1', '27.9', 15, NULL, 0, NULL, 0, 0),
+(115, 644, 'Killer Mantis', 'Killer Mantis', 'Mante Tueuse', 'Killermantis', 'キラーマンティス', NULL, 4, '22.3', '20.7', 16, NULL, 0, NULL, 0, 0),
+(116, 1853, 'Lammergeyer', 'Lammergeyer', 'Gypaète', 'Bartgeier', 'ラマーガイアー', NULL, 4, '12.4', '36.3', 41, NULL, 0, NULL, 1, 0),
+(117, 1062, 'Memeroon', 'Memeroon', 'Memeroon La Nantie', 'Memeroon', '金主のメメルン', NULL, 4, '27.7', '25.6', 19, NULL, 0, NULL, 0, 0),
+(118, 1701, 'Mouu The Puller', 'Mouu The Puller', 'Mouu Le Refluant', 'Mouu [t] Zieher', '引潮のモォウ', NULL, 4, '18.7', '21.8', 45, NULL, 1, NULL, 0, 0),
+(120, 1060, 'O\'adebh Whitemane', 'O\'adebh Whitemane', 'O\'adebh Blanche-chevelure', 'O\'adebh Weißmähne', '白髪のオ・アデブ', NULL, 4, '30.8', '27.5', 18, NULL, 0, NULL, 0, 0),
+(121, 3138, 'Perimu Haurimu Underfoot', 'Perimu Haurimu Underfoot', 'Perimu Haurimu Le Coursier', 'Perimu Haurimu', '追廻のペリム・ハウリム', NULL, 4, '32.9', '27.8', 30, NULL, 0, NULL, 0, 0),
+(122, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 4, '16.5', '31.6', 34, 4, 0, NULL, 1, 1),
+(123, 1852, 'Preying Mantis', 'Preying Mantis', 'Mante Prédatrice', 'Mantis-Dämon', 'マンティスデビル', NULL, 4, '14.2', '35.4', 40, 3, 0, NULL, 1, 0),
+(124, 402, 'Puk Hatchling', 'Puk Hatchling', 'Puk', 'Puk', 'プーク', NULL, 4, '29.8', '25.7', 15, NULL, 0, NULL, 0, 0),
+(125, 2532, 'Reinforced Whelk Ballista', 'Reinforced Whelk Ballista', 'Baliste De Bulot Renforcée', 'Verstärkt[a] Wellhorn-Balliste', '強化ユミール・バリスタ', NULL, 4, '13.0', '14.1', 48, NULL, 0, NULL, 0, 0),
+(126, 420, 'Rhotano Buccaneer', 'Rhotano Buccaneer', 'Boucanier De Rhotano', 'Rhotano-Seeräuber', 'ロータノ・バッカニア', NULL, 4, '33.8', '27.4', 14, NULL, 0, NULL, 0, 0),
+(127, 1171, 'Rope-burned Buccaneer', 'Rope-burned Buccaneer', 'Boucanier Encordé', 'Striemen-Seeräuber', 'ロープボーンド・バッカニア', NULL, 4, '28.6', '23.1', 18, NULL, 0, NULL, 0, 0),
+(128, 400, 'Roseling', 'Roseling', 'Callisia', 'Rösling', 'ローズリング', NULL, 4, '35.1', '30.2', 10, NULL, 0, NULL, 0, 0),
+(129, 1181, 'Rothlyt Pelican', 'Rothlyt Pelican', 'Pélican De Rothlyt', 'Rothlyt-Pelikan', 'ロズリトペリカン', NULL, 4, '23.9', '24.6', 16, NULL, 0, NULL, 0, 0),
+(130, 2165, 'Sahagin Sapper', 'Sahagin Sapper', 'Piquier Sahuagin', 'Sahagin-Sappeur', 'サハギン・サパー', NULL, 4, '21.1', '19.5', 41, NULL, 1, NULL, 0, 0),
+(131, 2166, 'Sahagin Skirmisher', 'Sahagin Skirmisher', 'Escarmoucheur Sahuagin', 'Sahagin-Hellebardier', 'サハギン・スカーミッシャー', NULL, 4, '18.5', '21.9', 42, NULL, 1, NULL, 0, 0),
+(132, 1075, 'Sanguinary Buccaneer', 'Sanguinary Buccaneer', 'Boucanier Sanguinaire', 'Blutrünstig[a] Seeräuber', 'サングイナリィ・バッカニア', NULL, 4, '28.2', '24.8', 18, NULL, 0, NULL, 0, 0),
+(133, 2527, 'Sapsa Elbst', 'Sapsa Elbst', 'Elbst De Sapsa', 'Sapsa-Elbst', 'サプサ・エルブスト', NULL, 4, '16.5', '15.0', 46, NULL, 0, NULL, 0, 0),
+(134, 1828, 'Sapsa Shelfclaw', 'Sapsa Shelfclaw', 'Griffe-des-profondeurs De Sapsa', 'Sapsa-Panzerklaue', 'サプサ・シェルフクロウ', NULL, 4, '14.3', '13.2', 49, 3, 0, NULL, 1, 0),
+(135, 1827, 'Sapsa Shelfscale', 'Sapsa Shelfscale', 'écaille-des-profondeurs De Sapsa', 'Sapsa-Panzerschuppe', 'サプサ・シェルフスケール', NULL, 4, '14.7', '14.3', 49, NULL, 0, NULL, 0, 0),
+(136, 1829, 'Sapsa Shelfspine', 'Sapsa Shelfspine', 'épine-des-profondeurs De Sapsa', 'Sapsa-Panzerdorn', 'サプサ・シェルフスパイン', NULL, 4, '15.6', '14.2', 49, 3, 0, NULL, 1, 0),
+(137, 1830, 'Sapsa Shelftooth', 'Sapsa Shelftooth', 'Dent-des-profondeurs De Sapsa', 'Sapsa-Panzerzahn', 'サプサ・シェルフトゥース', NULL, 4, '14.5', '13.6', 47, 3, 0, NULL, 1, 0),
+(138, 360, 'Sea Wasp', 'Sea Wasp', 'Guêpe Des Mers', 'Seewespe', 'シーワスプ', NULL, 4, '13.6', '17.4', 48, 3, 0, NULL, 1, 0),
+(140, 410, 'Sewer Mole', 'Sewer Mole', 'Taupe D\'égout', 'Kloaken-Mull', 'シュアモール', NULL, 4, '33.3', '28.5', 11, NULL, 0, NULL, 0, 0),
+(141, 342, 'Shallowtail Reaver', 'Shallowtail Reaver', 'Queue Des Pillards Du Serpent', 'Flachflossen-Plünderer', '海蛇の尾', NULL, 4, '24.5', '23.7', 15, NULL, 0, NULL, 0, 0),
+(142, 345, 'Shelfclaw Reaver', 'Shelfclaw Reaver', 'Aiguillon Des Pillards Du Serpent', 'Seichtklauen-Plünderer', '海蛇の赤き爪', NULL, 4, '13.6', '17.1', 48, NULL, 0, NULL, 0, 0),
+(143, 384, 'Shelfclaw Sahagin', 'Shelfclaw Sahagin', 'Sahuagin Griffe-des-profondeurs', 'Panzerklauen-Sahagin', 'シェルフクロウ・サハギン', NULL, 4, '17.7', '19.1', 44, 4, 0, NULL, 1, 0),
+(144, 2675, 'Shelfclaw Sentry', 'Shelfclaw Sentry', 'Sentinelle Griffe-des-profondeurs', 'Panzerklauen-Wache', 'シェルフクロウ・セントリー', NULL, 4, '19.1', '18.5', 50, NULL, 0, NULL, 0, 0),
+(145, 559, 'Shelfeye Reaver', 'Shelfeye Reaver', 'Prunelle Des Pillards Du Serpent', 'Seichtaugen-Plünderer', '海蛇の赤き目', NULL, 4, '12.6', '17.1', 48, 3, 0, NULL, 1, 0),
+(146, 347, 'Shelfscale Reaver', 'Shelfscale Reaver', 'Scutelle Des Pillards Du Serpent', 'Seichtschuppen-Plünderer', '海蛇の赤き鱗', NULL, 4, '12.9', '17.1', 48, NULL, 0, NULL, 0, 0),
+(147, 386, 'Shelfscale Sahagin', 'Shelfscale Sahagin', 'Sahuagin écaille-des-profondeurs', 'Panzerschuppen-Sahagin', 'シェルフスケール・サハギン', NULL, 4, '20.7', '18.4', 44, 3, 0, NULL, 1, 0),
+(148, 389, 'Shelfspine Sahagin', 'Shelfspine Sahagin', 'Sahuagin épine-des-profondeurs', 'Panzerdorn-Sahagin', 'シェルフスパイン・サハギン', NULL, 4, '19.7', '19.0', 44, NULL, 0, NULL, 0, 0),
+(149, 2524, 'Shoalclaw Sahagin', 'Shoalclaw Sahagin', 'Sahuagin Griffe-d\'écueil', 'Schwarmklauen-Sahagin', 'ショアルクロウ・サハギン', NULL, 4, '18.6', '15.7', 46, NULL, 0, NULL, 0, 0),
+(150, 2525, 'Shoalscale Sahagin', 'Shoalscale Sahagin', 'Sahuagin écaille-d\'écueil', 'Schwarmschuppen-Sahagin', 'ショアルスケール・サハギン', NULL, 4, '18.1', '15.7', 46, NULL, 0, NULL, 0, 0),
+(151, 2523, 'Shoalspine Sahagin', 'Shoalspine Sahagin', 'Sahuagin épine-d\'écueil', 'Schwarmdorn-Sahagin', 'ショアルスパイン・サハギン', NULL, 4, '16.6', '17.9', 46, NULL, 0, NULL, 0, 0),
+(152, 2526, 'Shoaltooth Sahagin', 'Shoaltooth Sahagin', 'Sahuagin Dent-d\'écueil', 'Schwarmfang-Sahagin', 'ショアルトゥース・サハギン', NULL, 4, '17.3', '15.9', 46, NULL, 0, NULL, 0, 0),
+(153, 1370, 'Sleepless Citizen', 'Sleepless Citizen', 'Citadine Apeurée', 'Verängstigt[a] Bürgerin', '魔物に怯える市民', NULL, 4, '28.7', '25.6', 15, NULL, 1, NULL, 0, 0),
+(154, 1346, 'Storm Courier', 'Storm Courier', 'Coursière Du Maelstrom', 'Mahlstrom-Botin', '黒渦団の輸送兵', NULL, 4, '26.0', '25.7', 13, NULL, 1, NULL, 0, 0),
+(155, 1332, 'Storm Private', 'Storm Private', 'Soldat 3e Classe Des Tempêtes', 'Sturmmariner', '黒渦団二等甲兵', NULL, 4, '18.5', '21.9', 40, NULL, 1, NULL, 0, 1),
+(156, 1172, 'Tar-stained Buccaneer', 'Tar-stained Buccaneer', 'Boucanier Taché De Goudron', 'Teerbefleckt[a] Seeräuber', 'タールステイン・バッカニア', NULL, 4, '28.1', '23.8', 17, NULL, 0, NULL, 0, 0),
+(157, 565, 'Trenchtooth Sahagin', 'Trenchtooth Sahagin', 'Sahuagin Dent-des-fosses', 'Grabenzahn-Sahagin', 'トレンチトゥース・サハギン', NULL, 4, '20.1', '19.8', 48, 3, 0, NULL, 1, 0),
+(158, 3129, 'V\'kebbe The Stray', 'V\'kebbe The Stray', 'V\'kebbe L\'errante', 'V\'kebbe [t] Streunerin', '野良猫のヴァ・ケビ', NULL, 4, '32.9', '27.8', 30, NULL, 0, NULL, 0, 0),
+(159, 1518, 'Voll The Sharkskinned', 'Voll The Sharkskinned', 'Voll Peau De Requin', 'Voll [t] Haihäutig[a]', '鮫肌のヴォル', NULL, 4, '18.6', '18.9', 44, 1, 1, 32, 1, 0),
+(160, 2167, 'Voll\'s Fang', 'Voll\'s Fang', 'Croc De Voll', 'Volls Fang[p]', 'ヴォルの鮫牙', NULL, 4, '18.7', '19.2', 41, NULL, 1, NULL, 0, 0),
+(161, 1056, 'Warren Warden', 'Warren Warden', 'Gardien De Garenne', 'Stollenjäger', '賞金首：ウォーレン・ワーデン', NULL, 4, '33.8', '29.9', 14, NULL, 0, NULL, 0, 0),
+(162, 2530, 'Whelk Ballista', 'Whelk Ballista', 'Baliste De Bulot', 'Wellhorn-Balliste', 'ユミール・バリスタ', NULL, 4, '19.8', '19.3', 44, NULL, 0, NULL, 0, 0),
+(163, 393, 'Wild Dodo', 'Wild Dodo', 'Dodo', 'Dodo', 'ドードー', NULL, 4, '28.8', '20.4', 7, NULL, 0, NULL, 0, 1),
+(164, 399, 'Wild Jackal', 'Wild Jackal', 'Chacal Sauvage', 'Wild[a] Schakal', 'ジャッカル', NULL, 4, '21.0', '32.7', 10, NULL, 0, NULL, 0, 1),
+(165, 2356, 'Yarr The Wavefiend', 'Yarr The Wavefiend', 'Yarr', 'Wellenteufel Yarr', '水鬼のヤァル', NULL, 4, '11.5', '14.0', 49, 1, 1, 317, 1, 0),
+(166, 1043, 'Yarzon Lurker', 'Yarzon Lurker', 'Yarzon Rôdeur', 'Lauernd[a] Yarzon', 'ヤーゾン・ラーカー', NULL, 4, '34.8', '29.9', 14, NULL, 0, NULL, 0, 0),
+(167, 1359, 'Yellowjacket Captain', 'Yellowjacket Captain', 'Capitaine D\'infanterie Des Casaques', 'Gelbjacken-Hauptmann', 'イエロージャケット陸士長', NULL, 4, '27.2', '23.7', 16, NULL, 1, NULL, 0, 0),
+(168, 28, 'Coeurl Pup', 'Coeurl Pup', 'Jeune Coeurl', 'Coeurl-Jungtier', 'クァール・パップ', NULL, 5, '9.0', '21.5', 23, NULL, 0, NULL, 0, 0),
+(169, 381, 'Forest Yarzon', 'Forest Yarzon', 'Yarzon Des Forêts', 'Wald-Yarzon', 'フォレスト・ヤーゾン', NULL, 5, '11.0', '21.3', 22, NULL, 0, NULL, 0, 0),
+(170, 380, 'Kobold Footman', 'Kobold Footman', 'Fantassin Kobold', 'Kobold-Fußsoldat', 'コボルド・フットマン', NULL, 5, '11.8', '22.0', 24, NULL, 0, NULL, 0, 0),
+(171, 379, 'Kobold Patrolman', 'Kobold Patrolman', 'Patrouilleur Kobold', 'Kobold-Grenzsoldat', 'コボルド・パトロールマン', NULL, 5, '28.3', '18.5', 34, NULL, 0, NULL, 0, 1),
+(172, 370, 'Kobold Pickman', 'Kobold Pickman', 'Piocheur Kobold', 'Kobold-Hauer', 'コボルド・ピックマン', NULL, 5, '12.0', '22.1', 24, NULL, 0, NULL, 0, 0),
+(173, 376, 'Kobold Sidesman', 'Kobold Sidesman', 'Bedeau Kobold', 'Kobold-Diener', 'コボルド・サイズマン', NULL, 5, '26.7', '19.6', 34, 4, 0, NULL, 1, 0),
+(174, 413, 'Mamool Ja Executioner', 'Mamool Ja Executioner', 'Exécuteur Mamool Ja', 'Mamool Ja-Henker', 'マムージャ・エクスキューショナー', NULL, 5, '32.0', '24.7', 33, 4, 0, NULL, 1, 1),
+(175, 416, 'Mamool Ja Infiltrator', 'Mamool Ja Infiltrator', 'Infiltrateur Mamool Ja', 'Mamool Ja-Spion', 'マムージャ・インフィルトレーター', NULL, 5, '33.2', '25.7', 33, NULL, 0, NULL, 0, 0),
+(177, 642, 'Mud Pugil', 'Mud Pugil', 'Pugil Vaseux', 'Schmodder-Pugil', 'マッドプギル', NULL, 5, '32.9', '25.6', 30, NULL, 0, NULL, 0, 0),
+(768, 859, 'Gluttonous Gertrude', 'Gluttonous Gertrude', 'Gertrude La Gloutonne', 'Gierschlund Gertrude', 'グルタナスガーティ', NULL, 4, '32.0', '28.0', 12, 1, 1, 10, 1, 0),
+(180, 1519, 'Oannes', 'Oannes', 'Oannes', 'Oannes', 'オアンネス', NULL, 5, '34.3', '24.2', 30, 1, 1, 22, 1, 0),
+(181, 1238, 'Rabid Ratata', 'Rabid Ratata', 'Ratata L\'enragée', 'Ratata [t] Wüterin[p]', '狂犬のラタタ', NULL, 5, '10.4', '23.6', 21, NULL, 1, NULL, 0, 0),
+(182, 391, 'Salamander', 'Salamander', 'Salamandre', 'Salamander', 'サラマンダー', NULL, 5, '27.4', '22.3', 34, 4, 0, NULL, 1, 0),
+(183, 1239, 'Salthound Boatswain', 'Salthound Boatswain', 'Matelot Des Dogues De Mer', 'Meeresköter-Bootsmann', '猟犬同盟の甲板員', NULL, 5, '12.5', '25.3', 17, NULL, 1, NULL, 0, 0),
+(184, 1240, 'Salthound Gunner', 'Salthound Gunner', 'Pilote Des Dogues De Mer', 'Meeresköter-Navigator', '猟犬同盟の航海士', NULL, 5, '11.2', '22.8', 17, NULL, 1, NULL, 0, 0),
+(185, 638, 'Stoneshell', 'Stoneshell', 'Coquepierre', 'Steinschale', 'ストーンシェル', NULL, 5, '13.6', '24.3', 21, NULL, 0, NULL, 0, 0),
+(186, 39, 'Tree Slug', 'Tree Slug', 'Limace Arboricole', 'Baumschnecke', 'ツリースラッグ', NULL, 5, '12.9', '26.1', 10, NULL, 0, NULL, 0, 1),
+(187, 643, 'Uragnite', 'Uragnite', 'Uragnite', 'Uragnit', 'ウラグナイト', NULL, 5, '28.8', '22.1', 31, 4, 0, NULL, 1, 0),
+(188, 1180, 'Wild Wolf', 'Wild Wolf', 'Loup Sauvage', 'Wildwolf', 'ワイルドウルフ', NULL, 5, '14.0', '25.3', 20, NULL, 0, NULL, 0, 0),
+(189, 1521, 'Zoredonite', 'Zoredonite', 'Zoredonite', 'Zoredonit', 'ゾレドナイト', NULL, 5, '28.6', '24.5', 31, 1, 1, 36, 1, 0),
+(190, 1670, '59th Order Bedesman Bi Go', '59th Order Bedesman Bi Go', 'Bi Go Prieur Du 59e Ordre', 'Fürbeter[p] Bi Go Vom 59. Orden', 'ビーズマン59 ビ・ゴ', NULL, 6, '24.5', '6.5', 49, 1, 1, 327, 1, 0),
+(191, 1524, '59th Order Pickman Be Ze', '59th Order Pickman Be Ze', 'Be Ze Piocheur Du 59e Ordre', 'Hauer[p] Be Ze Vom 59. Orden', 'ピックマン59 ベ・ゼ', NULL, 6, '22.9', '11.8', 44, 1, 1, 321, 1, 0),
+(192, 2516, '59th Order Roundsman Ge Ga', '59th Order Roundsman Ge Ga', 'Ge Ga Livreur Du 59e Ordre', 'Laufbursche Ge Ga Vom 59. Orden', 'ラウンズマン59 ゲ・ガ', NULL, 6, '22.4', '6.4', 47, 1, 1, 408, 1, 0),
+(193, 2357, '5th Order Patriarch Ze Bu', '5th Order Patriarch Ze Bu', 'Ze Bu Patriarche Du 5e Ordre', 'Ze Bu Vom 5. Orden', 'ペイトリアーク05 ゼ・ブ', NULL, 6, '22.5', '8.3', 47, 1, 1, 2, 1, 0),
+(195, 1671, 'Asbestos Coblyn', 'Asbestos Coblyn', 'Doblyn D\'asbeste', 'Asbest-Kobalos', 'アスベスト・ドブラン', NULL, 6, '24.7', '6.4', 45, NULL, 1, NULL, 0, 0),
+(196, 1528, 'Balidet', 'Balidet', 'Balidet', 'Balidet', 'バリデト', NULL, 6, '21.7', '5.8', 47, NULL, 1, NULL, 0, 0),
+(197, 365, 'Basalt Golem', 'Basalt Golem', 'Golem De Basalte', 'Basaltgolem', 'バサルトゴーレム', NULL, 6, '17.1', '16.2', 31, NULL, 0, NULL, 0, 0),
+(198, 2699, 'Big Shrapnel', 'Big Shrapnel', 'Shrapnelo Géant', 'Groß[a] Schrapnell', 'ビッグ・シュラプネル', NULL, 6, '25.8', '9.9', 44, NULL, 0, NULL, 0, 0),
+(199, 2528, 'Bomb Incubator', 'Bomb Incubator', 'Bombocubateur', 'Bomber-Brutofen', 'ボム培養炉', NULL, 6, '22.5', '11.3', 44, NULL, 0, NULL, 0, 0),
+(200, 106, 'Coeurl', 'Coeurl', 'Coeurl', 'Coeurl', 'クァール', NULL, 6, '14.9', '11.1', 34, 3, 0, NULL, 1, 0),
+(201, 1723, 'Cowering Coachman', 'Cowering Coachman', 'Fourrier Embarrassé', 'Gestrandet[a] Ladenbesitzer', '困り果てた御者', NULL, 6, '21.1', '17.3', 31, NULL, 1, NULL, 0, 0),
+(202, 2708, 'Dazzling Bomb', 'Dazzling Bomb', 'Bombo étincelant', 'Gleißend[a] Bomber', 'ブリリアント・ボム', NULL, 6, '27.1', '5.4', 48, NULL, 0, NULL, 0, 0),
+(203, 2521, 'Elite Bedesman', 'Elite Bedesman', 'Prieur D\'élite', 'Elite-Fürbeter', 'エリート・ビーズマン', NULL, 6, '25.0', '5.9', 49, NULL, 0, NULL, 0, 0),
+(204, 2520, 'Elite Priest', 'Elite Priest', 'Prêtre D\'élite', 'Elite-Priester', 'エリート・プリースト', NULL, 6, '26.7', '5.4', 49, NULL, 0, NULL, 0, 0),
+(205, 2519, 'Elite Quarryman', 'Elite Quarryman', 'Terrassier D\'élite', 'Elite-Steinschlepper', 'エリート・クォーリーマン', NULL, 6, '26.0', '8.4', 49, NULL, 0, NULL, 0, 0),
+(206, 2518, 'Elite Roundsman', 'Elite Roundsman', 'Livreur D\'élite', 'Elite-Laufbursche', 'エリート・ラウンズマン', NULL, 6, '25.1', '8.4', 49, NULL, 0, NULL, 0, 0),
+(207, 2707, 'Glowing Bomb', 'Glowing Bomb', 'Bombo Incandescent', 'Leuchtend[a] Bomber', 'ブライト・ボム', NULL, 6, '27.1', '5.6', 48, NULL, 0, NULL, 0, 0),
+(208, 398, 'Highland Condor', 'Highland Condor', 'Condor Des Hautes Terres', 'Hochland-Kondor', 'ハイランド・コンドル', NULL, 6, '16.6', '17.8', 34, NULL, 0, NULL, 0, 0),
+(209, 375, 'Kobold Bedesman', 'Kobold Bedesman', 'Prieur Kobold', 'Kobold-Fürbeter', 'コボルド・ビーズマン', NULL, 6, '22.9', '12.4', 41, 4, 0, NULL, 1, 0),
+(210, 374, 'Kobold Deacon', 'Kobold Deacon', 'Aruspice Kobold', 'Kobold-Diakon', 'コボルド・ディーコン', NULL, 6, '22.1', '6.0', 44, NULL, 1, NULL, 0, 0),
+(211, 371, 'Kobold Priest', 'Kobold Priest', 'Prêtre Kobold', 'Kobold-Priester', 'コボルド・プリースト', NULL, 6, '23.4', '12.1', 41, 4, 0, NULL, 1, 0),
+(212, 562, 'Kobold Quarryman', 'Kobold Quarryman', 'Terrassier Kobold', 'Kobold-Steinschlepper', 'コボルド・クォーリーマン', NULL, 6, '21.4', '15.1', 31, 4, 0, NULL, 1, 0),
+(213, 377, 'Kobold Roundsman', 'Kobold Roundsman', 'Livreur Kobold', 'Kobold-Laufbursche', 'コボルド・ラウンズマン', NULL, 6, '22.8', '15.2', 41, 4, 0, NULL, 1, 0),
+(214, 1856, 'Lost Lalafell', 'Lost Lalafell', 'Lalafell égaré', 'Verirrt[a] Lalafell', '迷い込んだ冒険者', NULL, 6, '15.6', '10.7', 1, NULL, 1, NULL, 0, 0),
+(215, 2749, 'Mark II Limpet Bomb', 'Mark II Limpet Bomb', 'Bombo Collant évolué', 'Brandneu[a] Haft-Bomber', '新式リムペットボム', NULL, 6, '23.6', '8.7', 48, NULL, 0, NULL, 0, 0),
+(216, 1604, 'Pack Chocobo', 'Pack Chocobo', 'Chocobo De Bât', 'Karawanen-Chocobo', '荷運びチョコボ', NULL, 6, '22.1', '17.4', 1, NULL, 1, NULL, 0, 1),
+(217, 2529, 'Prototype Bomb Incubator', 'Prototype Bomb Incubator', 'Bombocubateur évolué', 'Brandneu[a] Bomber-Brutofen', '新式ボム培養炉', NULL, 6, '27.1', '5.1', 48, NULL, 0, NULL, 0, 0),
+(218, 62, 'Pteroc', 'Pteroc', 'Ptéroc Des Embruns', 'Pterosaurus', 'テロック', NULL, 6, '15.0', '19.0', 30, NULL, 0, NULL, 0, 0),
+(219, 1863, 'Restless Raptor', 'Restless Raptor', 'Raptor Agité', 'Rastlos[a] Raptor', 'レストレス・ラプトル', NULL, 6, '17.7', '16.2', 31, NULL, 1, NULL, 0, 0),
+(220, 407, 'Ringtail', 'Ringtail', 'Galago à Queue Annelée', 'Katzenfrett', 'リングテイル', NULL, 6, '15.7', '11.0', 34, NULL, 0, NULL, 0, 0),
+(221, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 6, '18.3', '15.8', 46, NULL, 0, NULL, 0, 1),
+(222, 1836, 'Synthetic Doblyn', 'Synthetic Doblyn', 'Doblyn Synthétique', 'Synthetisch[a] Dobalos', 'シンセティック・ドブラン', NULL, 6, '21.9', '9.3', 48, 3, 0, NULL, 1, 0),
+(223, 1834, 'U\'Ghamaro Bedesman', 'U\'Ghamaro Bedesman', 'Prieur D\'U\'Ghamaro', 'U\'Ghamaro-Fürbeter', 'ウ・ガマロ・ビーズマン', NULL, 6, '22.6', '7.2', 48, 3, 0, NULL, 1, 0),
+(224, 2522, 'U\'Ghamaro Golem', 'U\'Ghamaro Golem', 'Golem D\'U\'Ghamaro', 'U\'Ghamaro-Golem', 'ウ・ガマロ・ゴーレム', NULL, 6, '27.2', '7.4', 49, NULL, 0, NULL, 0, 0),
+(225, 2715, 'U\'Ghamaro Patrolman', 'U\'Ghamaro Patrolman', 'Patrouilleur D\'U\'Ghamaro', 'U\'Ghamaro-Grenzsoldat', 'ウ・ガマロ・パトロールマン', NULL, 6, '23.5', '8.6', 48, NULL, 0, NULL, 0, 0),
+(226, 1835, 'U\'Ghamaro Priest', 'U\'Ghamaro Priest', 'Prêtre D\'U\'Ghamaro', 'U\'Ghamaro-Priester', 'ウ・ガマロ・プリースト', NULL, 6, '22.1', '6.3', 48, 3, 0, NULL, 1, 0),
+(227, 1833, 'U\'Ghamaro Quarryman', 'U\'Ghamaro Quarryman', 'Terrassier D\'U\'Ghamaro', 'U\'Ghamaro-Steinschlepper', 'ウ・ガマロ・クォリーマン', NULL, 6, '23.7', '6.5', 48, 3, 0, NULL, 1, 0),
+(228, 1832, 'U\'Ghamaro Roundsman', 'U\'Ghamaro Roundsman', 'Livreur D\'U\'Ghamaro', 'U\'Ghamaro-Laufbursche', 'ウ・ガマロ・ラウンズマン', NULL, 6, '22.5', '9.9', 48, 4, 0, NULL, 1, 0),
+(229, 412, 'Velociraptor', 'Velociraptor', 'Velociraptor', 'Velociraptor', 'ヴェロキラプトル', NULL, 6, '20.3', '15.4', 34, 3, 0, NULL, 1, 0),
+(231, 2192, 'Young Coeurl', 'Young Coeurl', 'Coeurl Pubère', 'Jung[a] Coeurl', 'ヤング・クァール', NULL, 6, '16.1', '15.1', 34, NULL, 0, NULL, 0, 0),
+(232, 120, 'Anole', 'Anole', 'Anolis', 'Anolis', 'アノール', NULL, 7, '30.4', '19.3', 9, NULL, 0, NULL, 0, 0),
+(233, 511, 'Barricade', 'Barricade', 'Barricade', 'Barriere', 'バリケード', NULL, 7, '19.1', '20.5', 25, NULL, 0, NULL, 0, 0),
+(234, 196, 'Black Eft', 'Black Eft', 'Jeune Triton Noir', 'Schwarzmolch', 'ブラックエフト', NULL, 7, '25.8', '21.9', 6, NULL, 0, NULL, 0, 0),
+(235, 197, 'Bog Yarzon', 'Bog Yarzon', 'Yarzon Des Marais', 'Sumpf-Yarzon', 'ボッグヤーゾン', NULL, 7, '22.4', '20.7', 7, NULL, 0, NULL, 0, 0),
+(236, 1385, 'Bomb', 'Bomb', 'Bombe', 'Bombe', '爆弾', NULL, 7, '19.2', '20.5', 50, NULL, 0, NULL, 0, 0),
+(237, 221, 'Brood Ziz', 'Brood Ziz', 'Ziz Poussin', 'Brütend[a] Ziz', 'ブルード・ジズ', NULL, 7, '15.4', '20.5', 30, NULL, 0, NULL, 0, 0),
+(238, 181, 'Carrion Chigoe', 'Carrion Chigoe', 'Chigoe Charognard', 'Aasmücke', 'キャリオンチゴー', NULL, 7, '21.5', '20.2', 10, NULL, 0, NULL, 0, 0),
+(239, 131, 'Crater Golem', 'Crater Golem', 'Golem Des Cratères', 'Krater-Golem', 'クレーターゴーレム', NULL, 7, '9.8', '18.3', 43, 3, 0, NULL, 1, 0),
+(240, 55, 'Deathgaze', 'Deathgaze', 'Mortalis', 'Thanatos', 'デスゲイズ', NULL, 7, '17.8', '22.2', 33, 4, 0, NULL, 1, 0),
+(241, 10, 'Diremite', 'Diremite', 'Acarus', 'Schaudermilbe', 'ダイアマイト', NULL, 7, '20.2', '18.2', 12, NULL, 0, NULL, 0, 0),
+(242, 1328, 'Entomophobic Woodcutter', 'Entomophobic Woodcutter', 'Bûcheron Entomophobe', 'Insekten Hassend[a] Holzfäller', '蟲嫌いの木こり', NULL, 7, '28.2', '21.6', 6, NULL, 1, NULL, 0, 0),
+(243, 207, 'Floating Eye', 'Floating Eye', 'œil Flottant', 'Schwebauge', 'フローティングアイ', NULL, 7, '10.9', '23.5', 31, 4, 0, NULL, 1, 0),
+(244, 47, 'Forest Funguar', 'Forest Funguar', 'Fungus Des Forêts', 'Forst-Fungus', 'フォレストファンガー', NULL, 7, '24.2', '18.6', 4, NULL, 0, NULL, 0, 0),
+(245, 464, 'Goblin Outlaw', 'Goblin Outlaw', 'Hors-la-loi Gobelin', 'Goblin-Bandit', 'ゴブリン・アウトロー', NULL, 7, '19.8', '20.3', 25, NULL, 0, NULL, 0, 0),
+(246, 519, 'Greatloam Farmer', 'Greatloam Farmer', 'Botaniste Du Courtil', 'Erntehelfer', '収穫に来た園芸師', NULL, 7, '14.7', '17.9', 1, NULL, 1, NULL, 0, 0),
+(247, 2057, 'Halitostroper', 'Halitostroper', 'Halitostoroper', 'Halit-Todesweide', 'ハリトストローパー', NULL, 7, '15.0', '21.3', 31, NULL, 0, NULL, 0, 0),
+(248, 195, 'Hoglet', 'Hoglet', 'Goret', 'Schweinchen', 'ホグレット', NULL, 7, '29.0', '23.3', 8, NULL, 0, NULL, 0, 0),
+(249, 54, 'Hornet Swarm', 'Hornet Swarm', 'Nuée De Frelons', 'Hornissenschwarm', 'ホーネット・スウォーム', NULL, 7, '11.3', '23.9', 14, NULL, 0, NULL, 0, 1),
+(250, 1329, 'Jaded Jody', 'Jaded Jody', 'Jody L\'aigrie', 'Satt[a] Susi', 'ジェイデッド・ジョディ', NULL, 7, '13.3', '22.4', 31, 1, 1, 14, 1, 0),
+(251, 178, 'Leafbleed Mite', 'Leafbleed Mite', 'Mite Feuillesang', 'Blattblutmilbe', 'リーフブリード・マイト', NULL, 7, '19.0', '19.1', 8, NULL, 0, NULL, 0, 0),
+(252, 180, 'Leafbleed Roseling', 'Leafbleed Roseling', 'Roselette Feuillesang', 'Blattblut-Rösling', 'リーフブリード・ローズレット', NULL, 7, '18.9', '20.8', 12, NULL, 0, NULL, 0, 1),
+(253, 177, 'Leafbleed Slug', 'Leafbleed Slug', 'Limace Feuillesang', 'Blattblutschnecke', 'リーフブリード・スラッグ', NULL, 7, '18.5', '19.5', 10, NULL, 0, NULL, 0, 0),
+(254, 2190, 'Lightning Spark', 'Lightning Spark', 'éclair Fulgurant', 'Blitzfunken', 'ライトニングスパーク', NULL, 7, '15.7', '17.9', 29, NULL, 0, NULL, 0, 0),
+(255, 130, 'Lindwurm', 'Lindwurm', 'Lindwurm', 'Lindwurm', 'リンドヴルム', NULL, 7, '14.5', '18.4', 33, 3, 0, NULL, 1, 0),
+(256, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 7, '25.0', '18.3', 2, NULL, 0, NULL, 0, 1),
+(257, 448, 'Lou Carcolh', 'Lou Carcolh', 'Lou Carcolh', 'Lou Carcolh', 'ル・カルコル', NULL, 7, '14.7', '25.4', 14, 1, 1, 57, 1, 0),
+(258, 592, 'Lumber Toad', 'Lumber Toad', 'Crapaud Bûcheron', 'Holzkröte', 'ランバートード', NULL, 7, '24.7', '31.3', 13, NULL, 0, NULL, 0, 0),
+(259, 20, 'Magicked Bones', 'Magicked Bones', 'Squelette Maudit', 'Verhext[a] Gerippe', 'マジックドボーンズ', NULL, 7, '19.5', '27.8', 13, NULL, 0, NULL, 0, 0),
+(260, 517, 'Miraudont The Madder', 'Miraudont The Madder', 'Miraudont Le Furieux', 'Manisch[a] Miraudont', '激高のミロードン', NULL, 7, '24.1', '19.7', 5, NULL, 1, NULL, 0, 0),
+(261, 2175, 'Nameless Conjurer', 'Nameless Conjurer', 'élémentaliste Curieuse', 'Wissbegierig[a] Seher', '謎に挑む道士', NULL, 7, '12.5', '16.5', 1, NULL, 1, NULL, 0, 0),
+(262, 218, 'Qiqirn Scrambler', 'Qiqirn Scrambler', 'Qiqirn Farfouilleur', 'Qiqirn-Störenfried', 'キキルン・スクランブラー', NULL, 7, '17.8', '19.8', 10, NULL, 0, NULL, 0, 0),
+(263, 22, 'Roselet', 'Roselet', 'Roselette', 'Rösling', 'ローズレット', NULL, 7, '20.6', '30.3', 10, NULL, 0, NULL, 0, 0),
+(264, 188, 'Saprophagous Slug', 'Saprophagous Slug', 'Limace Nécrophage', 'Saprophage', 'ネクロファガス・スラッグ', NULL, 7, '19.6', '31.1', 10, NULL, 0, NULL, 0, 0),
+(265, 518, 'Serpent Recruit', 'Serpent Recruit', 'Jeune Recrue Des Deux Vipères', 'Neu[a] Rekrut', '双蛇党の新兵', NULL, 7, '24.4', '20.0', 3, NULL, 1, NULL, 0, 0),
+(266, 2996, 'Slate Golem', 'Slate Golem', 'Golem D\'ardoise', 'Tongolem', 'スレートゴーレム', NULL, 7, '11.8', '17.3', 30, NULL, 1, NULL, 0, 0),
+(267, 91, 'Spriggan', 'Spriggan', 'Spriggan', 'Spriggan', 'スプリガン', NULL, 7, '12.5', '16.7', 33, 4, 0, NULL, 1, 0),
+(268, 445, 'Stagnant Water Sprite', 'Stagnant Water Sprite', 'élémentaire Stagnant', 'Anomal[a] Wasser-Exergon', 'スタグナントスプライト', NULL, 7, '23.8', '24.1', 8, 1, 1, 45, 1, 0),
+(269, 465, 'Stikflix Grumblytoss', 'Stikflix Grumblytoss', 'Stikflix Le Grincheux', 'Stickflix Grummeltoss', '仏頂面のスティックフリックス', NULL, 7, '17.1', '18.2', 28, NULL, 0, NULL, 0, 0),
+(270, 199, 'Stumbling Funguar', 'Stumbling Funguar', 'Fungus Trébuchant', 'Stolper-Fungus', 'スタンブリング・ファンガー', NULL, 7, '22.6', '24.4', 19, NULL, 0, NULL, 0, 1),
+(271, 41, 'Syrphid Swarm', 'Syrphid Swarm', 'Nuée De Syrphes', 'Mistfliegenschwarm', 'サーフィド・スウォーム', NULL, 7, '26.3', '25.1', 8, NULL, 0, NULL, 0, 0),
+(272, 48, 'Toadstool', 'Toadstool', 'Vesse-de-crapaud', 'Krötenstuhl', 'トードスツール', NULL, 7, '15.5', '18.2', 29, NULL, 0, NULL, 0, 0),
+(273, 492, 'Trickster Imp', 'Trickster Imp', 'Imp Farceur', 'Gauner-Imp', 'トリックスター', NULL, 7, '19.0', '18.9', 15, NULL, 0, NULL, 0, 0),
+(274, 21, 'Trickster Imp', 'Trickster Imp', 'Imp', 'Gauner-Imp', 'インプ', NULL, 7, '27.2', '25.2', 9, NULL, 0, NULL, 0, 0),
+(275, 491, 'Wandering Wisp', 'Wandering Wisp', 'Feu Follet Errant', 'Umherstreifend[a] Irrlicht', 'ワンダリング・ウィスプ', NULL, 7, '18.6', '20.8', 13, NULL, 0, NULL, 0, 0),
+(769, 1522, 'Scarface Bugaal Ja', 'Scarface Bugaal Ja', 'Bugaal Ja Le Balafré', 'Narbengesicht Bugaal Ja', '美男のブガージャ', NULL, 5, '28.0', '23.0', 33, 1, 1, 26, 1, 0),
+(278, 2173, '3rd Cohort Optio', '3rd Cohort Optio', 'Optio De La 3e Cohorte', 'Optio[p] Der III. Kohorte', 'IIIコホルス・オプティオ', NULL, 8, '32.5', '20.4', 41, NULL, 1, NULL, 0, 0),
+(279, 1663, 'Aulus Rem Vulso', 'Aulus Rem Vulso', 'Aulus Rem Vulso', 'Aulus Rem Vulso', 'アウルス・レム・ヴルソ', NULL, 8, '32.4', '20.5', 44, NULL, 1, NULL, 0, 0),
+(280, 2314, 'Banestool', 'Banestool', 'Vesse-de-fléau', 'Fluchhut', 'ドクキリタケ', NULL, 8, '27.1', '22.5', 41, NULL, 0, NULL, 0, 0),
+(281, 38, 'Black Bat', 'Black Bat', 'Chauve-souris Noire', 'Schwarz[a] Fledermaus', 'ブラックバット', NULL, 8, '16.5', '22.8', 20, NULL, 0, NULL, 0, 0),
+(282, 612, 'Blood Bat', 'Blood Bat', 'Chauve-souris Vampire', 'Blutfledermaus', 'ブラッドバット', NULL, 8, '22.3', '28.2', 15, NULL, 0, NULL, 0, 0),
+(283, 240, 'Boar Poacher', 'Boar Poacher', 'Braconnière De Sangliers', 'Keiler-Wilderin', 'ボア・ポーチャー', NULL, 8, '19.7', '30.1', 18, NULL, 0, NULL, 0, 0),
+(284, 36, 'Boring Weevil', 'Boring Weevil', 'Hanneton', 'Rüsselkäfer', 'ウィーヴィル', NULL, 8, '23.9', '30.2', 16, NULL, 0, NULL, 0, 0),
+(285, 524, 'Bothered Beekeeper', 'Bothered Beekeeper', 'Apiculteur En Colère', 'Verdrossen[a] Imker', '怒れる養蜂家', NULL, 8, '11.8', '24.7', 8, NULL, 1, NULL, 0, 0),
+(286, 1662, 'Capricious Cassie', 'Capricious Cassie', 'Cassie La Capricieuse', 'Kapriziös[a] Cassie', 'カプリシャス・キャシー', NULL, 8, '23.2', '20.6', 43, 1, 1, 336, 1, 0),
+(287, 1664, 'Daxio Of The Dawn', 'Daxio Of The Dawn', 'Daxio', 'Daxio', '覚醒のダキシオ', NULL, 8, '32.1', '14.2', 47, 1, 1, 9, 1, 0),
+(288, 232, 'Diseased Treant', 'Diseased Treant', 'Tréant Malade', 'Krank[a] Baumschrat', 'ディズィーズ・トレント', NULL, 8, '16.4', '22.7', 21, NULL, 0, NULL, 0, 0),
+(289, 164, 'Dreamtoad', 'Dreamtoad', 'Crapaud Rêveur', 'Traumkröte', 'ドリームトード', NULL, 8, '28.2', '17.7', 46, 3, 0, NULL, 1, 0),
+(290, 220, 'Faerie Funguar', 'Faerie Funguar', 'Fungus Fée', 'Feen-Fungus', 'フェアリーファンガー', NULL, 8, '18.5', '28.5', 16, NULL, 0, NULL, 0, 0),
+(291, 1203, 'Fruiting Fungus', 'Fruiting Fungus', 'Fungus Fructifiant', 'Frucht-Fungus', 'フルーティング・ファンガー', NULL, 8, '23.3', '30.1', 18, NULL, 1, NULL, 0, 0),
+(292, 2157, 'Gall Gnat', 'Gall Gnat', 'Taon Galeux', 'Gallenschnake', 'ガルナット', NULL, 8, '22.3', '30.9', 21, NULL, 0, NULL, 0, 0),
+(293, 77, 'Gelmorran Cogfinder', 'Gelmorran Cogfinder', 'Quêteuse De Rouages De Gelmorra', 'Gelmorrisch[a] Zahnrädlerin', 'コッグファインダー', NULL, 8, '17.6', '28.9', 17, NULL, 0, NULL, 0, 0),
+(294, 2316, 'Giant Banestool', 'Giant Banestool', 'Vesse-de-fléau Géante', 'Beseelt[a] Fluchhut', '特大ドクキリタケ', NULL, 8, '23.9', '15.0', 48, NULL, 0, NULL, 0, 0),
+(295, 7, 'Giant Gnat', 'Giant Gnat', 'Taon Géant', 'Dämonenschnake', 'ナット', NULL, 8, '19.5', '26.5', 16, NULL, 0, NULL, 0, 0),
+(296, 2876, 'Giant Treant', 'Giant Treant', 'Tréant Géant', 'Riesenbaumschrat', 'ジャイアント・トレント', NULL, 8, '32.0', '15.0', 50, NULL, 0, NULL, 0, 0),
+(297, 211, 'Glowfly', 'Glowfly', 'Lampyre', 'Glühwürmchen', 'グロウフライ', NULL, 8, '16.1', '21.2', 24, NULL, 0, NULL, 0, 0),
+(298, 1136, 'Gnarled Treant', 'Gnarled Treant', 'Tréant Noueux', 'Knorrig[a] Baumschrat', 'ナールド・トレント', NULL, 8, '17.9', '28.3', 26, NULL, 0, NULL, 0, 0),
+(299, 621, 'Gods\' Quiver Bow', 'Gods\' Quiver Bow', 'Flèche Divine', 'Soldat[p] Von Nophicas Schar', '神勇隊の隊士 ', NULL, 8, '21.2', '29.7', 13, NULL, 1, NULL, 0, 0),
+(300, 2315, 'Greater Banestool', 'Greater Banestool', 'Grosse Vesse-de-fléau', 'Groß[a] Fluchhut', '大ぶりドクキリタケ', NULL, 8, '27.2', '15.6', 44, NULL, 0, NULL, 0, 0),
+(301, 553, 'Honeybee Swarm', 'Honeybee Swarm', 'Nuée D\'abeilles', 'Honigbienenschwarm', 'ハニービー・スウォーム', NULL, 8, '11.3', '22.2', 8, NULL, 0, NULL, 0, 0),
+(302, 2757, 'Hungry Buzzard', 'Hungry Buzzard', 'Busard Affamé', 'Hungrig[a] Bussard', 'ハングリー・バザード', NULL, 8, '20.4', '27.4', 16, NULL, 0, NULL, 0, 0),
+(303, 449, 'Jackanapes', 'Jackanapes', 'Zigoto', 'Naseweis', 'ジャッカネイプス', NULL, 8, '21.1', '29.9', 19, 1, 1, 63, 1, 0),
+(304, 535, 'Jackanapes\'s Bean-bearer', 'Jackanapes\'s Bean-bearer', 'Sbire De Zigoto', 'Naseweis-Gefolgsmann', 'ジャッカネイプスの手下', NULL, 8, '21.1', '29.9', 17, NULL, 1, NULL, 0, 0),
+(305, 44, 'Jumping Djigga', 'Jumping Djigga', 'Djigga Sautilleur', 'Hopsend[a] Haarmücke', 'ヂッガ', NULL, 8, '16.2', '20.8', 24, NULL, 0, NULL, 0, 0),
+(306, 1202, 'Lazy Laurence', 'Lazy Laurence', 'Laurence La Lambine', 'Faul[a] Laurence', 'レジー・ローレンス', NULL, 8, '23.4', '29.8', 20, NULL, 1, NULL, 0, 0),
+(307, 203, 'Leathervine Microchu', 'Leathervine Microchu', 'Microtyugh à Sarment', 'Lederranken-Mikrochu', 'レザーヴァイン・コチュー', NULL, 8, '17.5', '29.1', 18, NULL, 0, NULL, 0, 0),
+(308, 1143, 'Lefquene The Mystic', 'Lefquene The Mystic', 'Milburh La Mystique', 'Milburh', '魔性のレフケン', NULL, 8, '18.4', '28.0', 24, NULL, 0, NULL, 0, 0),
+(309, 6, 'Lemur', 'Lemur', 'Lémur', 'Lori', 'レミュー', NULL, 8, '21.5', '27.8', 18, NULL, 0, NULL, 0, 0),
+(310, 531, 'Little Solace Sylph', 'Little Solace Sylph', 'Sylphe Du Refuge', 'Zufluchts-Sylphe', '仮宿のシルフ', NULL, 8, '21.7', '26.3', 16, NULL, 1, NULL, 0, 0),
+(311, 1144, 'Long-winded Lemur', 'Long-winded Lemur', 'Lémur Prolixe', 'Langatmig[a] Lori', 'ロングウィンド・レミュー', NULL, 8, '18.1', '28.3', 24, NULL, 0, NULL, 0, 0),
+(312, 107, 'Mandragora', 'Mandragora', 'Mandragore', 'Mandragora', 'マンドラゴラ', NULL, 8, '14.0', '25.7', 13, NULL, 0, NULL, 0, 0),
+(313, 1330, 'Mead-porting Midlander', 'Mead-porting Midlander', 'Livreur D\'hydromel', 'Met Schleppend[a] Wiesländer[p]', '蜂蜜酒の運び人', NULL, 8, '17.8', '27.0', 18, NULL, 1, NULL, 0, 0),
+(315, 1729, 'Mianne Thousandmalm', 'Mianne Thousandmalm', 'Mianne', 'Mianne Tausendmalm', '千里眼のミアヌ', NULL, 8, '28.3', '20.3', 40, NULL, 1, NULL, 0, 0),
+(316, 165, 'Milkroot Cluster', 'Milkroot Cluster', 'Grappe De Tuberculait', 'Milchwurzel-Knöterich', 'ミルクルート・クラスター', NULL, 8, '24.0', '16.6', 48, 3, 0, NULL, 1, 0),
+(317, 162, 'Milkroot Sapling', 'Milkroot Sapling', 'Pousse De Tuberculait', 'Milchwurzel-Schössling', 'ミルクルート・サップリング', NULL, 8, '23.4', '14.7', 48, 3, 0, NULL, 1, 0),
+(318, 222, 'Molted Ziz', 'Molted Ziz', 'Ziz Déplumé', 'Gehäutet[a] Ziz', 'モルテッド・ジズ', NULL, 8, '27.0', '24.2', 40, 3, 0, NULL, 1, 0),
+(319, 237, 'Morbol', 'Morbol', 'Morbol', 'Morbol', 'モルボル', NULL, 8, '23.0', '20.7', 43, 3, 0, NULL, 1, 1),
+(320, 183, 'North Shroud Lemur', 'North Shroud Lemur', 'Lémur De La Forêt Du Nord', 'Nordwald-Lori', 'ノースシュラウド・レミュー', NULL, 8, '15.8', '26.7', 15, NULL, 0, NULL, 0, 0),
+(321, 12, 'Northern Vulture', 'Northern Vulture', 'Vautour', 'Kapgeier', 'ヴァルチャー', NULL, 8, '14.4', '26.3', 13, NULL, 0, NULL, 0, 0),
+(322, 33, 'Ochu', 'Ochu', 'Otyugh', 'Ochu', 'オチュー', NULL, 8, '25.5', '24.6', 44, NULL, 0, NULL, 0, 0),
+(323, 233, 'Old-growth Treant', 'Old-growth Treant', 'Tréant Centenaire', 'Alt[a] Baumschrat', 'オールドグロウス・トレント', NULL, 8, '25.6', '20.8', 41, 3, 0, NULL, 1, 0),
+(324, 507, 'Orphaned Sylph', 'Orphaned Sylph', 'Sylphe Orphelin', 'Sylphen-Waise', '孤児シルフ', NULL, 8, '21.2', '27.1', 19, NULL, 0, NULL, 0, 0),
+(325, 214, 'Overgrown Ivy', 'Overgrown Ivy', 'Lierre Envahissant', 'Wuchernd[a] Efeuranke', 'オーバーグロウン・アイビー', NULL, 8, '20.8', '29.7', 21, NULL, 0, NULL, 0, 0),
+(326, 1137, 'Pannixia Of The Woven Wing', 'Pannixia Of The Woven Wing', 'Pannixia à L\'aile Tissée', 'Pannixia', '大羽のパニシア', NULL, 8, '18.2', '27.6', 29, NULL, 0, NULL, 0, 0),
+(327, 513, 'Prince Of Pestilence', 'Prince Of Pestilence', 'Prince De La Pestilence', 'Pestilenzio', 'プリンス・オブ・ペスト', NULL, 8, '19.1', '27.6', 16, 1, 1, 59, 1, 0),
+(328, 125, 'Pus Gnat', 'Pus Gnat', 'Taon Pyophage', 'Eiterdämonenschnake', 'パスナット', NULL, 8, '19.1', '28.1', 17, NULL, 0, NULL, 0, 0),
+(329, 239, 'Raptor Poacher', 'Raptor Poacher', 'Braconnière De Raptors', 'Raptoren-Wilderin', 'ラプトル・ポーチャー', NULL, 8, '19.8', '30.1', 18, NULL, 0, NULL, 0, 0),
+(330, 474, 'Seven-year Gnat', 'Seven-year Gnat', 'Gnat De Sept Ans', 'Verflixt[a] Dämonenschnake', '賞金首：セブンイヤー・ナット', NULL, 8, '15.9', '27.6', 18, NULL, 0, NULL, 0, 0),
+(331, 179, 'Shroudbee Swarm', 'Shroudbee Swarm', 'Nuée D\'abeilles De Sombrelinceul', 'Waldbienenschwarm', 'シュラウドビー・スウォーム', NULL, 8, '16.4', '28.3', 17, NULL, 0, NULL, 0, 0),
+(332, 184, 'South Shroud Opo-opo', 'South Shroud Opo-opo', 'Opo-opo De La Forêt Du Sud', 'Südwald-Opo-Opo', 'サウスシュラウド・オポオポ', NULL, 8, '17.9', '29.0', 13, NULL, 0, NULL, 0, 0),
+(334, 2187, 'Swollen Djigga', 'Swollen Djigga', 'Djigga Boursouflé', 'Schwell-Haarmücke', 'スウォーレン・ヂッガ', NULL, 8, '15.7', '21.3', 24, NULL, 0, NULL, 0, 0),
+(335, 166, 'Sylph Bonnet', 'Sylph Bonnet', 'Chapeau Sylphe', 'Sylphenkappe', 'シルフボンネット', NULL, 8, '26.6', '13.5', 48, 3, 0, NULL, 1, 0),
+(336, 67, 'Sylpheed Screech', 'Sylpheed Screech', 'Crieur Sylphe', 'Sylphen-Kreischerin', 'シルフィード・スクリーチ', NULL, 8, '30.0', '11.9', 47, 3, 0, NULL, 1, 0),
+(337, 68, 'Sylpheed Sigh', 'Sylpheed Sigh', 'Soupireur Sylphe', 'Sylphen-Seufzerin', 'シルフィード・サイ', NULL, 8, '28.7', '16.9', 45, 3, 0, NULL, 1, 0),
+(338, 69, 'Sylpheed Snarl', 'Sylpheed Snarl', 'Grondeur Sylphe', 'Sylphen-Keiferin', 'シルフィード・スナール', NULL, 8, '28.5', '16.3', 45, 3, 0, NULL, 1, 0),
+(339, 567, 'Sylphlands Condor', 'Sylphlands Condor', 'Condor Des Terres Sylphes', 'Sylphenland-Kondor', 'シルフランド・コンドル', NULL, 8, '28.2', '17.0', 46, 3, 0, NULL, 1, 0),
+(340, 163, 'Sylphlands Sentinel', 'Sylphlands Sentinel', 'Sentinelle Des Terres Sylphes', 'Sylphenland-Wächter', 'シルフランド・センチネル', NULL, 8, '21.3', '10.5', 48, 3, 0, NULL, 1, 0),
+(341, 231, 'Sylvan Groan', 'Sylvan Groan', 'Gémisseur Sylvain', 'Silvanisch[a] Ächzerin', 'シルヴァン・グローン', NULL, 8, '20.0', '21.8', 23, NULL, 1, NULL, 0, 0),
+(342, 229, 'Sylvan Scream', 'Sylvan Scream', 'Hurleur Sylvain', 'Silvanisch[a] Schreierin', 'シルヴァン・スクリーム', NULL, 8, '18.8', '21.4', 23, NULL, 1, NULL, 0, 0),
+(343, 64, 'Sylvan Screech', 'Sylvan Screech', 'Crieur Sylvain', 'Silvanisch[a] Kreischerin', 'シルヴァン・スクリーチ', NULL, 8, '23.8', '20.6', 43, 4, 0, NULL, 1, 0),
+(344, 65, 'Sylvan Sigh', 'Sylvan Sigh', 'Soupireur Sylvain', 'Silvanisch[a] Seufzerin', 'シルヴァン・サイ', NULL, 8, '25.0', '21.4', 43, NULL, 0, NULL, 1, 0),
+(345, 66, 'Sylvan Snarl', 'Sylvan Snarl', 'Grondeur Sylvain', 'Silvanisch[a] Keiferin', 'シルヴァン・スナール', NULL, 8, '28.5', '20.5', 43, 4, 0, NULL, 1, 0),
+(346, 230, 'Sylvan Sough', 'Sylvan Sough', 'Murmureur Sylvain', 'Silvanisch[a] Heulerin', 'シルヴァン・サウ', NULL, 8, '18.7', '21.4', 23, NULL, 1, NULL, 0, 0),
+(347, 136, 'Tainted Water Sprite', 'Tainted Water Sprite', 'élémentaire D\'eau Corrompu', 'Unrein[a] Wasser-Exergon', '淀んだウォータースプライト', NULL, 8, '16.0', '28.8', 15, NULL, 0, NULL, 0, 0);
 INSERT INTO `mobs_arr` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `lvl`, `slain`, `is_fate`, `id_fate`, `is_visible`, `is_multiple`) VALUES
-(358, 16, 'Wild Boar', 'Wild Boar', 'Sanglier Sauvage', 'Wild[a] Keiler', 'ワイルドボア', NULL, 8, 16.6, 23.8, 21, NULL, 0, NULL, 0, 0),
-(360, 14, 'Wild Hoglet', 'Wild Hoglet', 'Goret Sauvage', 'Wildschweinchen', 'ワイルドホグレット', NULL, 8, 17.0, 25.4, 14, NULL, 0, NULL, 0, 0),
-(361, 115, 'Wind Sprite', 'Wind Sprite', 'élémentaire De Vent', 'Wind-Exergon', 'ウィンドスプライト', NULL, 8, 28.7, 20.5, 42, NULL, 0, NULL, 0, 1),
-(362, 241, 'Wolf Poacher', 'Wolf Poacher', 'Braconnière De Loups', 'Wolfs-Wilderin', 'ウルフ・ポーチャー', NULL, 8, 19.6, 30.2, 18, NULL, 0, NULL, 0, 0),
-(363, 498, 'Zezeroon Stickyfingers', 'Zezeroon Stickyfingers', 'Zezeroon Le Gourmand', 'Zezerix Klebeklau', '食道楽のゼゼルン', NULL, 8, 17.6, 29.1, 19, NULL, 0, NULL, 0, 0),
-(364, 223, 'Ziz Gorlin', 'Ziz Gorlin', 'Petit Ziz', 'Jung-Ziz', 'ジズ・ゴーリン', NULL, 8, 20.9, 26.4, 20, NULL, 0, NULL, 0, 0),
-(365, 57, '3rd Cohort Decurion', '3rd Cohort Decurion', 'Decurio De La 3e Cohorte', 'Decurio[p] Der III. Kohorte', 'IIIコホルス・デクリオン', NULL, 9, 18.6, 18.8, 23, NULL, 0, NULL, 0, 0),
-(366, 529, 'Abused Adventurer', 'Abused Adventurer', 'Client Embarrassé', 'Belästigt[a] Stammgast', '困り果てた常連客', NULL, 9, 17.5, 20.6, 20, NULL, 1, NULL, 0, 0),
-(367, 34, 'Adamantoise', 'Adamantoise', 'Adamankhélone', 'Adaman-Taimai', 'アダマンタス', NULL, 9, 15.9, 29.6, 33, 4, 0, NULL, 1, 0),
-(368, 475, 'Alpha Stag', 'Alpha Stag', 'Cerf Alpha', 'Alpha-Antilopenbock', '賞金首：アルファスタッグ', NULL, 9, 23.6, 21.4, 20, NULL, 0, NULL, 0, 0),
-(370, 508, 'Angered Elm', 'Angered Elm', 'Orme Furieux', 'Erzürnt[a] Ulme', 'アンガード・エルム', NULL, 9, 23.8, 21.6, 22, NULL, 0, NULL, 0, 0),
-(371, 3, 'Antelope Doe', 'Antelope Doe', 'Antilope Biche', 'Antilopenkuh', 'アンテロープ・ドゥ', NULL, 9, 18.2, 22.5, 23, NULL, 0, NULL, 0, 0),
-(372, 4, 'Antelope Stag', 'Antelope Stag', 'Antilope Cerf', 'Antilopenbock', 'アンテロープ・スタッグ', NULL, 9, 27.1, 22.6, 26, NULL, 0, NULL, 0, 0),
-(373, 228, 'Bark Eft', 'Bark Eft', 'Triton Noir', 'Rindenmolch', 'バークエフト', NULL, 9, 19.6, 22.6, 23, NULL, 0, NULL, 0, 0),
-(374, 235, 'Bigmouth Orobon', 'Bigmouth Orobon', 'Orobon Grande Gueule', 'Großmaul-Orobon', 'ビッグマウス・オロボン', NULL, 9, 17.8, 30.5, 31, 3, 0, NULL, 1, 0),
-(375, 2163, 'Burchard Swiftspear', 'Burchard Swiftspear', 'Burchard Vive-lance', 'Burchard Flinkspeer', '豪槍のバーカード', NULL, 9, 23.6, 18.3, 32, NULL, 1, NULL, 0, 0),
-(376, 43, 'Chigoe', 'Chigoe', 'Chigoe', 'Stechmücke', 'チゴー', NULL, 9, 27.2, 18.1, 9, NULL, 0, NULL, 0, 1),
-(377, 2647, 'Clockwork Footman', 'Clockwork Footman', 'Soldat Mécanique', 'Uhrwerk-Fußsoldat', 'アラガンワーク・フットマン', NULL, 9, 21.6, 21.7, 50, NULL, 0, NULL, 0, 0),
-(378, 2648, 'Clockwork Warrior', 'Clockwork Warrior', 'Chevalier Mécanique', 'Uhrwerk-Kämpfer', 'アラガンワーク・ウォーリア', NULL, 9, 21.4, 21.7, 50, NULL, 0, NULL, 0, 0),
-(379, 169, 'Coeurlclaw Cutter', 'Coeurlclaw Cutter', 'Trancheuse Griffecoeurl', 'Coeurlklauen-Sammlerin', 'クァールクロウ・カッター', NULL, 9, 26.1, 21.8, 29, NULL, 0, NULL, 0, 0),
-(380, 139, 'Coeurlclaw Hunter', 'Coeurlclaw Hunter', 'Chasseresse Griffecoeurl', 'Coeurlklauen-Jägerin', 'クァールクロウ・ハンター', NULL, 9, 15.0, 33.8, 29, NULL, 0, NULL, 0, 0),
-(381, 140, 'Coeurlclaw Poacher', 'Coeurlclaw Poacher', 'Braconnière Griffecoeurl', 'Coeurlklauen-Wilderin', 'クァールクロウ・ポーチャー', NULL, 9, 24.0, 21.0, 27, NULL, 0, NULL, 0, 0),
-(382, 520, 'Crestfallen Merchant', 'Crestfallen Merchant', 'Marchand Penaud', 'Geknickt[a] Händler', '途方に暮れた商人', NULL, 9, 27.3, 21.0, 30, NULL, 1, NULL, 0, 0),
-(383, 170, 'Deepvoid Deathmouse', 'Deepvoid Deathmouse', 'Souris Meurtrière Du Néant Profond', 'Zwielicht-Todesmaus', 'ディープヴォイド・ドーマウス', NULL, 9, 25.2, 21.7, 35, 4, 0, NULL, 1, 0),
-(384, 501, 'Despicable Devilet', 'Despicable Devilet', 'Diablotin Infâme', 'Jämmerlich[a] Eufel', 'ディスピッカブル・デビレット', NULL, 9, 26.2, 19.8, 28, NULL, 0, NULL, 0, 0),
-(385, 454, 'Disorderly Adventurer', 'Disorderly Adventurer', 'Aventurier Brutal', 'Ungestüm[a] Abenteurer', '荒々しい冒険者', NULL, 9, 18.6, 20.6, 35, NULL, 0, NULL, 0, 0),
-(386, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 9, 26.3, 21.8, 14, NULL, 0, NULL, 0, 1),
-(387, 480, 'Figgy Pudding', 'Figgy Pudding', 'Pudding Aux Figues', 'Feigenpudding', 'フィギープリン', NULL, 9, 26.2, 20.0, 30, NULL, 0, NULL, 0, 0),
-(388, 176, 'Foraging Doe', 'Foraging Doe', 'Biche Ruminant', 'Futtersuchend[a] Antilopenkuh', 'フォージング・ドゥ', NULL, 9, 23.7, 20.5, 25, NULL, 0, NULL, 0, 0),
-(389, 460, 'Foraging Stag', 'Foraging Stag', 'Cerf Ruminant', 'Futtersuchend[a] Antilopenbock', 'フォージング・スタッグ', NULL, 9, 25.1, 18.8, 25, NULL, 0, NULL, 0, 0),
-(390, 50, 'Goblin Thug', 'Goblin Thug', 'Malfrat Gobelin', 'Goblin-Strolch', 'ゴブリン・サグ', NULL, 9, 26.0, 22.0, 28, NULL, 0, NULL, 0, 0),
-(391, 502, 'Greedy Hog', 'Greedy Hog', 'Verrat Affamé', 'Hungrig[a] Schwein', 'グリーディ・ホッグ', NULL, 9, 26.1, 19.8, 28, NULL, 0, NULL, 0, 0),
-(393, 523, 'Hive Gate', 'Hive Gate', 'Porte Du Guêpier Des Ventrerouge', 'Nesttür', 'レッドベリー砦の門扉', NULL, 9, 22.7, 17.7, 32, NULL, 1, NULL, 0, 0),
-(394, 168, 'Hoverfly Swarm', 'Hoverfly Swarm', 'Nuée De Mouches', 'Schwebfliegenschwarm', 'ホバーフライ・スウォーム', NULL, 9, 16.2, 33.9, 30, NULL, 0, NULL, 0, 0),
-(395, 8, 'Ked', 'Ked', 'Pou Volant', 'Dämonenfliege', 'ケッド', NULL, 9, 31.5, 23.8, 47, 3, 0, NULL, 1, 0),
-(396, 23, 'Kedtrap', 'Kedtrap', 'Piège-pou', 'Dämonenfliegenfalle', 'ケッドトラップ', NULL, 9, 20.3, 20.7, 21, NULL, 0, NULL, 0, 0),
-(397, 497, 'Leafbleed Ochu', 'Leafbleed Ochu', 'Otyugh Feuillesang', 'Blattblut-Ochu', 'リーフブリード・オチュー', NULL, 9, 24.3, 21.2, 19, NULL, 0, NULL, 0, 1),
-(398, 566, 'Midland Condor', 'Midland Condor', 'Condor Des Plaines', 'Wiesland-Kondor', 'ミッドランド・コンドル', NULL, 9, 18.2, 25.3, 30, 4, 0, NULL, 1, 0),
-(771, 878, 'Gossamer', 'Gossamer', 'Floche-de-soie', 'Seidenflausch', 'ゴッサマー', NULL, 13, 26.0, 21.0, 29, 1, 1, 11, 1, 0),
-(402, 215, 'Overgrown Offering', 'Overgrown Offering', 'Otyugh Monstrueux', 'Grabranke', 'オーバーグロウン・オファリング', NULL, 9, 19.0, 18.9, 22, NULL, 0, NULL, 0, 0),
-(403, 1667, 'Phaia', 'Phaia', 'Phaïa', 'Phaia', 'パイア', NULL, 9, 32.2, 25.6, 46, 1, 1, 347, 1, 0),
-(404, 175, 'Poisonous Flytrap', 'Poisonous Flytrap', 'Piège-mouche Vénéneux', 'Giftig[a] Fliegenfalle', 'ポイズン・フライトラップ', NULL, 9, 25.9, 21.7, 26, NULL, 0, NULL, 0, 1),
-(405, 219, 'Qiqirn Beater', 'Qiqirn Beater', 'Qiqirn Rabatteur', 'Qiqirn-Schläger', 'キキルン・ビーター', NULL, 9, 15.4, 17.5, 29, NULL, 0, NULL, 0, 1),
-(406, 84, 'Redbelly Chanter', 'Redbelly Chanter', 'Psalmodieur Ventrerouge', 'Rotbauch-Singstimme', 'レッドベリー・チャンター', NULL, 9, 23.8, 18.3, 29, NULL, 1, NULL, 0, 0),
-(407, 540, 'Redbelly Conspirator', 'Redbelly Conspirator', 'Conspirateur Ventrerouge', 'Rotbauch-Verschwörer', 'レッドベリー・コンスピレーター', NULL, 9, 15.6, 22.9, 21, NULL, 1, NULL, 0, 0),
-(408, 80, 'Redbelly Gutter', 'Redbelly Gutter', 'étripeur Ventrerouge', 'Rotbauch-Wache', 'レッドベリー・ガッター', NULL, 9, 23.7, 18.1, 29, NULL, 1, NULL, 0, 0),
-(409, 172, 'Redbelly Larcener', 'Redbelly Larcener', 'Vide-gousset Ventrerouge', 'Rotbauch-Strauchdieb', 'レッドベリー・ラーセナー', NULL, 9, 25.1, 18.6, 27, NULL, 0, NULL, 0, 0),
-(410, 52, 'Redbelly Lookout', 'Redbelly Lookout', 'Guetteur Ventrerouge', 'Rotbauch-Späher', 'レッドベリー・ルックアウト', NULL, 9, 24.1, 19.3, 27, NULL, 0, NULL, 0, 0),
-(411, 83, 'Redbelly Sharpeye', 'Redbelly Sharpeye', 'épieur Ventrerouge', 'Rotbauch-Blinzler', 'レッドベリー・シャープアイ', NULL, 9, 22.0, 16.5, 27, NULL, 0, NULL, 0, 0),
-(412, 236, 'Revenant', 'Revenant', 'Revenant', 'Wiedergänger', 'レブナント', NULL, 9, 14.8, 30.1, 32, 4, 0, NULL, 1, 1),
-(413, 226, 'River Yarzon', 'River Yarzon', 'Yarzon Des Rivières', 'Fluss-Yarzon', 'リバー・ヤーゾン', NULL, 9, 24.5, 21.7, 25, NULL, 0, NULL, 0, 0),
-(414, 1992, 'Scarred Antelope', 'Scarred Antelope', 'Antilope Balafrée', 'Narbig[a] Antilope', 'スカード・アンテロープ', NULL, 9, 17.7, 23.7, 23, NULL, 0, NULL, 0, 0),
-(415, 514, 'Sirocco', 'Sirocco', 'Sirocco', 'Sirocco', 'シロッコ', NULL, 9, 20.1, 22.9, 23, 1, 1, 28, 1, 0),
-(416, 234, 'Smallmouth Orobon', 'Smallmouth Orobon', 'Orobon Petite Gueule', 'Schmalmaul-Orobon', 'スモールマウス・オロボン', NULL, 9, 19.6, 21.0, 10, NULL, 0, NULL, 0, 1),
-(417, 450, 'Spenser Of The Bottomless Cup', 'Spenser Of The Bottomless Cup', 'Spenser Le Boit-sans-soif', 'Trunkenbold[p] Spenser', '酔客のスペンサー', NULL, 9, 17.9, 20.1, 22, NULL, 1, NULL, 0, 0),
-(418, 238, 'Stroper', 'Stroper', 'Storoper', 'Todesweide', 'ストローパー', NULL, 9, 21.4, 28.2, 31, 4, 0, NULL, 1, 1),
-(419, 2646, 'Surveillance Module', 'Surveillance Module', 'Module De Surveillance', 'Überwachungsmodul', '巡察システム', NULL, 9, 21.5, 19.8, 50, NULL, 0, NULL, 0, 0),
-(420, 2973, 'Territorial Zu Cockerel', 'Territorial Zu Cockerel', 'Coquelet Zu Territorial', 'Hinterhältig[a] Montisaurus-Hahn', 'テリトリアル・クックル', NULL, 9, 17.9, 26.6, 50, NULL, 0, NULL, 0, 0),
-(421, 2974, 'Territorial Zu Pullet', 'Territorial Zu Pullet', 'Poulette Zu Territoriale', 'Hinterhältig[a] Montisaurus-Henne', 'テリトリアル・プレット', NULL, 9, 18.2, 26.6, 50, NULL, 0, NULL, 0, 0),
-(422, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 9, 15.8, 17.4, 26, NULL, 0, NULL, 0, 1),
-(423, 500, 'Trancetoad', 'Trancetoad', 'Crapaud En Transe', 'Dämmerkröte', 'トランストード', NULL, 9, 26.4, 19.7, 27, NULL, 0, NULL, 0, 0),
-(424, 24, 'Treant', 'Treant', 'Tréant', 'Baumschrat', 'トレント', NULL, 9, 24.4, 22.7, 38, 4, 0, NULL, 1, 0),
-(425, 476, 'Wanted Goblin', 'Wanted Goblin', 'Gobelin Recherché', 'Gesucht[a] Goblin', '賞金首：ワンテッド・ゴブリン', NULL, 9, 26.5, 19.4, 26, NULL, 0, NULL, 0, 0),
-(426, 45, 'Will-o\'-the-wisp', 'Will-o\'-the-wisp', 'Feu Follet', 'Irrlicht', 'ウィル・オ・ザ・ウィスプ', NULL, 9, 23.4, 24.5, 38, 4, 0, NULL, 1, 0),
-(427, 526, 'Wood Wailer Lance', 'Wood Wailer Lance', 'Vigile Sombre', 'Klageregiment-Pikenier', '鬼哭隊の隊士', NULL, 9, 22.5, 17.3, 30, NULL, 1, NULL, 0, 1),
-(428, 1860, 'Airstone', 'Airstone', 'Pierre De Vent', 'Windstein', '風生みの珠', NULL, 10, 20.9, 18.5, 44, NULL, 1, NULL, 0, 0),
-(429, 17, 'Balloon', 'Balloon', 'Ballon', 'Brandballon', 'バルーン', NULL, 10, 16.1, 26.3, 25, NULL, 0, NULL, 0, 0),
-(430, 11, 'Banemite', 'Banemite', 'Sarcopte', 'Terrormilbe', 'ベーンマイト', NULL, 10, 16.5, 25.5, 27, NULL, 0, NULL, 0, 0),
-(431, 2189, 'Bright Balloon', 'Bright Balloon', 'Ballon Incandescent', 'Gleißer', 'ブライトバルーン', NULL, 10, 17.7, 27.3, 29, NULL, 0, NULL, 0, 0),
-(432, 30, 'Clay Golem', 'Clay Golem', 'Golem D\'argile', 'Lehmgolem', 'クレイゴーレム', NULL, 10, 19.8, 28.6, 28, NULL, 0, NULL, 0, 0),
-(433, 452, 'Curupira', 'Curupira', 'Curupira', 'Curupira', 'クルピラ', NULL, 10, 26.2, 21.9, 8, 1, 1, 8, 1, 0),
-(434, 1668, 'Daedalus', 'Daedalus', 'Dédale', 'Daedalus', 'ダイダロス', NULL, 10, 21.9, 19.8, 48, 1, 1, 349, 1, 0),
-(435, 191, 'Dewdrinker Ladybug', 'Dewdrinker Ladybug', 'Coccinelle Des Bois', 'Tau-Marienkäfer', 'デュードリンカー・レディバグ', NULL, 10, 25.5, 28.5, 7, NULL, 0, NULL, 0, 0),
-(436, 25, 'Dryad', 'Dryad', 'Dryade', 'Dryade', 'ドライアド', NULL, 10, 23.7, 25.3, 37, 3, 0, NULL, 1, 0),
-(437, 516, 'Dschubba', 'Dschubba', 'Dschubba', 'Dschubba', 'ジュバ', NULL, 10, 25.0, 28.4, 3, 1, 1, 39, 1, 0),
-(439, 1669, 'Great Oak', 'Great Oak', 'Grand Chêne', 'Borkig[a] Baumschrat', 'グレートオーク', NULL, 10, 23.7, 25.0, 37, 1, 1, 12, 1, 0),
-(440, 37, 'Ground Squirrel', 'Ground Squirrel', 'écureuil', 'Baumhörnchen', 'スクウィレル', NULL, 10, 30.0, 25.4, 2, NULL, 0, NULL, 0, 1),
-(441, 521, 'Guild-issue Supplies', 'Guild-issue Supplies', 'Caisse De Provisions', 'Versorgungsgut', '鬼哭隊の補給物資', NULL, 10, 22.9, 26.6, 24, NULL, 1, NULL, 0, 0),
-(442, 103, 'Ixali Boldwing', 'Ixali Boldwing', 'Ixal Aile-hardie', 'Ixal-Mutschwinge', 'イクサル・ボールドウィング', NULL, 10, 18.9, 19.6, 24, 3, 0, NULL, 1, 0),
-(443, 662, 'Ixali Boundwing', 'Ixali Boundwing', 'Ixal Aile-garrottée', 'Ixal-Bannschwinge', 'イクサル・バウンドウィング', NULL, 10, 22.2, 22.2, 37, 1, 0, NULL, 1, 1),
-(444, 209, 'Ixali Deftalon', 'Ixali Deftalon', 'Ixal Serres-vives', 'Ixal-Tollkralle', 'イクサル・デフタロン', NULL, 10, 23.2, 28.5, 27, NULL, 0, NULL, 0, 0),
-(445, 192, 'Ixali Dulltalon', 'Ixali Dulltalon', 'Ixal Serres-usées', 'Ixal-Stumpfkralle', 'イクサル・ダルタロン', NULL, 10, 25.8, 26.6, 5, NULL, 0, NULL, 0, 0),
-(446, 663, 'Ixali Fearcaller', 'Ixali Fearcaller', 'Terroriseur Ixal', 'Ixal-Furchtrufer', 'イクサル・フィアコーラー', NULL, 10, 22.4, 22.3, 34, NULL, 0, NULL, 0, 1),
-(447, 208, 'Ixali Lightwing', 'Ixali Lightwing', 'Ixal Aile-légère', 'Ixal-Leichtschwinge', 'イクサル・ライトビーク', NULL, 10, 22.6, 28.2, 27, NULL, 0, NULL, 0, 0),
-(448, 193, 'Ixali Lostwing', 'Ixali Lostwing', 'Ixal Aile-perdue', 'Ixal-Stutzschwinge', 'イクサル・ロストウィング', NULL, 10, 26.5, 25.9, 5, NULL, 0, NULL, 0, 0),
-(449, 194, 'Ixali Slowbeak', 'Ixali Slowbeak', 'Ixal Bec-lent', 'Ixal-Lahmschnabel', 'イクサル・スロウビーク', NULL, 10, 25.9, 26.6, 5, NULL, 0, NULL, 0, 0),
-(450, 210, 'Ixali Straightbeak', 'Ixali Straightbeak', 'Ixal Bec-droit', 'Ixal-Spitzschnabel', 'イクサル・ストレートビーク', NULL, 10, 22.9, 28.1, 27, NULL, 0, NULL, 0, 0),
-(451, 104, 'Ixali Swiftbeak', 'Ixali Swiftbeak', 'Ixal Bec-vif', 'Ixal-Flinkschnabel', 'イクサル・スウィフトビーク', NULL, 10, 18.7, 20.1, 44, NULL, 1, NULL, 0, 0),
-(452, 102, 'Ixali Swordfighter', 'Ixali Swordfighter', 'épéiste Ixal', 'Ixal-Schwertkämpfer', 'イクサル・ソードファイター', NULL, 10, 23.3, 25.5, 24, NULL, 1, NULL, 0, 0),
-(453, 436, 'Ixali Windtalon', 'Ixali Windtalon', 'Ixal Serres-vent', 'Ixal-Windkralle', 'イクサル・ウィンドタロン', NULL, 10, 20.6, 18.5, 47, NULL, 1, NULL, 1, 0),
-(985, 860, 'Old Six-arms', 'Old Six-arms', 'Six-pattes Ancien', 'Alter Sechsarm', 'オールドシックスアームズ', NULL, 4, 30.0, 29.0, 13, 1, 1, 153, 1, 0),
-(456, 539, 'Lunar Golem', 'Lunar Golem', 'Golem Lunaire', 'Mondgolem', 'ルナゴーレム', NULL, 10, 15.8, 31.1, 25, NULL, 1, NULL, 0, 0),
-(457, 32, 'Microchu', 'Microchu', 'Microtyugh', 'Mikrochu', 'コチュー', NULL, 10, 28.8, 21.8, 6, NULL, 0, NULL, 0, 1),
-(458, 118, 'Midge Swarm', 'Midge Swarm', 'Nuée De Moucherons', 'Mückenschwarm', 'ミッヂ・スウォーム', NULL, 10, 28.2, 25.1, 8, NULL, 0, NULL, 0, 0),
-(459, 9, 'Miteling', 'Miteling', 'Petit Acarus', 'Schattenmilbe', 'マイトリング', NULL, 10, 26.2, 26.9, 4, NULL, 0, NULL, 0, 1),
-(460, 5, 'Opo-opo', 'Opo-opo', 'Opo-opo', 'Opo-Opo', 'オポオポ', NULL, 10, 27.7, 23.6, 7, NULL, 0, NULL, 0, 0),
-(777, 856, '426th Order Pickman Bu Ga', '426th Order Pickman Bu Ga', 'Bu Ga Piocheur Du 426e Ordre', 'Bu Ga Vom 426. Orden', 'ピックマン426 ブ・ガ', NULL, 2, 31.8, 13.2, 10, 1, 1, 1, 1, 0),
-(462, 2188, 'Pumice Golem', 'Pumice Golem', 'Golem De Pierre Ponce', 'Bimsgolem', 'パミスゴーレム', NULL, 10, 15.4, 30.8, 28, NULL, 0, NULL, 0, 0),
-(463, 533, 'Shifty-eyed Prospector', 'Shifty-eyed Prospector', 'Prospecteur Suspect', 'Rastlos[a] Geologe', 'うさんくさい山師', NULL, 10, 16.5, 29.3, 30, NULL, 1, NULL, 0, 0),
-(464, 40, 'Shroud Hare', 'Shroud Hare', 'Arion De Sombrelinceul', 'Glitscher', 'シュラウドアリオン', NULL, 10, 20.9, 30.5, 24, NULL, 0, NULL, 0, 0),
-(465, 552, 'Stone Golem', 'Stone Golem', 'Golem De Pierre', 'Steingolem', 'ストーンゴーレム', NULL, 10, 17.4, 28.2, 25, NULL, 1, NULL, 0, 0),
-(466, 174, 'Watchwolf', 'Watchwolf', 'Loup De Garde', 'Wachwolf', 'ウォッチウルフ', NULL, 10, 20.8, 19.1, 46, 3, 0, NULL, 1, 0),
-(467, 453, 'Wood Wailer Sentry', 'Wood Wailer Sentry', 'Sentinelle Des Vigiles Sombres', 'Wache[p] Des Klageregiments', '鬼哭隊の衛士', NULL, 10, 19.3, 25.9, 35, NULL, 0, NULL, 0, 1),
-(468, 224, 'Ziz', 'Ziz', 'Ziz', 'Ziz', 'ジズ', NULL, 10, 16.9, 27.2, 28, NULL, 0, NULL, 0, 0),
-(469, 1817, '4th Cohort Eques', '4th Cohort Eques', 'Eques De La 4e Cohorte', 'Eques[p] Der IV. Kohorte', 'IVコホルス・エクエス', NULL, 11, 13.1, 7.2, 48, NULL, 0, NULL, 0, 0),
-(470, 1815, '4th Cohort Hoplomachus', '4th Cohort Hoplomachus', 'Hoplomachus De La 4e Cohorte', 'Hoplomachus[p] Der IV. Kohorte', 'IVコホルス・ホプロマクス', NULL, 11, 12.4, 6.4, 48, 3, 0, NULL, 1, 0),
-(471, 1365, '4th Cohort Imaginifer', '4th Cohort Imaginifer', 'Imaginifer De La 4e Cohorte', 'Imaginifer[p] Der IV. Kohorte', 'IVコホルス・イマギニファー', NULL, 11, 13.6, 7.1, 20, NULL, 1, NULL, 0, 0),
-(472, 1816, '4th Cohort Laquearius', '4th Cohort Laquearius', 'Laquearius De La 4e Cohorte', 'Laquearius[p] Der IV. Kohorte', 'IVコホルス・ラクエリウス', NULL, 11, 10.1, 6.6, 48, NULL, 0, NULL, 0, 0),
-(473, 1818, '4th Cohort Secutor', '4th Cohort Secutor', 'Secutor De La 4e Cohorte', 'Secutor[p] Der IV. Kohorte', 'IVコホルス・セクトール', NULL, 11, 10.0, 5.6, 48, 3, 0, NULL, 1, 0),
-(474, 1819, '4th Cohort Signifer', '4th Cohort Signifer', 'Signifer De La 4e Cohorte', 'Signifer[p] Der IV. Kohorte', 'IVコホルス・シグニフェル', NULL, 11, 11.6, 7.4, 48, NULL, 0, NULL, 0, 0),
-(475, 1364, '4th Cohort Triarius', '4th Cohort Triarius', 'Triarius De La 4e Cohorte', 'Triarius[p] Der IV. Kohorte', 'IVコホルス・トリアリウス', NULL, 11, 14.1, 7.3, 20, NULL, 1, NULL, 0, 0),
-(476, 1820, '4th Cohort Vanguard', '4th Cohort Vanguard', 'Avant-garde De La 4e Cohorte', 'Frontbrecher[p] Der IV. Kohorte', 'IVコホルス・ヴァンガード', NULL, 11, 13.3, 6.2, 49, 3, 0, NULL, 1, 0),
-(477, 1366, '4th Cohort War Hound', '4th Cohort War Hound', 'Chien De Guerre De La 4e Cohorte', 'Kriegshund[p] Der IV. Kohorte', 'IVコホルス・ウォーハウンド', NULL, 11, 13.6, 7.0, 20, NULL, 1, NULL, 0, 0),
-(478, 13, 'Arbor Buzzard', 'Arbor Buzzard', 'Busard', 'Baumkronen-Bussard', 'バザード', NULL, 11, 16.3, 15.7, 13, NULL, 0, NULL, 0, 1),
-(479, 309, 'Bloated Bogy', 'Bloated Bogy', 'épouvantôme Boursouflé', 'Aufgebläht[a] Spukgespenst', 'ブローテッド・ボギー', NULL, 11, 13.0, 11.9, 20, NULL, 1, NULL, 0, 0),
-(480, 1039, 'Blood-eyed Buzzard', 'Blood-eyed Buzzard', 'Busard Aux Yeux Rouges', 'Blutaugen-Bussard', 'ブラッドアイ・バザード', NULL, 11, 23.9, 19.0, 12, NULL, 0, NULL, 0, 0),
-(481, 316, 'Bomb', 'Bomb', 'Bombo', 'Bomber', 'ボム', NULL, 11, 27.7, 16.4, 11, NULL, 0, NULL, 0, 0),
-(482, 867, 'Bubbly Bernie', 'Bubbly Bernie', 'Bernie Le Bulleux', 'Blubbernd[a] Bernie', 'バブリーバーニー', NULL, 11, 15.9, 16.1, 13, 1, 1, 181, 1, 0),
-(483, 287, 'Cactuar', 'Cactuar', 'Cactuar', 'Kaktor', 'カクター', NULL, 11, 27.7, 24.0, 3, NULL, 0, NULL, 0, 0),
-(484, 277, 'Copper Coblyn', 'Copper Coblyn', 'Coblyn De Cuivre', 'Kupfer-Kobalos', 'カッパーコブラン', NULL, 11, 27.4, 16.8, 11, NULL, 0, NULL, 0, 0),
-(485, 869, 'Daddy Longlegs', 'Daddy Longlegs', 'Faucheux', 'Opa Langbein', 'ダディーロングレッグ', NULL, 11, 14.5, 6.7, 22, NULL, 1, NULL, 0, 0),
-(486, 305, 'Desert Peiste', 'Desert Peiste', 'Peiste Du Désert', 'Wüsten-Peiste', 'ペイスト', NULL, 11, 24.7, 20.7, 10, NULL, 0, NULL, 0, 0),
-(487, 1033, 'Dirty Mongrel', 'Dirty Mongrel', 'Houret Sale', 'Schmutzig[a] Mischling', 'ダーティ・モングレル', NULL, 11, 23.4, 19.1, 12, NULL, 0, NULL, 0, 0),
-(488, 865, 'Doomed Gigantoad', 'Doomed Gigantoad', 'Crapaud Maudit', 'Verderbnis-Karpfenkröte', 'ドゥーム・ギガントード', NULL, 11, 24.3, 21.4, 9, 1, 1, 176, 1, 0),
-(489, 896, 'Dune Bogy', 'Dune Bogy', 'épouvantôme Des Dunes', 'Dünen-Spukgespenst', 'デューンボギー', NULL, 11, 13.3, 12.0, 17, NULL, 1, NULL, 0, 0),
-(490, 302, 'Dusty Mongrel', 'Dusty Mongrel', 'Houret Poussiéreux', 'Verwahrlost[a] Mischling', 'モングレル', NULL, 11, 25.4, 19.9, 10, NULL, 0, NULL, 0, 1),
-(491, 1034, 'Fire Bomb', 'Fire Bomb', 'Bombo Incendiaire', 'Feuerbomber', 'ファイアボム', NULL, 11, 24.9, 18.2, 11, NULL, 0, NULL, 0, 0),
-(492, 1324, 'Flustered Fisher', 'Flustered Fisher', 'Pêcheur Dans L\'embarras', 'Nervös[a] Fischer', '困り果てた漁師', NULL, 11, 15.9, 16.6, 1, NULL, 1, NULL, 0, 0),
-(493, 283, 'Goblin Mugger', 'Goblin Mugger', 'Détrousseur Gobelin', 'Goblin-Räuber', 'ゴブリン・マガー', NULL, 11, 18.8, 25.9, 8, NULL, 0, NULL, 0, 0),
-(494, 1036, 'Guillotine Beak', 'Guillotine Beak', 'Bec-couperet', 'Guillotinenschnabel', 'ギロチンビーク', NULL, 11, 16.8, 14.5, 12, NULL, 0, NULL, 0, 0),
-(495, 282, 'Hammer Beak', 'Hammer Beak', 'Bec-marteau', 'Hammerschnabel', 'ハンマービーク', NULL, 11, 24.8, 22.9, 8, NULL, 0, NULL, 0, 1),
-(496, 217, 'Laughing Toad', 'Laughing Toad', 'Crapaud Rieur', 'Lachkröte', 'ラフィングトード', NULL, 11, 14.7, 6.2, 23, NULL, 0, NULL, 0, 0),
-(497, 278, 'Lead Coblyn', 'Lead Coblyn', 'Coblyn De Plomb', 'Blei-Kobalos', 'レッドコブラン', NULL, 11, 14.0, 10.8, 21, NULL, 0, NULL, 0, 0),
-(498, 1032, 'Loamshell', 'Loamshell', 'Coqueterre', 'Lehmschale', 'ロームシェル', NULL, 11, 24.6, 17.7, 10, NULL, 0, NULL, 0, 0),
-(499, 312, 'Moondrip Blastmaster', 'Moondrip Blastmaster', 'Pilonneur De Gouttelune', 'Mondtropfen-Sprengmeister', 'ムーン・ブラストマスター', NULL, 11, 17.8, 6.6, 24, NULL, 0, NULL, 0, 0),
-(500, 314, 'Moondrip Piledriver', 'Moondrip Piledriver', 'Artificier De Gouttelune', 'Mondtropfen-Ramme', 'ムーン・パイルドライバー', NULL, 11, 18.3, 6.6, 24, NULL, 0, NULL, 0, 0),
-(501, 310, 'Moondrip Stonehauler', 'Moondrip Stonehauler', 'Hercheur De Gouttelune', 'Mondtropfen-Steineschlepper', 'ムーン・ストーンハウラー', NULL, 11, 18.3, 6.8, 24, NULL, 0, NULL, 0, 0),
-(502, 308, 'Orobon', 'Orobon', 'Orobon', 'Orobon', 'オロボン', NULL, 11, 19.4, 16.6, 5, NULL, 0, NULL, 0, 1),
-(503, 503, 'Plump Orobon', 'Plump Orobon', 'Orobon Pansu', 'Fett[a] Orobon', 'プランプ・オロボン', NULL, 11, 16.7, 16.2, 9, NULL, 0, NULL, 0, 0),
-(504, 1041, 'Pyrite Coblyn', 'Pyrite Coblyn', 'Coblyn De Pyrite', 'Pyrit-Kobalos', 'パイライトコブラン', NULL, 11, 25.4, 26.1, 7, NULL, 0, NULL, 0, 0),
-(505, 276, 'Rusty Coblyn', 'Rusty Coblyn', 'Coblyn Rouillé', 'Rostig[a] Kobalos', 'ラスティコブラン', NULL, 11, 18.8, 29.5, 8, NULL, 0, NULL, 0, 0),
-(506, 265, 'Sandtoad', 'Sandtoad', 'Crapaud Des Sables', 'Sandkröte', 'サンドトード', NULL, 11, 21.2, 23.6, 9, NULL, 0, NULL, 0, 0),
-(507, 1011, 'Scale Eater', 'Scale Eater', 'Basilic Lépidophage', 'Schuppenfresser', '賞金首：スケールイーター', NULL, 11, 24.3, 18.6, 14, NULL, 0, NULL, 0, 0),
-(508, 635, 'Scaphite', 'Scaphite', 'Scaphite', 'Scaphit', 'スカフィテ', NULL, 11, 17.3, 14.9, 14, NULL, 0, NULL, 0, 0),
-(510, 902, 'Shipment Of Brass Cogs', 'Shipment Of Brass Cogs', 'Matériel Pour Le Marteau', 'Ladung[p] Bronzezahnräder', '杭打塔の資材', NULL, 11, 19.8, 27.0, 8, NULL, 1, NULL, 0, 0),
-(511, 1037, 'Softskin Peiste', 'Softskin Peiste', 'Peiste à Peau Tendre', 'Samthaut-Peiste', 'ソフトスキン・ペイスト', NULL, 11, 18.7, 17.0, 12, NULL, 0, NULL, 0, 0),
-(512, 1035, 'Soulless Chrisom', 'Soulless Chrisom', 'Chrémeau Sans âme', 'Seelenlos[a] Taufkleid', 'ソウルレス・クリソム', NULL, 11, 24.1, 18.9, 15, NULL, 0, NULL, 0, 0),
-(513, 262, 'Star Marmot', 'Star Marmot', 'Marmotte', 'Stern-Murmelhörnchen', 'マーモット', NULL, 11, 20.3, 27.2, 2, NULL, 0, NULL, 0, 1),
-(514, 298, 'Sun Midge Swarm', 'Sun Midge Swarm', 'Nuée De Moucherons Soleil', 'Sonnenmückenschwarm', 'サンミッヂ・スウォーム', NULL, 11, 16.6, 15.8, 12, NULL, 0, NULL, 0, 0),
-(515, 636, 'Thickshell', 'Thickshell', 'Coquépaisse', 'Panzerschale', 'シックシェル', NULL, 11, 15.6, 17.0, 13, NULL, 0, NULL, 0, 0),
-(516, 1038, 'Tomahawk Beak', 'Tomahawk Beak', 'Bec-tomahawk', 'Tomahawkschnabel', 'トマホークビーク', NULL, 11, 24.8, 25.5, 8, NULL, 0, NULL, 0, 0),
-(517, 1322, 'Worried Worker', 'Worried Worker', 'Ouvrier Dans L\'embarras', 'Besorgt[a] Arbeiter', '困り果てた作業員', NULL, 11, 22.6, 27.8, 6, NULL, 1, NULL, 0, 0),
-(518, 284, 'Yarzon Feeder', 'Yarzon Feeder', 'Yarzon Nourricier', 'Gefräßig[a] Yarzon', 'ヤーゾン・フィーダー', NULL, 11, 24.1, 27.4, 4, NULL, 0, NULL, 0, 0),
-(519, 227, 'Yarzon Scavenger', 'Yarzon Scavenger', 'Yarzon Charognard', 'Aas-Yarzon', 'ヤーゾン・スカベンジャー', NULL, 11, 14.7, 7.2, 26, NULL, 0, NULL, 0, 1),
-(520, 2425, 'Alpha Ziz', 'Alpha Ziz', 'Ziz Alpha', 'Alpha-Ziz', 'アルファ・ジズ', NULL, 12, 22.2, 33.9, 48, NULL, 0, NULL, 0, 0),
-(521, 246, 'Amalj\'aa Impaler', 'Amalj\'aa Impaler', 'Empaleur Amalj\'aa', 'Amalj\'aa-Aufspießer', 'アマルジャ・インペイラー', NULL, 12, 22.4, 16.4, 6, NULL, 0, NULL, 0, 0),
-(522, 254, 'Amalj\'aa Striker', 'Amalj\'aa Striker', 'Cogneur Amalj\'aa', 'Amalj\'aa-Schläger', 'アマルジャ・ストライカー', NULL, 12, 22.1, 16.9, 6, NULL, 0, NULL, 0, 0),
-(523, 293, 'Antling Sentry', 'Antling Sentry', 'Fourmi Sentinelle', 'Treiberameisen-Wache', 'アントリング・セントリー', NULL, 12, 16.6, 14.2, 12, NULL, 0, NULL, 0, 0),
-(524, 292, 'Antling Soldier', 'Antling Soldier', 'Fourmi Soldat', 'Treiberameisen-Soldat', 'アントリング・ソルジャー', NULL, 12, 22.4, 19.9, 10, NULL, 0, NULL, 0, 0),
-(525, 294, 'Antling Worker', 'Antling Worker', 'Fourmi Ouvrière', 'Treiberameisen-Arbeiter', 'アントリング・ワーカー', NULL, 12, 23.3, 17.1, 5, NULL, 0, NULL, 0, 0),
-(526, 872, 'Babaroon Halfshell', 'Babaroon Halfshell', 'Babaroon Mimollet', 'Babaroon Halbschale', '半熟のババルン', NULL, 12, 15.9, 19.2, 9, 1, 1, 191, 1, 0),
-(527, 328, 'Baron Von Quiveron III Esquire', 'Baron Von Quiveron III Esquire', 'Baron Quiveron Troisième Du Nom', 'Baron[p] Von Quiveron III.', 'サー・キヴロン男爵III世', NULL, 12, 24.1, 21.2, 12, NULL, 0, NULL, 0, 0),
-(528, 288, 'Cochineal Cactuar', 'Cochineal Cactuar', 'Cactuar Nopal', 'Koschenillen-Kaktor', 'コチニールカクター', NULL, 12, 24.4, 19.9, 11, NULL, 0, NULL, 0, 0),
-(529, 289, 'Eft', 'Eft', 'Jeune Triton', 'Molch', 'エフト', NULL, 12, 23.2, 18.8, 10, NULL, 0, NULL, 0, 0),
-(530, 244, 'Giant Tortoise', 'Giant Tortoise', 'Tortue Géante', 'Riesenschildkröte', 'ジャイアントトータス', NULL, 12, 19.5, 19.0, 12, NULL, 0, NULL, 0, 1),
-(531, 870, 'Grishild The Ungood', 'Grishild The Ungood', 'Grishild La Terreur', 'Grausam[a] Grishild', '無頼のグリスヒルド', NULL, 12, 21.0, 25.8, 5, NULL, 1, NULL, 0, 0),
-(532, 632, 'Huge Hornet', 'Huge Hornet', 'Frelon Géant', 'Riesenhornisse', 'ヒュージ・ホーネット', NULL, 12, 21.9, 26.7, 1, NULL, 0, NULL, 0, 0),
-(533, 1348, 'Hungry Hobbledehoy', 'Hungry Hobbledehoy', 'Fille Affamée', 'Hungrig[a] Mädchen', '腹を減らした少女', NULL, 12, 23.1, 16.6, 10, NULL, 1, NULL, 0, 0),
-(534, 1352, 'Kindly Father', 'Kindly Father', 'Pêcheur à La Fibre Paternelle', 'Rücksichtsvoll[a] Vater', '息子想いの漁師', NULL, 12, 20.5, 24.2, 1, NULL, 1, NULL, 0, 0),
-(535, 875, 'Nest Commander', 'Nest Commander', 'Commandante Du Nid', 'Nestkommandant', 'ネストコマンダー', NULL, 12, 17.7, 14.5, 12, 1, 1, 197, 1, 0),
-(776, 868, 'Crier Briareos', 'Crier Briareos', 'Briarée L\'inconsolable', 'Griesgram Briareos', '悲嘆のブリアレオス', NULL, 11, 13.7, 10.5, 21, 1, 1, 7, 1, 0),
-(537, 266, 'Qiqirn Shellsweeper', 'Qiqirn Shellsweeper', 'Qiqirn Casse-coquille', 'Qiqirn-Panzerbrecher', 'キキルン・シェルスウィーパー', NULL, 12, 16.6, 19.5, 9, NULL, 0, NULL, 0, 0),
-(538, 330, 'Quiveron Attendant', 'Quiveron Attendant', 'Domestique Des Quiveron', 'Quiveron-Handlanger', 'キヴロン家の使用人', NULL, 12, 24.5, 21.2, 11, NULL, 0, NULL, 0, 0),
-(539, 326, 'Quiveron Guard', 'Quiveron Guard', 'Garde Des Quiveron', 'Quiveron-Wache', 'キヴロン家の侍衛', NULL, 12, 24.5, 21.2, 11, NULL, 0, NULL, 0, 0),
-(775, 51, 'Alpha Anole', 'Alpha Anole', 'Anolis Alpha', 'Alpha-Anolis', 'アルファ・アノール', NULL, 7, 31.0, 21.0, 9, 1, 1, 4, 1, 0),
-(541, 318, 'Snapping Shrew', 'Snapping Shrew', 'Musaraigne Agressive', 'Schnappspitzmull', 'スナッピング・シュルー', NULL, 12, 22.2, 25.8, 3, NULL, 0, NULL, 0, 0),
-(542, 874, 'Spitfire', 'Spitfire', 'Crachefeu', 'Spitfire', 'スピットファイア', NULL, 12, 18.2, 23.5, 7, 1, 1, 29, 1, 0),
-(543, 317, 'Spriggan Graverobber', 'Spriggan Graverobber', 'Spriggan Pilleur De Tombe', 'Grabräuber-Spriggan', 'スプリガン・グレイブラバー', NULL, 12, 17.9, 23.6, 7, NULL, 0, NULL, 0, 0),
-(544, 1276, 'Stone Torch', 'Stone Torch', 'Torche D\'acier', 'Eisenschein-Soldat', '鉄灯団の衛兵', NULL, 12, 21.7, 17.9, 35, NULL, 0, NULL, 0, 0),
-(545, 279, 'Sun Bat', 'Sun Bat', 'Chauve-souris Du Soleil', 'Sonnenfledermaus', 'サンバット', NULL, 12, 23.2, 19.5, 13, NULL, 0, NULL, 0, 0),
-(546, 2426, 'Territorial Axe Beak', 'Territorial Axe Beak', 'Bec-pic Territorial', 'Hinterhältig[a] Pelisaurus', 'テリトリアル・アクスビーク', NULL, 12, 22.5, 33.7, 48, NULL, 0, NULL, 0, 0),
-(547, 216, 'Toxic Toad', 'Toxic Toad', 'Crapaud Toxique', 'Giftkröte', 'トキシックトード', NULL, 12, 27.0, 19.2, 14, NULL, 0, NULL, 0, 0),
-(548, 1250, 'Aldebrand', 'Aldebrand', 'Aldebrand', 'Aldebrand', 'アルデブランド', NULL, 13, 22.2, 21.6, 1, NULL, 1, NULL, 0, 0),
-(549, 256, 'Amalj\'aa Bruiser', 'Amalj\'aa Bruiser', 'Tabasseur Amalj\'aa', 'Amalj\'aa-Kraftprotz', 'アマルジャ・ブルーザー', NULL, 13, 24.8, 20.5, 23, NULL, 0, NULL, 0, 1),
-(550, 250, 'Amalj\'aa Hunter', 'Amalj\'aa Hunter', 'Chasseur Amalj\'aa', 'Amalj\'aa-Jäger', 'アマルジャ・ハンター', NULL, 13, 20.1, 27.5, 18, NULL, 1, NULL, 0, 0),
-(551, 247, 'Amalj\'aa Javelinier', 'Amalj\'aa Javelinier', 'Javelinier Amalj\'aa', 'Amalj\'aa-Speerwerfer', 'アマルジャ・ジャベリナー', NULL, 13, 20.0, 27.3, 18, NULL, 1, NULL, 0, 0),
-(552, 251, 'Amalj\'aa Ranger', 'Amalj\'aa Ranger', 'Ranger Amalj\'aa', 'Amalj\'aa-Waldläufer', 'アマルジャ・レンジャー', NULL, 13, 24.8, 21.6, 27, NULL, 1, NULL, 0, 0),
-(553, 900, 'Amalj\'aa Supply Crate', 'Amalj\'aa Supply Crate', 'Caisse De Ravitaillement Amalj\'aa', 'Amalj\'aa-Vorratskiste', 'アマルジャ軍の軍需物資', NULL, 13, 20.4, 27.0, 18, NULL, 1, NULL, 0, 0),
-(554, 281, 'Axe Beak', 'Axe Beak', 'Bec-pic', 'Pelisaurus', 'アクスビーク', NULL, 13, 24.2, 19.1, 26, NULL, 0, NULL, 0, 0),
-(555, 1311, 'Bandit Archer', 'Bandit Archer', 'Bandit Archer', 'Räuberisch[a] Schütze', 'バンディット・アーチャー', NULL, 13, 26.7, 18.5, 28, NULL, 0, NULL, 0, 0),
-(556, 1310, 'Bandit Mage', 'Bandit Mage', 'Bandit Mage', 'Räuberisch[a] Zauberer', 'バンディット・メイジ', NULL, 13, 26.6, 18.7, 28, NULL, 0, NULL, 0, 0),
-(557, 1309, 'Bandit Trapper', 'Bandit Trapper', 'Bandit Trappeur', 'Räuberisch[a] Fallensteller', 'バンディット・トラッパー', NULL, 13, 26.8, 19.0, 28, NULL, 0, NULL, 0, 0),
-(558, 1246, 'Bertram', 'Bertram', 'Bertram', 'Bertram', 'バートラム', NULL, 13, 22.4, 21.4, 1, NULL, 1, NULL, 0, 0),
-(559, 1199, 'Blowfly Swarm', 'Blowfly Swarm', 'Nuée De Mouches Bleues', 'Aasfliegenschwarm', 'ブロウフライ・スウォーム', NULL, 13, 13.2, 22.4, 16, NULL, 0, NULL, 0, 0),
-(560, 1255, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 13, 24.2, 22.8, 25, NULL, 1, NULL, 0, 0),
-(561, 296, 'Bumble Beetle', 'Bumble Beetle', 'Scarabourdon', 'Brummkäfer', 'バンブルビートル', NULL, 13, 27.8, 17.0, 25, NULL, 0, NULL, 0, 1),
-(562, 1245, 'Chachamun', 'Chachamun', 'Chachamun', 'Chachamun', '武具屋 チャチャムン', NULL, 13, 22.3, 21.4, 5, NULL, 1, NULL, 0, 0),
-(563, 301, 'Chasm Buzzard', 'Chasm Buzzard', 'Busard Des Gouffres', 'Schlucht-Bussard', 'キャズム・バザード', NULL, 13, 21.8, 19.9, 25, NULL, 0, NULL, 0, 0),
-(564, 1350, 'Dry Slug', 'Dry Slug', 'Limace Déshydratée', 'Trockenschnecke', 'ドライスラッグ', NULL, 13, 13.8, 20.8, 14, NULL, 1, NULL, 0, 0),
-(565, 1047, 'Drybone Tuco-tuco', 'Drybone Tuco-tuco', 'Tuco-tuco Des Os Desséchés', 'Knochenbleich-Tukotuko', 'ドライボーン・ツコツコ', NULL, 13, 16.1, 24.1, 24, NULL, 0, NULL, 0, 0),
-(566, 1371, 'Flame Private', 'Flame Private', 'Soldat 3e Classe Des Sables', 'Legionär[p] 3. Klasse', '不滅隊二等闘兵', NULL, 13, 25.1, 20.0, 22, NULL, 1, NULL, 0, 1),
-(567, 1275, 'Flame Recruit', 'Flame Recruit', 'Soldat Des Immortels', 'Legionsrekrut', '不滅隊の兵卒', NULL, 13, 12.9, 25.0, 44, NULL, 0, NULL, 0, 1),
-(774, 1666, 'Pulxio Of The Short Gale', 'Pulxio Of The Short Gale', 'Pulxio', 'Pulxio', '風狂のプルシオ', NULL, 8, 20.0, 10.0, 49, 1, 1, 25, 1, 0),
-(569, 271, 'Golden Fleece', 'Golden Fleece', 'Toison D\'or', 'Goldvlies', 'ゴールデンフリース', NULL, 13, 26.0, 25.2, 40, 3, 0, NULL, 1, 0),
-(570, 1249, 'Jajanzo', 'Jajanzo', 'Jajanzo', 'Jajanzo', 'ジャジャンゾ', NULL, 13, 24.1, 23.6, 1, NULL, 1, NULL, 0, 0),
-(571, 1251, 'Ligart', 'Ligart', 'Ligart', 'Ligart', 'リガート', NULL, 13, 23.9, 24.4, 1, NULL, 1, NULL, 0, 0),
-(572, 634, 'Mirrorknight', 'Mirrorknight', 'Chevalier Miroir', 'Speglidae', 'ミラーナイト', NULL, 13, 26.9, 26.5, 42, 3, 0, NULL, 1, 0),
-(573, 273, 'Myotragus Billy', 'Myotragus Billy', 'Bouquetin Myotragus', 'Myotragus-Bock', 'ミオトラグス・ビリー', NULL, 13, 16.5, 28.6, 16, NULL, 0, NULL, 0, 0),
-(574, 274, 'Myotragus Nanny', 'Myotragus Nanny', 'étagne Myotragus', 'Myotragus-Geiß', 'ミオトラグス・ナニー', NULL, 13, 18.4, 22.5, 18, NULL, 0, NULL, 0, 0),
-(575, 1242, 'Nayokk Roh', 'Nayokk Roh', 'Nayokk Roh Le Trafiquant', 'Nayokk Roh', '人買のナヨク・ロー', NULL, 13, 23.5, 24.6, 26, NULL, 1, NULL, 0, 0),
-(576, 272, 'Phurble', 'Phurble', 'Poiluche', 'Flausch', 'ファーブル', NULL, 13, 23.4, 21.6, 25, NULL, 0, NULL, 0, 0),
-(577, 268, 'Qiqirn Roerunner', 'Qiqirn Roerunner', 'Qiqirn Gobe-oisillon', 'Qiqirn-Läufer', 'キキルン・ロウランナー', NULL, 13, 23.8, 23.3, 26, NULL, 0, NULL, 0, 0),
-(578, 1244, 'Qiqirn Trafficker', 'Qiqirn Trafficker', 'Qiqirn Fricoteur', 'Qiqirn-Streuner', 'キキルン・トラフィッカー', NULL, 13, 23.8, 24.3, 26, NULL, 1, NULL, 0, 0),
-(579, 1125, 'Ravenous Billygoat', 'Ravenous Billygoat', 'Bouquetin Insatiable', 'Gefräßig[a] Steinbock', 'ラヴェナス・ビリー', NULL, 13, 15.2, 23.5, 24, NULL, 0, NULL, 0, 0),
-(580, 319, 'Rotting Corpse', 'Rotting Corpse', 'Cadavre Putrescent', 'Verrottend[a] Leiche', 'ロッティング・コープス', NULL, 13, 14.6, 16.4, 17, NULL, 0, NULL, 0, 0),
-(581, 322, 'Rotting Noble', 'Rotting Noble', 'Noble Putrescent', 'Verrottend[a] Edelmann', 'ロッティング・ノーブル', NULL, 13, 14.6, 16.3, 17, NULL, 0, NULL, 0, 0),
-(582, 1248, 'Rururaji', 'Rururaji', 'Rururaji', 'Rururaji', 'ルルラジ', NULL, 13, 22.1, 21.5, 1, NULL, 1, NULL, 0, 0),
-(583, 1223, 'Steelquill Tuco-tuco', 'Steelquill Tuco-tuco', 'Tuco-tuco à Piquants Durs', 'Stahlfeder-Tukotuko', 'スチールクイル・ツコツコ', NULL, 13, 12.4, 26.5, 12, NULL, 1, NULL, 0, 0),
-(584, 486, 'Stinging Syrphid Cloud', 'Stinging Syrphid Cloud', 'Nuage De Syrphes Piquants', 'Stechend[a] Mistfliegenwolke', 'スティンギング・サーフィド', NULL, 13, 15.7, 22.0, 24, NULL, 0, NULL, 0, 0),
-(585, 1247, 'Tiny Aurochs', 'Tiny Aurochs', 'Tiny Aurochs', 'Winzig[a] Ochse', 'タイニー・オーロクス', NULL, 13, 21.8, 21.7, 1, NULL, 1, NULL, 0, 0),
-(586, 306, 'Tuco-tuco', 'Tuco-tuco', 'Tuco-tuco', 'Tukotuko', 'ツコツコ', NULL, 13, 13.1, 18.7, 17, NULL, 0, NULL, 0, 0),
-(587, 1198, 'Vandalous Imp', 'Vandalous Imp', 'Imp Vandale', 'Randale-Imp', 'ヴァンドロス・インプ', NULL, 13, 14.4, 18.7, 16, NULL, 0, NULL, 0, 0),
-(588, 1711, 'Abducted Ala Mhigan', 'Abducted Ala Mhigan', 'Engagé De Force Mhigois', 'Entführt[a] Mhigit', '拐われたアラミゴ人', NULL, 14, 18.5, 19.6, 1, NULL, 1, NULL, 0, 0),
-(589, 1984, 'Ala Mhigan Youth', 'Ala Mhigan Youth', 'Jeune Mhigois', 'Mhigisch[a] Jüngling', 'アラミゴ人の若者', NULL, 14, 17.7, 10.4, 27, NULL, 0, NULL, 0, 0),
-(591, 249, 'Amalj\'aa Archer', 'Amalj\'aa Archer', 'Archer Amalj\'aa', 'Amalj\'aa-Bogenschütze', 'アマルジャ・アーチャー', NULL, 14, 20.9, 23.9, 47, 4, 0, NULL, 1, 1),
-(592, 1388, 'Amalj\'aa Brigand', 'Amalj\'aa Brigand', 'Brigand Amalj\'aa', 'Amalj\'aa-Brigant', 'アマルジャ・ブリガンド', NULL, 14, 20.7, 21.7, 45, NULL, 0, NULL, 0, 0),
-(593, 260, 'Amalj\'aa Divinator', 'Amalj\'aa Divinator', 'Divinateur Amalj\'aa', 'Amalj\'aa-Weissager', 'アマルジャ・ディヴィネーター', NULL, 14, 25.1, 34.5, 32, 3, 0, NULL, 1, 0),
-(594, 2155, 'Amalj\'aa Halberdier', 'Amalj\'aa Halberdier', 'Hallebardier Amalj\'aa', 'Amalj\'aa-Hellebardier', 'アマルジャ・ハルバルディア', NULL, 14, 25.9, 35.1, 32, 3, 0, NULL, 1, 0),
-(595, 245, 'Amalj\'aa Lancer', 'Amalj\'aa Lancer', 'Lancier Amalj\'aa', 'Amalj\'aa-Pikenier', 'アマルジャ・ランサー', NULL, 14, 18.6, 20.9, 15, 4, 0, NULL, 1, 1),
-(596, 253, 'Amalj\'aa Pugilist', 'Amalj\'aa Pugilist', 'Pugiliste Amalj\'aa', 'Amalj\'aa-Faustkämpfer', 'アマルジャ・ピュージャリスト', NULL, 14, 19.2, 26.0, 47, 4, 0, NULL, 1, 1),
-(597, 1389, 'Amalj\'aa Scavenger', 'Amalj\'aa Scavenger', 'Charognard Amalj\'aa', 'Amalj\'aa-Plünderer', 'アマルジャ・スカベンジャー', NULL, 14, 20.3, 21.7, 45, NULL, 0, NULL, 0, 0),
-(598, 259, 'Amalj\'aa Seer', 'Amalj\'aa Seer', 'Voyant Amalj\'aa', 'Amalj\'aa-Seher', 'アマルジャ・シーア', NULL, 14, 21.4, 15.0, 26, NULL, 0, NULL, 0, 0),
-(599, 252, 'Amalj\'aa Sniper', 'Amalj\'aa Sniper', 'Tireur Amalj\'aa', 'Amalj\'aa-Scharfschütze', 'アマルジャ・スナイパー', NULL, 14, 26.0, 34.8, 32, 4, 0, NULL, 1, 0),
-(600, 258, 'Amalj\'aa Thaumaturge', 'Amalj\'aa Thaumaturge', 'Occultiste Amalj\'aa', 'Amalj\'aa-Thaumaturg', 'アマルジャ・サーマタージ', NULL, 14, 16.8, 25.5, 45, NULL, 0, NULL, 0, 0),
-(601, 307, 'Angler', 'Angler', 'Lotte', 'Anglerfisch', 'アングラー', NULL, 14, 15.9, 20.4, 28, NULL, 0, NULL, 0, 0),
-(602, 1505, 'Aspidochelone', 'Aspidochelone', 'Aspidochélon', 'Aspidochelone', 'アスピドケロン', NULL, 14, 20.3, 20.8, 46, 1, 1, 213, 1, 0),
-(603, 1344, 'Augmented Battle Drake', 'Augmented Battle Drake', 'Draconide De Combat Amélioré', 'Gestärkt[a] Kampf-Drakon', '強化型バトルドレイク', NULL, 14, 16.7, 11.8, 25, NULL, 1, NULL, 0, 0),
-(604, 1277, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 14, 16.5, 15.0, 35, NULL, 0, NULL, 0, 1),
-(605, 2511, 'Bronze Tortoise', 'Bronze Tortoise', 'Tortue De Bronze', 'Bronzeschildkröte', 'ブロンズトータス', NULL, 14, 19.3, 21.0, 43, NULL, 0, NULL, 0, 0),
-(606, 332, 'Corpse Brigade Firedancer', 'Corpse Brigade Firedancer', 'Sorcier De La Brigade Des Cadavres', 'Leichenbrigaden-Feuerteufel', '骸旅団の魔術兵', NULL, 14, 22.3, 9.6, 28, NULL, 0, NULL, 0, 0),
-(607, 331, 'Corpse Brigade Knuckledancer', 'Corpse Brigade Knuckledancer', 'Lutteur De La Brigade Des Cadavres', 'Leichenbrigaden-Knöcheltänzer', '骸旅団の格闘兵', NULL, 14, 22.2, 9.6, 28, NULL, 0, NULL, 0, 0),
-(608, 2332, 'Dapper Zombie', 'Dapper Zombie', 'Zombi Bien Mis', 'Galant[a] Zombie', 'ゾンビー・ジェントルマン', NULL, 14, 15.9, 26.0, 43, NULL, 1, NULL, 0, 0),
-(609, 2191, 'Dune Angler', 'Dune Angler', 'Lotte Des Dunes', 'Dünen-Anglerfisch', 'デューン・アングラー', NULL, 14, 19.9, 31.1, 31, NULL, 0, NULL, 0, 0),
-(610, 323, 'Fallen Mage', 'Fallen Mage', 'Mage Déchu', 'Gefallen[a] Magier', 'フォールン・メイジ', NULL, 14, 19.3, 16.6, 26, NULL, 0, NULL, 0, 0),
-(611, 321, 'Fallen Pikeman', 'Fallen Pikeman', 'Lancier Déchu', 'Gefallen[a] Pikenier', 'フォールン・パイクマン', NULL, 14, 21.5, 38.8, 34, NULL, 0, NULL, 0, 0),
-(612, 320, 'Fallen Soldier', 'Fallen Soldier', 'Soldat Déchu', 'Gefallen[a] Soldat', 'フォールン・ソルジャー', NULL, 14, 19.1, 16.7, 26, NULL, 0, NULL, 0, 0),
-(613, 324, 'Fallen Wizard', 'Fallen Wizard', 'Magicien Déchu', 'Gefallen[a] Zauberer', 'フォールン・ウィザード', NULL, 14, 19.5, 38.7, 34, 4, 0, NULL, 1, 0),
-(614, 1343, 'Flame Scout', 'Flame Scout', 'éclaireur Des Immortels', 'Legionskundschafter', '不滅隊の偵察兵', NULL, 14, 17.7, 17.9, 18, NULL, 1, NULL, 0, 1),
-(615, 2354, 'Flamecrest Afajj Koh', 'Flamecrest Afajj Koh', 'Afajj Koh', 'Flammenkranz Afajj Koh', '火印のアファジ・コー', NULL, 14, 26.2, 21.4, 48, 1, 1, 304, 1, 0),
-(616, 2368, 'Flamefang Commander', 'Flamefang Commander', 'Commandant Croc De Feu', 'Flammenfang-Kommandant', 'フレイム・コマンダー', NULL, 14, 32.3, 20.8, 49, NULL, 1, NULL, 0, 0),
-(617, 2369, 'Flamefang Elite', 'Flamefang Elite', 'Combattant D\'élite Croc De Feu', 'Flammenfang-Elitekrieger', 'フレイム・エリート', NULL, 14, 32.3, 20.8, 49, NULL, 1, NULL, 0, 0),
-(618, 1390, 'Flaming Beacon', 'Flaming Beacon', 'Brasière Enflammée', 'Flammenkessel', '燃える聖火台', NULL, 14, 16.0, 23.6, 43, NULL, 0, NULL, 0, 0),
-(619, 882, 'Gisfrid The Grinder', 'Gisfrid The Grinder', 'Gisfrid Le Transgresseur', 'Gisfrid der Gnadenloser', '破戒のギスフリッド', NULL, 14, 23.6, 10.7, 28, 1, 1, 231, 1, 0),
-(620, 2053, 'Hired Bow', 'Hired Bow', 'Archer Stipendié', 'Söldner-Bogenschützin', '雇われの弓術士', NULL, 14, 19.4, 14.4, 40, NULL, 0, NULL, 0, 0),
-(621, 2052, 'Hired Fist', 'Hired Fist', 'Pugiliste Stipendié', 'Söldner-Faustkämpferin', '雇われの格闘士', NULL, 14, 19.6, 14.1, 40, NULL, 0, NULL, 0, 0),
-(622, 1878, 'Ifrit\'s Beacon', 'Ifrit\'s Beacon', 'Pilier Du Feu Sacré', 'Ifrits Kessel', '焔神イフリートの聖火台', NULL, 14, 32.6, 20.2, 49, NULL, 0, NULL, 0, 0),
-(623, 1877, 'Infernal Beacon', 'Infernal Beacon', 'Torchère Infernale', 'Infernokessel', '燃え盛る聖火台', NULL, 14, 23.7, 25.4, 46, NULL, 0, NULL, 0, 0),
-(624, 243, 'Iron Tortoise', 'Iron Tortoise', 'Tortue De Fer', 'Eisenschildkröte', 'アイアントータス', NULL, 14, 16.1, 24.9, 46, 3, 0, NULL, 1, 0),
-(625, 564, 'Potter Wasp Swarm', 'Potter Wasp Swarm', 'Nuée De Guêpes Maçonnes', 'Lehmfliegenschwarm', 'ポッターワスプ・スウォーム', NULL, 14, 15.0, 13.6, 25, NULL, 0, NULL, 0, 0),
-(626, 1278, 'Ranger Of The Drake', 'Ranger Of The Drake', 'Chasseuse De La Tribu Des U', 'Drakon-Jägerin', 'ウ族の狩人', NULL, 14, 16.5, 29.8, 29, NULL, 0, NULL, 0, 0),
-(627, 889, 'Ranger Of The Drake', 'Ranger Of The Drake', 'Chasseuse De La Tribu Des U', 'Drakon-Jägerin', 'ウ族の狩人', NULL, 14, 14.5, 32.0, 25, NULL, 1, NULL, 0, 0),
-(628, 1993, 'Rockskin Peiste', 'Rockskin Peiste', 'Peiste à Peau Dure', 'Steinhaut-Peiste', 'ロックスキン・ペイスト', NULL, 14, 16.5, 12.8, 28, NULL, 0, NULL, 0, 0),
-(629, 285, 'Russet Yarzon', 'Russet Yarzon', 'Yarzon Brun', 'Rotbraun[a] Yarzon', 'ラセット・ヤーゾン', NULL, 14, 12.7, 32.2, 31, 4, 0, NULL, 1, 0),
-(630, 286, 'Sabotender', 'Sabotender', 'Pampa', 'Sabotender', 'サボテンダー', NULL, 14, 20.3, 7.9, 25, NULL, 0, NULL, 0, 0),
-(631, 303, 'Sandskin Peiste', 'Sandskin Peiste', 'Peiste Sablon', 'Sandhaut-Peiste', 'サンドスキン・ペイスト', NULL, 14, 21.0, 9.6, 26, NULL, 0, NULL, 0, 0),
-(632, 280, 'Sandstone Golem', 'Sandstone Golem', 'Golem De Grès', 'Sandstein-Golem', 'サンドストーン・ゴーレム', NULL, 14, 23.1, 12.1, 29, NULL, 0, NULL, 0, 0),
-(633, 290, 'Sandworm', 'Sandworm', 'Ver Des Sables', 'Sandwurm', 'サンドウォーム', NULL, 14, 14.5, 31.8, 29, 4, 0, NULL, 1, 0),
-(634, 132, 'Smoke Bomb', 'Smoke Bomb', 'Bombo Fumigène', 'Rauchbomber', 'スモークボム', NULL, 14, 19.0, 35.5, 32, 4, 0, NULL, 1, 0),
-(635, 264, 'Sundrake', 'Sundrake', 'Draconide Du Soleil', 'Drakon', 'ドレイク', NULL, 14, 24.3, 36.7, 32, 3, 0, NULL, 1, 0),
-(636, 1999, 'Tempered Brand', 'Tempered Brand', 'Mage Belahdien', 'Besessen[a] Magier', 'ベラフディアン・メイジ', NULL, 14, 19.6, 17.1, 26, NULL, 0, NULL, 0, 0),
-(637, 338, 'Tempered Champion', 'Tempered Champion', 'Lutteur Subjugué', 'Abgeklärt[a] Faustkämpfer', 'テンパード・チャンピオン', NULL, 14, 18.1, 19.4, 42, NULL, 1, NULL, 0, 0),
-(638, 337, 'Tempered Gladiator', 'Tempered Gladiator', 'Gladiateur Subjugué', 'Abgeklärt[a] Gladiator', 'テンパード・グラディエーター', NULL, 14, 21.2, 19.9, 46, NULL, 1, NULL, 0, 0),
-(639, 2361, 'Tempered Huntress', 'Tempered Huntress', 'Chasseuse Subjuguée', 'Besessen[a] Jägerin', 'テンパード・ハンター', NULL, 14, 21.1, 21.9, 43, NULL, 0, NULL, 0, 0),
-(640, 339, 'Tempered Orator', 'Tempered Orator', 'Psalmodieur Subjugué', 'Abgeklärt[a] Redner', 'テンパード・オラター', NULL, 14, 18.1, 19.3, 46, 3, 1, NULL, 1, 0),
-(641, 1998, 'Tempered Sword', 'Tempered Sword', 'Soldat Belahdien', 'Besessen[a] Soldat', 'ベラフディアン・ソルジャー', NULL, 14, 19.5, 16.9, 26, NULL, 0, NULL, 0, 0),
-(642, 918, 'U\'kahmuli', 'U\'kahmuli', 'U\'kahmuli', 'U\'kahmuli', 'ウ・カムリ', NULL, 14, 14.7, 30.3, 25, NULL, 1, NULL, 0, 0),
-(643, 920, 'U\'konelua', 'U\'konelua', 'U\'konelua', 'U\'konelua', 'ウ・コネルア', NULL, 14, 14.6, 29.9, 25, NULL, 1, NULL, 0, 0),
-(644, 922, 'U\'lolamo', 'U\'lolamo', 'U\'lolamo', 'U\'lolamo', 'ウ・ローラモ', NULL, 14, 15.3, 29.5, 25, NULL, 1, NULL, 0, 0),
-(645, 921, 'U\'ndomii', 'U\'ndomii', 'U\'ndomii', 'U\'ndomii', 'ウ・ンドミィ', NULL, 14, 14.9, 29.8, 25, NULL, 1, NULL, 0, 0),
-(646, 919, 'U\'ralka', 'U\'ralka', 'U\'ralka', 'U\'ralka', 'ウ・ラルカ', NULL, 14, 14.8, 30.1, 25, NULL, 1, NULL, 0, 0),
-(647, 912, 'Wildfire Sprite', 'Wildfire Sprite', 'élémentaire Exergonique', 'Lauffeuer-Exergon', 'ワイルドファイアスプライト', NULL, 14, 24.3, 26.4, 48, NULL, 0, NULL, 0, 0),
-(648, 1838, 'Zahar\'ak Archer', 'Zahar\'ak Archer', 'Archer De Zahar\'ak', 'Zahar\'ak-Bogenschütze', 'ザハラク・アーチャー', NULL, 14, 23.1, 22.0, 49, 3, 0, NULL, 1, 0),
-(649, 1841, 'Zahar\'ak Battle Drake', 'Zahar\'ak Battle Drake', 'Draconide De Zahar\'ak', 'Zahar\'ak-Kampf-Drakon', 'ザハラク・バトルドレイク', NULL, 14, 30.3, 19.9, 48, 3, 0, NULL, 1, 0),
-(650, 2303, 'Zahar\'ak Fortune-teller', 'Zahar\'ak Fortune-teller', 'Augure De Zahar\'ak', 'Zahar\'ak-Wahrsager', 'ザハラク・フォーチュンテラー', NULL, 14, 30.6, 18.8, 49, NULL, 0, NULL, 0, 0),
-(651, 1837, 'Zahar\'ak Lancer', 'Zahar\'ak Lancer', 'Lancier De Zahar\'ak', 'Zahar\'ak-Pikenier', 'ザハラク・ランサー', NULL, 14, 24.8, 20.8, 49, NULL, 0, NULL, 0, 0),
-(652, 1839, 'Zahar\'ak Pugilist', 'Zahar\'ak Pugilist', 'Pugiliste De Zahar\'ak', 'Zahar\'ak-Faustkämpfer', 'ザハラク・ピュージャリスト', NULL, 14, 32.2, 20.0, 49, 3, 0, NULL, 1, 0),
-(653, 1840, 'Zahar\'ak Thaumaturge', 'Zahar\'ak Thaumaturge', 'Occultiste De Zahar\'ak', 'Zahar\'ak-Thaumaturg', 'ザハラク・サーマタージ', NULL, 14, 29.8, 18.9, 49, 3, 0, NULL, 1, 0),
-(655, 2296, 'Zanr\'ak Archer', 'Zanr\'ak Archer', 'Archer De Zanr\'ak', 'Zanr\'ak-Bogenschütze', 'ザンラク・アーチャー', NULL, 14, 24.7, 26.5, 49, NULL, 1, NULL, 0, 0),
-(656, 2297, 'Zanr\'ak Lancer', 'Zanr\'ak Lancer', 'Lancier De Zanr\'ak', 'Zanr\'ak-Pikenier', 'ザンラク・ランサー', NULL, 14, 24.0, 24.4, 48, NULL, 0, NULL, 0, 0),
-(657, 1880, 'Zanr\'ak Pugilist', 'Zanr\'ak Pugilist', 'Pugiliste De Zanr\'ak', 'Zanr\'ak-Faustkämpfer', 'ザンラク・ピュージャリスト', NULL, 14, 24.4, 26.3, 49, NULL, 0, NULL, 0, 0),
-(658, 1879, 'Zanr\'ak Thaumaturge', 'Zanr\'ak Thaumaturge', 'Occultiste De Zanr\'ak', 'Zanr\'ak-Thaumaturg', 'ザンラク・サーマタージ', NULL, 14, 25.0, 26.3, 48, NULL, 0, NULL, 0, 0),
-(659, 53, '3rd Cohort Hoplomachus', '3rd Cohort Hoplomachus', 'Hoplomachus De La 3e Cohorte', 'Hoplomachus[p] Der III. Kohorte', 'IIIコホルス・ホプロマクス', NULL, 15, 16.8, 18.6, 49, 3, 0, NULL, 1, 1),
-(660, 2120, '7th Cohort Eques', '7th Cohort Eques', 'Eques De La 7e Cohorte', 'Eques[p] Der VII. Kohorte', 'VIIコホルス・エクエス', NULL, 15, 12.2, 13.1, 50, NULL, 0, NULL, 0, 0),
-(661, 242, 'Ahriman', 'Ahriman', 'Ahriman', 'Ahriman', 'アーリマン', NULL, 15, 22.2, 23.1, 46, 3, 0, NULL, 1, 0),
-(662, 1508, 'Arimaspi', 'Arimaspi', 'Arimaspe', 'Arimaspi', 'アリマスピ', NULL, 15, 25.3, 20.4, 49, 1, 1, 223, 1, 0),
-(663, 304, 'Basilisk', 'Basilisk', 'Basilic', 'Basilisk', 'バジリスク', NULL, 15, 23.1, 23.3, 49, 3, 0, NULL, 1, 0),
-(773, 1515, 'Sekhmet', 'Sekhmet', 'Sekhmet', 'Sekhmet', 'セクメト', NULL, 3, 18.0, 28.0, 34, 1, 1, 27, 1, 0),
-(665, 270, 'Grenade', 'Grenade', 'Grenado', 'Granate', 'グレネード', NULL, 15, 21.4, 14.4, 49, 3, 0, NULL, 1, 1),
-(666, 269, 'Magitek Vanguard', 'Magitek Vanguard', 'Avant-garde Magitek', 'Magitek-Frontbrecher', '魔導ヴァンガード', NULL, 15, 16.6, 15.6, 49, NULL, 0, NULL, 0, 0),
-(667, 275, 'Quartz Doblyn', 'Quartz Doblyn', 'Doblyn De Quartz', 'Quarz-Dobalos', 'クォーツドブラン', NULL, 15, 30.4, 26.1, 49, 3, 0, NULL, 1, 1),
-(668, 1718, 'Wary Merchant', 'Wary Merchant', 'Marchand Circonspect', 'Erschöpft[a] Händler', '慎重な商人', NULL, 15, 22.7, 23.1, 46, NULL, 1, NULL, 0, 0),
-(669, 59, '3rd Cohort Eques', '3rd Cohort Eques', 'Eques De La 3e Cohorte', 'Eques[p] Der III. Kohorte', 'IIIコホルス・エクエス', NULL, 16, 20.1, 20.9, 21, NULL, 0, NULL, 0, 1),
-(670, 58, '3rd Cohort Laquearius', '3rd Cohort Laquearius', 'Laquearius De La 3e Cohorte', 'Laquearius[p] Der III. Kohorte', 'IIIコホルス・ラクエリウス', NULL, 16, 17.1, 16.0, 22, NULL, 0, NULL, 1, 1),
-(671, 60, '3rd Cohort Secutor', '3rd Cohort Secutor', 'Secutor De La 3e Cohorte', 'Secutor[p] Der III. Kohorte', 'IIIコホルス・セクトール', NULL, 16, 19.5, 26.6, 49, NULL, 0, NULL, 0, 1),
-(672, 61, '3rd Cohort Signifer', '3rd Cohort Signifer', 'Signifer De La 3e Cohorte', 'Signifer[p] Der III. Kohorte', 'IIIコホルス・シグニフェル', NULL, 16, 18.5, 15.7, 49, 4, 0, NULL, 1, 1),
-(673, 1850, 'Baritine Croc', 'Baritine Croc', 'Croco Baryton', 'Baritogator', 'バリトンダイル', NULL, 16, 4.1, 22.0, 40, 3, 0, NULL, 1, 0),
-(674, 1183, 'Bateleur', 'Bateleur', 'Bateleur Des Dunes', 'Gaukler', 'バテラー', NULL, 16, 17.5, 17.7, 39, NULL, 0, NULL, 0, 0),
-(676, 788, 'Biast', 'Biast', 'Biast', 'Smei', 'ビアスト', NULL, 16, 17.7, 29.5, 45, 3, 0, NULL, 1, 0),
-(677, 1761, 'Blizzard Biast', 'Blizzard Biast', 'Biast Des Blizzards', 'Schneesturm-Smei', 'ブリザード・ビアスト', NULL, 16, 12.8, 18.1, 44, NULL, 0, NULL, 0, 0),
-(678, 2156, 'Chinchilla', 'Chinchilla', 'Chinchilla', 'Chinchilla', 'チンチラ', NULL, 16, 16.4, 20.2, 39, NULL, 0, NULL, 0, 0),
-(679, 1712, 'Coerthan Porter', 'Coerthan Porter', 'Livreur Du Coerthas', 'Coerthisch[a] Träger', 'クルザスの荷運び人', NULL, 16, 25.9, 21.2, 1, NULL, 1, NULL, 0, 0),
-(680, 1762, 'Downcast Hippocerf', 'Downcast Hippocerf', 'Hippocerf Rejeté', 'Niedergeschlagen[a] Hippocerf', 'ダウンキャスト・ヒッポセルフ', NULL, 16, 13.9, 18.5, 44, NULL, 0, NULL, 0, 0),
-(681, 1849, 'Downy Aevis', 'Downy Aevis', 'Eibis Duveteux', 'Flaum-Avis', 'ダウニーエイビス', NULL, 16, 24.1, 8.1, 38, 4, 0, NULL, 1, 0),
-(682, 637, 'Dragonfly', 'Dragonfly', 'Draguêpe', 'Drachycera', 'ドラゴンフライ', NULL, 16, 9.8, 12.8, 37, 3, 0, NULL, 1, 0),
-(683, 784, 'Feral Croc', 'Feral Croc', 'Crocodile Sauvage', 'Domigator', 'ワイルドダイル', NULL, 16, 25.6, 24.5, 33, 3, 0, NULL, 1, 0),
-(684, 1429, 'Gargamelle', 'Gargamelle', 'Gargamelle', 'Gargamelle', 'ガルガメル', NULL, 16, 34.2, 13.8, 39, 1, 1, 244, 1, 0),
-(685, 785, 'Giant Logger', 'Giant Logger', 'Géant Bûcheron', 'Riesen-Henker', 'ジャイアント・ロガー', NULL, 16, 13.6, 25.3, 46, 3, 0, NULL, 1, 0),
-(686, 786, 'Giant Lugger', 'Giant Lugger', 'Géant Jouteur', 'Riesen-Fäller', 'ジャイアント・ラガー', NULL, 16, 12.2, 26.7, 46, 3, 0, NULL, 1, 0),
-(687, 787, 'Giant Reader', 'Giant Reader', 'Géant Devin', 'Riesen-Häuptling', 'ジャイアント・リーダー', NULL, 16, 15.8, 26.7, 46, 3, 0, NULL, 1, 0),
-(688, 1612, 'Highland Goobbue', 'Highland Goobbue', 'Goobbue Des Hautes Terres', 'Hochland-Goobbue', 'ハイランド・グゥーブー', NULL, 16, 26.8, 19.6, 35, 4, 0, NULL, 1, 0),
-(689, 790, 'Hippocerf', 'Hippocerf', 'Hippocerf', 'Hippocerf', 'ヒッポセルフ', NULL, 16, 8.5, 20.5, 40, 3, 0, NULL, 1, 0),
-(690, 1581, 'House Durendaire Guard', 'House Durendaire Guard', 'Sentinelle Des Durendaire', 'Durendaire-Gardist', 'デュランデル家の衛兵', NULL, 16, 27.0, 28.2, 43, NULL, 0, NULL, 0, 0),
-(691, 1862, 'House Fortemps Engineer', 'House Fortemps Engineer', 'Ingénieur Des Fortemps', 'Fortemps-Techniker', 'フォルタン家の工兵', NULL, 16, 26.4, 15.9, 34, NULL, 1, NULL, 0, 0),
-(692, 1582, 'House Fortemps Guard', 'House Fortemps Guard', 'Sentinelle Des Fortemps', 'Fortemps-Gardist', 'フォルタン家の衛兵', NULL, 16, 26.6, 16.1, 31, NULL, 0, NULL, 0, 0),
-(693, 1847, 'House Fortemps Herald', 'House Fortemps Herald', 'Héraut Des Fortemps', 'Fortemps-Herold', 'フォルタン家の伝令', NULL, 16, 25.9, 19.1, 36, NULL, 1, NULL, 0, 0),
-(694, 1990, 'House Fortemps Knight', 'House Fortemps Knight', 'Chevalier Des Fortemps', 'Fortemps-Ritter', 'フォルタン家の騎兵', NULL, 16, 24.6, 16.1, 37, NULL, 0, NULL, 0, 0),
-(695, 1716, 'Ishgardian Astrologian', 'Ishgardian Astrologian', 'Astrologue Ishgardais', 'Ishgarder Astrologe', 'イシュガルドの占星術士', NULL, 16, 26.0, 18.9, 33, NULL, 1, NULL, 0, 0),
-(696, 1583, 'Ishgardian Sentry', 'Ishgardian Sentry', 'Sentinelle Ishgardaise', 'Ishgard-Gardist', '神殿騎士団の衛兵', NULL, 16, 18.8, 15.8, 41, NULL, 0, NULL, 0, 0),
-(697, 661, 'Ixali Stillbeak', 'Ixali Stillbeak', 'Ixal Bec-serein', 'Ixal-Stillschnabel', 'イクサル・スチルビーク', NULL, 16, 32.3, 27.3, 37, NULL, 0, NULL, 0, 0),
-(698, 660, 'Ixali Wildtalon', 'Ixali Wildtalon', 'Ixal Serres-folles', 'Ixal-Wildkralle', 'イクサル・ワイルドタロン', NULL, 16, 32.1, 27.5, 30, 3, 0, NULL, 1, 0),
-(699, 2355, 'Kozol Nomotl The Turbulent', 'Kozol Nomotl The Turbulent', 'Kozol Nomotl', 'Sturmböe Kozol Nomotl', '風標のコゾル・ノモトル', NULL, 16, 34.1, 19.4, 49, 1, 1, 268, 1, 0),
-(700, 1430, 'Lutin', 'Lutin', 'Follet De Glace', 'Lutin', 'リュタン', NULL, 16, 15.8, 20.7, 39, 1, 1, 18, 1, 0),
-(701, 645, 'Mudpuppy', 'Mudpuppy', 'Protée', 'Olm', 'マッドパピー', NULL, 16, 18.2, 30.9, 44, 4, 0, NULL, 1, 1),
-(702, 1843, 'Natalan Boldwing', 'Natalan Boldwing', 'Aile-hardie De Natalan', 'Natalan-Mutschwinge', 'ナタラン・ボールドウィング', NULL, 16, 33.5, 24.1, 49, 3, 0, NULL, 1, 0),
-(703, 1845, 'Natalan Fogcaller', 'Natalan Fogcaller', 'Embrumeur De Natalan', 'Natalan-Nebelrufer', 'ナタラン・フォグコーラー', NULL, 16, 32.7, 18.2, 49, 3, 0, NULL, 1, 0),
-(704, 1844, 'Natalan Swiftbeak', 'Natalan Swiftbeak', 'Bec-vif De Natalan', 'Natalan-Flinkschnabel', 'ナタラン・スウィフトビーク', NULL, 16, 34.6, 20.7, 49, 3, 0, NULL, 1, 0),
-(705, 1846, 'Natalan Watchwolf', 'Natalan Watchwolf', 'Loup De Natalan', 'Natalan-Wachwolf', 'ナタラン・ウォッチウルフ', NULL, 16, 34.2, 20.2, 48, 4, 0, NULL, 1, 0),
-(706, 1842, 'Natalan Windtalon', 'Natalan Windtalon', 'Serres-vent De Natalan', 'Natalan-Windkralle', 'ナタラン・ウィンドタロン', NULL, 16, 31.7, 17.4, 49, 4, 0, NULL, 1, 0),
-(708, 795, 'Ornery Karakul', 'Ornery Karakul', 'Karakul Rageur', 'Karakul', 'カラクール', NULL, 16, 24.8, 19.6, 36, 3, 0, NULL, 1, 0),
-(709, 794, 'Redhorn Ogre', 'Redhorn Ogre', 'Ogre Corne-rouge', 'Rothorn-Oger', 'レッドホーン・オーガ', NULL, 16, 29.7, 11.5, 35, 4, 0, NULL, 1, 0);
+(348, 538, 'Tempered Sylph', 'Tempered Sylph', 'Sylphe Subjugué', 'Besessen[a] Sylphe', 'テンパード・シルフ', NULL, 8, '19.6', '21.9', 23, NULL, 1, NULL, 0, 0),
+(349, 2312, 'Tipsy Sylph', 'Tipsy Sylph', 'Sylphe Brindezingue', 'Halluzinierend[a] Sylphe', '酩酊したシルフ', NULL, 8, '20.5', '28.2', 45, NULL, 0, NULL, 0, 0),
+(351, 128, 'Treant Sapling', 'Treant Sapling', 'Pousse De Tréant', 'Baumschrat-Ableger', 'トレント・サップリング', NULL, 8, '13.6', '25.6', 14, NULL, 0, NULL, 0, 1),
+(352, 1028, 'Trickster Imp', 'Trickster Imp', 'Imp Farceur', 'Scharlatan-Imp', 'トリックスター・インプ', NULL, 8, '18.5', '27.7', 25, NULL, 0, NULL, 0, 0),
+(353, 1975, 'Tusked Hog', 'Tusked Hog', 'Verrat à Défenses', 'Eber', 'タスケッド・ホッグ', NULL, 8, '20.1', '25.2', 21, NULL, 0, NULL, 0, 0),
+(354, 2319, 'Violet Screech', 'Violet Screech', 'Crieur Violet', 'Violett[a] Kreischerin', 'ヴァイオレット・スクリーチ', NULL, 8, '23.8', '15.0', 49, NULL, 0, NULL, 0, 0),
+(355, 2317, 'Violet Sigh', 'Violet Sigh', 'Soupireur Violet', 'Violett[a] Seufzerin', 'ヴァイオレット・サイ', NULL, 8, '23.9', '15.5', 49, NULL, 0, NULL, 0, 0),
+(356, 2318, 'Violet Snarl', 'Violet Snarl', 'Grondeur Violet', 'Violett[a] Keiferin', 'ヴァイオレット・スナール', NULL, 8, '23.8', '17.6', 49, NULL, 0, NULL, 0, 0),
+(357, 1141, 'Vodoriga Cur', 'Vodoriga Cur', 'Vodoriga Croisée', 'Vodoriga-Köter', 'ヴォドリガ・カー', NULL, 8, '18.4', '28.0', 20, NULL, 0, NULL, 0, 0),
+(358, 16, 'Wild Boar', 'Wild Boar', 'Sanglier Sauvage', 'Wild[a] Keiler', 'ワイルドボア', NULL, 8, '16.6', '23.8', 21, NULL, 0, NULL, 0, 0),
+(360, 14, 'Wild Hoglet', 'Wild Hoglet', 'Goret Sauvage', 'Wildschweinchen', 'ワイルドホグレット', NULL, 8, '17.0', '25.4', 14, NULL, 0, NULL, 0, 0),
+(361, 115, 'Wind Sprite', 'Wind Sprite', 'élémentaire De Vent', 'Wind-Exergon', 'ウィンドスプライト', NULL, 8, '28.7', '20.5', 42, NULL, 0, NULL, 0, 1),
+(362, 241, 'Wolf Poacher', 'Wolf Poacher', 'Braconnière De Loups', 'Wolfs-Wilderin', 'ウルフ・ポーチャー', NULL, 8, '19.6', '30.2', 18, NULL, 0, NULL, 0, 0),
+(363, 498, 'Zezeroon Stickyfingers', 'Zezeroon Stickyfingers', 'Zezeroon Le Gourmand', 'Zezerix Klebeklau', '食道楽のゼゼルン', NULL, 8, '17.6', '29.1', 19, NULL, 0, NULL, 0, 0),
+(364, 223, 'Ziz Gorlin', 'Ziz Gorlin', 'Petit Ziz', 'Jung-Ziz', 'ジズ・ゴーリン', NULL, 8, '20.9', '26.4', 20, NULL, 0, NULL, 0, 0),
+(365, 57, '3rd Cohort Decurion', '3rd Cohort Decurion', 'Decurio De La 3e Cohorte', 'Decurio[p] Der III. Kohorte', 'IIIコホルス・デクリオン', NULL, 9, '18.6', '18.8', 23, NULL, 0, NULL, 0, 0),
+(366, 529, 'Abused Adventurer', 'Abused Adventurer', 'Client Embarrassé', 'Belästigt[a] Stammgast', '困り果てた常連客', NULL, 9, '17.5', '20.6', 20, NULL, 1, NULL, 0, 0),
+(367, 34, 'Adamantoise', 'Adamantoise', 'Adamankhélone', 'Adaman-Taimai', 'アダマンタス', NULL, 9, '15.9', '29.6', 33, 4, 0, NULL, 1, 0),
+(368, 475, 'Alpha Stag', 'Alpha Stag', 'Cerf Alpha', 'Alpha-Antilopenbock', '賞金首：アルファスタッグ', NULL, 9, '23.6', '21.4', 20, NULL, 0, NULL, 0, 0),
+(370, 508, 'Angered Elm', 'Angered Elm', 'Orme Furieux', 'Erzürnt[a] Ulme', 'アンガード・エルム', NULL, 9, '23.8', '21.6', 22, NULL, 0, NULL, 0, 0),
+(371, 3, 'Antelope Doe', 'Antelope Doe', 'Antilope Biche', 'Antilopenkuh', 'アンテロープ・ドゥ', NULL, 9, '18.2', '22.5', 23, NULL, 0, NULL, 0, 0),
+(372, 4, 'Antelope Stag', 'Antelope Stag', 'Antilope Cerf', 'Antilopenbock', 'アンテロープ・スタッグ', NULL, 9, '27.1', '22.6', 26, NULL, 0, NULL, 0, 0),
+(373, 228, 'Bark Eft', 'Bark Eft', 'Triton Noir', 'Rindenmolch', 'バークエフト', NULL, 9, '19.6', '22.6', 23, NULL, 0, NULL, 0, 0),
+(374, 235, 'Bigmouth Orobon', 'Bigmouth Orobon', 'Orobon Grande Gueule', 'Großmaul-Orobon', 'ビッグマウス・オロボン', NULL, 9, '17.8', '30.5', 31, 3, 0, NULL, 1, 0),
+(375, 2163, 'Burchard Swiftspear', 'Burchard Swiftspear', 'Burchard Vive-lance', 'Burchard Flinkspeer', '豪槍のバーカード', NULL, 9, '23.6', '18.3', 32, NULL, 1, NULL, 0, 0),
+(376, 43, 'Chigoe', 'Chigoe', 'Chigoe', 'Stechmücke', 'チゴー', NULL, 9, '27.2', '18.1', 9, NULL, 0, NULL, 0, 1),
+(377, 2647, 'Clockwork Footman', 'Clockwork Footman', 'Soldat Mécanique', 'Uhrwerk-Fußsoldat', 'アラガンワーク・フットマン', NULL, 9, '21.6', '21.7', 50, NULL, 0, NULL, 0, 0),
+(378, 2648, 'Clockwork Warrior', 'Clockwork Warrior', 'Chevalier Mécanique', 'Uhrwerk-Kämpfer', 'アラガンワーク・ウォーリア', NULL, 9, '21.4', '21.7', 50, NULL, 0, NULL, 0, 0),
+(379, 169, 'Coeurlclaw Cutter', 'Coeurlclaw Cutter', 'Trancheuse Griffecoeurl', 'Coeurlklauen-Sammlerin', 'クァールクロウ・カッター', NULL, 9, '26.1', '21.8', 29, NULL, 0, NULL, 0, 0),
+(380, 139, 'Coeurlclaw Hunter', 'Coeurlclaw Hunter', 'Chasseresse Griffecoeurl', 'Coeurlklauen-Jägerin', 'クァールクロウ・ハンター', NULL, 9, '15.0', '33.8', 29, NULL, 0, NULL, 0, 0),
+(381, 140, 'Coeurlclaw Poacher', 'Coeurlclaw Poacher', 'Braconnière Griffecoeurl', 'Coeurlklauen-Wilderin', 'クァールクロウ・ポーチャー', NULL, 9, '24.0', '21.0', 27, NULL, 0, NULL, 0, 0),
+(382, 520, 'Crestfallen Merchant', 'Crestfallen Merchant', 'Marchand Penaud', 'Geknickt[a] Händler', '途方に暮れた商人', NULL, 9, '27.3', '21.0', 30, NULL, 1, NULL, 0, 0),
+(383, 170, 'Deepvoid Deathmouse', 'Deepvoid Deathmouse', 'Souris Meurtrière Du Néant Profond', 'Zwielicht-Todesmaus', 'ディープヴォイド・ドーマウス', NULL, 9, '25.2', '21.7', 35, 4, 0, NULL, 1, 0),
+(384, 501, 'Despicable Devilet', 'Despicable Devilet', 'Diablotin Infâme', 'Jämmerlich[a] Eufel', 'ディスピッカブル・デビレット', NULL, 9, '26.2', '19.8', 28, NULL, 0, NULL, 0, 0),
+(385, 454, 'Disorderly Adventurer', 'Disorderly Adventurer', 'Aventurier Brutal', 'Ungestüm[a] Abenteurer', '荒々しい冒険者', NULL, 9, '18.6', '20.6', 35, NULL, 0, NULL, 0, 0),
+(386, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 9, '26.3', '21.8', 14, NULL, 0, NULL, 0, 1),
+(387, 480, 'Figgy Pudding', 'Figgy Pudding', 'Pudding Aux Figues', 'Feigenpudding', 'フィギープリン', NULL, 9, '26.2', '20.0', 30, NULL, 0, NULL, 0, 0),
+(388, 176, 'Foraging Doe', 'Foraging Doe', 'Biche Ruminant', 'Futtersuchend[a] Antilopenkuh', 'フォージング・ドゥ', NULL, 9, '23.7', '20.5', 25, NULL, 0, NULL, 0, 0),
+(389, 460, 'Foraging Stag', 'Foraging Stag', 'Cerf Ruminant', 'Futtersuchend[a] Antilopenbock', 'フォージング・スタッグ', NULL, 9, '25.1', '18.8', 25, NULL, 0, NULL, 0, 0),
+(390, 50, 'Goblin Thug', 'Goblin Thug', 'Malfrat Gobelin', 'Goblin-Strolch', 'ゴブリン・サグ', NULL, 9, '26.0', '22.0', 28, NULL, 0, NULL, 0, 0),
+(391, 502, 'Greedy Hog', 'Greedy Hog', 'Verrat Affamé', 'Hungrig[a] Schwein', 'グリーディ・ホッグ', NULL, 9, '26.1', '19.8', 28, NULL, 0, NULL, 0, 0),
+(393, 523, 'Hive Gate', 'Hive Gate', 'Porte Du Guêpier Des Ventrerouge', 'Nesttür', 'レッドベリー砦の門扉', NULL, 9, '22.7', '17.7', 32, NULL, 1, NULL, 0, 0),
+(394, 168, 'Hoverfly Swarm', 'Hoverfly Swarm', 'Nuée De Mouches', 'Schwebfliegenschwarm', 'ホバーフライ・スウォーム', NULL, 9, '16.2', '33.9', 30, NULL, 0, NULL, 0, 0),
+(395, 8, 'Ked', 'Ked', 'Pou Volant', 'Dämonenfliege', 'ケッド', NULL, 9, '31.5', '23.8', 47, 3, 0, NULL, 1, 0),
+(396, 23, 'Kedtrap', 'Kedtrap', 'Piège-pou', 'Dämonenfliegenfalle', 'ケッドトラップ', NULL, 9, '20.3', '20.7', 21, NULL, 0, NULL, 0, 0),
+(397, 497, 'Leafbleed Ochu', 'Leafbleed Ochu', 'Otyugh Feuillesang', 'Blattblut-Ochu', 'リーフブリード・オチュー', NULL, 9, '24.3', '21.2', 19, NULL, 0, NULL, 0, 1),
+(398, 566, 'Midland Condor', 'Midland Condor', 'Condor Des Plaines', 'Wiesland-Kondor', 'ミッドランド・コンドル', NULL, 9, '18.2', '25.3', 30, 4, 0, NULL, 1, 0),
+(771, 878, 'Gossamer', 'Gossamer', 'Floche-de-soie', 'Seidenflausch', 'ゴッサマー', NULL, 13, '26.0', '21.0', 29, 1, 1, 11, 1, 0),
+(402, 215, 'Overgrown Offering', 'Overgrown Offering', 'Otyugh Monstrueux', 'Grabranke', 'オーバーグロウン・オファリング', NULL, 9, '19.0', '18.9', 22, NULL, 0, NULL, 0, 0),
+(403, 1667, 'Phaia', 'Phaia', 'Phaïa', 'Phaia', 'パイア', NULL, 9, '32.2', '25.6', 46, 1, 1, 347, 1, 0),
+(404, 175, 'Poisonous Flytrap', 'Poisonous Flytrap', 'Piège-mouche Vénéneux', 'Giftig[a] Fliegenfalle', 'ポイズン・フライトラップ', NULL, 9, '25.9', '21.7', 26, NULL, 0, NULL, 0, 1),
+(405, 219, 'Qiqirn Beater', 'Qiqirn Beater', 'Qiqirn Rabatteur', 'Qiqirn-Schläger', 'キキルン・ビーター', NULL, 9, '15.4', '17.5', 29, NULL, 0, NULL, 0, 1),
+(406, 84, 'Redbelly Chanter', 'Redbelly Chanter', 'Psalmodieur Ventrerouge', 'Rotbauch-Singstimme', 'レッドベリー・チャンター', NULL, 9, '23.8', '18.3', 29, NULL, 1, NULL, 0, 0),
+(407, 540, 'Redbelly Conspirator', 'Redbelly Conspirator', 'Conspirateur Ventrerouge', 'Rotbauch-Verschwörer', 'レッドベリー・コンスピレーター', NULL, 9, '15.6', '22.9', 21, NULL, 1, NULL, 0, 0),
+(408, 80, 'Redbelly Gutter', 'Redbelly Gutter', 'étripeur Ventrerouge', 'Rotbauch-Wache', 'レッドベリー・ガッター', NULL, 9, '23.7', '18.1', 29, NULL, 1, NULL, 0, 0),
+(409, 172, 'Redbelly Larcener', 'Redbelly Larcener', 'Vide-gousset Ventrerouge', 'Rotbauch-Strauchdieb', 'レッドベリー・ラーセナー', NULL, 9, '25.1', '18.6', 27, NULL, 0, NULL, 0, 0),
+(410, 52, 'Redbelly Lookout', 'Redbelly Lookout', 'Guetteur Ventrerouge', 'Rotbauch-Späher', 'レッドベリー・ルックアウト', NULL, 9, '24.1', '19.3', 27, NULL, 0, NULL, 0, 0),
+(411, 83, 'Redbelly Sharpeye', 'Redbelly Sharpeye', 'épieur Ventrerouge', 'Rotbauch-Blinzler', 'レッドベリー・シャープアイ', NULL, 9, '22.0', '16.5', 27, NULL, 0, NULL, 0, 0),
+(412, 236, 'Revenant', 'Revenant', 'Revenant', 'Wiedergänger', 'レブナント', NULL, 9, '14.8', '30.1', 32, 4, 0, NULL, 1, 1),
+(413, 226, 'River Yarzon', 'River Yarzon', 'Yarzon Des Rivières', 'Fluss-Yarzon', 'リバー・ヤーゾン', NULL, 9, '24.5', '21.7', 25, NULL, 0, NULL, 0, 0),
+(414, 1992, 'Scarred Antelope', 'Scarred Antelope', 'Antilope Balafrée', 'Narbig[a] Antilope', 'スカード・アンテロープ', NULL, 9, '17.7', '23.7', 23, NULL, 0, NULL, 0, 0),
+(415, 514, 'Sirocco', 'Sirocco', 'Sirocco', 'Sirocco', 'シロッコ', NULL, 9, '20.1', '22.9', 23, 1, 1, 28, 1, 0),
+(416, 234, 'Smallmouth Orobon', 'Smallmouth Orobon', 'Orobon Petite Gueule', 'Schmalmaul-Orobon', 'スモールマウス・オロボン', NULL, 9, '19.6', '21.0', 10, NULL, 0, NULL, 0, 1),
+(417, 450, 'Spenser Of The Bottomless Cup', 'Spenser Of The Bottomless Cup', 'Spenser Le Boit-sans-soif', 'Trunkenbold[p] Spenser', '酔客のスペンサー', NULL, 9, '17.9', '20.1', 22, NULL, 1, NULL, 0, 0),
+(418, 238, 'Stroper', 'Stroper', 'Storoper', 'Todesweide', 'ストローパー', NULL, 9, '21.4', '28.2', 31, 4, 0, NULL, 1, 1),
+(419, 2646, 'Surveillance Module', 'Surveillance Module', 'Module De Surveillance', 'Überwachungsmodul', '巡察システム', NULL, 9, '21.5', '19.8', 50, NULL, 0, NULL, 0, 0),
+(420, 2973, 'Territorial Zu Cockerel', 'Territorial Zu Cockerel', 'Coquelet Zu Territorial', 'Hinterhältig[a] Montisaurus-Hahn', 'テリトリアル・クックル', NULL, 9, '17.9', '26.6', 50, NULL, 0, NULL, 0, 0),
+(421, 2974, 'Territorial Zu Pullet', 'Territorial Zu Pullet', 'Poulette Zu Territoriale', 'Hinterhältig[a] Montisaurus-Henne', 'テリトリアル・プレット', NULL, 9, '18.2', '26.6', 50, NULL, 0, NULL, 0, 0),
+(422, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 9, '15.8', '17.4', 26, NULL, 0, NULL, 0, 1),
+(423, 500, 'Trancetoad', 'Trancetoad', 'Crapaud En Transe', 'Dämmerkröte', 'トランストード', NULL, 9, '26.4', '19.7', 27, NULL, 0, NULL, 0, 0),
+(424, 24, 'Treant', 'Treant', 'Tréant', 'Baumschrat', 'トレント', NULL, 9, '24.4', '22.7', 38, 4, 0, NULL, 1, 0),
+(425, 476, 'Wanted Goblin', 'Wanted Goblin', 'Gobelin Recherché', 'Gesucht[a] Goblin', '賞金首：ワンテッド・ゴブリン', NULL, 9, '26.5', '19.4', 26, NULL, 0, NULL, 0, 0),
+(426, 45, 'Will-o\'-the-wisp', 'Will-o\'-the-wisp', 'Feu Follet', 'Irrlicht', 'ウィル・オ・ザ・ウィスプ', NULL, 9, '23.4', '24.5', 38, 4, 0, NULL, 1, 0),
+(427, 526, 'Wood Wailer Lance', 'Wood Wailer Lance', 'Vigile Sombre', 'Klageregiment-Pikenier', '鬼哭隊の隊士', NULL, 9, '22.5', '17.3', 30, NULL, 1, NULL, 0, 1),
+(428, 1860, 'Airstone', 'Airstone', 'Pierre De Vent', 'Windstein', '風生みの珠', NULL, 10, '20.9', '18.5', 44, NULL, 1, NULL, 0, 0),
+(429, 17, 'Balloon', 'Balloon', 'Ballon', 'Brandballon', 'バルーン', NULL, 10, '16.1', '26.3', 25, NULL, 0, NULL, 0, 0),
+(430, 11, 'Banemite', 'Banemite', 'Sarcopte', 'Terrormilbe', 'ベーンマイト', NULL, 10, '16.5', '25.5', 27, NULL, 0, NULL, 0, 0),
+(431, 2189, 'Bright Balloon', 'Bright Balloon', 'Ballon Incandescent', 'Gleißer', 'ブライトバルーン', NULL, 10, '17.7', '27.3', 29, NULL, 0, NULL, 0, 0),
+(432, 30, 'Clay Golem', 'Clay Golem', 'Golem D\'argile', 'Lehmgolem', 'クレイゴーレム', NULL, 10, '19.8', '28.6', 28, NULL, 0, NULL, 0, 0),
+(433, 452, 'Curupira', 'Curupira', 'Curupira', 'Curupira', 'クルピラ', NULL, 10, '26.2', '21.9', 8, 1, 1, 8, 1, 0),
+(434, 1668, 'Daedalus', 'Daedalus', 'Dédale', 'Daedalus', 'ダイダロス', NULL, 10, '21.9', '19.8', 48, 1, 1, 349, 1, 0),
+(435, 191, 'Dewdrinker Ladybug', 'Dewdrinker Ladybug', 'Coccinelle Des Bois', 'Tau-Marienkäfer', 'デュードリンカー・レディバグ', NULL, 10, '25.5', '28.5', 7, NULL, 0, NULL, 0, 0),
+(436, 25, 'Dryad', 'Dryad', 'Dryade', 'Dryade', 'ドライアド', NULL, 10, '23.7', '25.3', 37, 3, 0, NULL, 1, 0),
+(437, 516, 'Dschubba', 'Dschubba', 'Dschubba', 'Dschubba', 'ジュバ', NULL, 10, '25.0', '28.4', 3, 1, 1, 39, 1, 0),
+(439, 1669, 'Great Oak', 'Great Oak', 'Grand Chêne', 'Borkig[a] Baumschrat', 'グレートオーク', NULL, 10, '23.7', '25.0', 37, 1, 1, 12, 1, 0),
+(440, 37, 'Ground Squirrel', 'Ground Squirrel', 'écureuil', 'Baumhörnchen', 'スクウィレル', NULL, 10, '30.0', '25.4', 2, NULL, 0, NULL, 0, 1),
+(441, 521, 'Guild-issue Supplies', 'Guild-issue Supplies', 'Caisse De Provisions', 'Versorgungsgut', '鬼哭隊の補給物資', NULL, 10, '22.9', '26.6', 24, NULL, 1, NULL, 0, 0),
+(442, 103, 'Ixali Boldwing', 'Ixali Boldwing', 'Ixal Aile-hardie', 'Ixal-Mutschwinge', 'イクサル・ボールドウィング', NULL, 10, '18.9', '19.6', 24, 3, 0, NULL, 1, 0),
+(443, 662, 'Ixali Boundwing', 'Ixali Boundwing', 'Ixal Aile-garrottée', 'Ixal-Bannschwinge', 'イクサル・バウンドウィング', NULL, 10, '22.2', '22.2', 37, 1, 0, NULL, 1, 1),
+(444, 209, 'Ixali Deftalon', 'Ixali Deftalon', 'Ixal Serres-vives', 'Ixal-Tollkralle', 'イクサル・デフタロン', NULL, 10, '23.2', '28.5', 27, NULL, 0, NULL, 0, 0),
+(445, 192, 'Ixali Dulltalon', 'Ixali Dulltalon', 'Ixal Serres-usées', 'Ixal-Stumpfkralle', 'イクサル・ダルタロン', NULL, 10, '25.8', '26.6', 5, NULL, 0, NULL, 0, 0),
+(446, 663, 'Ixali Fearcaller', 'Ixali Fearcaller', 'Terroriseur Ixal', 'Ixal-Furchtrufer', 'イクサル・フィアコーラー', NULL, 10, '22.4', '22.3', 34, NULL, 0, NULL, 0, 1),
+(447, 208, 'Ixali Lightwing', 'Ixali Lightwing', 'Ixal Aile-légère', 'Ixal-Leichtschwinge', 'イクサル・ライトビーク', NULL, 10, '22.6', '28.2', 27, NULL, 0, NULL, 0, 0),
+(448, 193, 'Ixali Lostwing', 'Ixali Lostwing', 'Ixal Aile-perdue', 'Ixal-Stutzschwinge', 'イクサル・ロストウィング', NULL, 10, '26.5', '25.9', 5, NULL, 0, NULL, 0, 0),
+(449, 194, 'Ixali Slowbeak', 'Ixali Slowbeak', 'Ixal Bec-lent', 'Ixal-Lahmschnabel', 'イクサル・スロウビーク', NULL, 10, '25.9', '26.6', 5, NULL, 0, NULL, 0, 0),
+(450, 210, 'Ixali Straightbeak', 'Ixali Straightbeak', 'Ixal Bec-droit', 'Ixal-Spitzschnabel', 'イクサル・ストレートビーク', NULL, 10, '22.9', '28.1', 27, NULL, 0, NULL, 0, 0),
+(451, 104, 'Ixali Swiftbeak', 'Ixali Swiftbeak', 'Ixal Bec-vif', 'Ixal-Flinkschnabel', 'イクサル・スウィフトビーク', NULL, 10, '18.7', '20.1', 44, NULL, 1, NULL, 0, 0),
+(452, 102, 'Ixali Swordfighter', 'Ixali Swordfighter', 'épéiste Ixal', 'Ixal-Schwertkämpfer', 'イクサル・ソードファイター', NULL, 10, '23.3', '25.5', 24, NULL, 1, NULL, 0, 0),
+(453, 436, 'Ixali Windtalon', 'Ixali Windtalon', 'Ixal Serres-vent', 'Ixal-Windkralle', 'イクサル・ウィンドタロン', NULL, 10, '20.6', '18.5', 47, NULL, 1, NULL, 1, 0),
+(985, 860, 'Old Six-arms', 'Old Six-arms', 'Six-pattes Ancien', 'Alter Sechsarm', 'オールドシックスアームズ', NULL, 4, '30.0', '29.0', 13, 1, 1, 153, 1, 0),
+(456, 539, 'Lunar Golem', 'Lunar Golem', 'Golem Lunaire', 'Mondgolem', 'ルナゴーレム', NULL, 10, '15.8', '31.1', 25, NULL, 1, NULL, 0, 0),
+(457, 32, 'Microchu', 'Microchu', 'Microtyugh', 'Mikrochu', 'コチュー', NULL, 10, '28.8', '21.8', 6, NULL, 0, NULL, 0, 1),
+(458, 118, 'Midge Swarm', 'Midge Swarm', 'Nuée De Moucherons', 'Mückenschwarm', 'ミッヂ・スウォーム', NULL, 10, '28.2', '25.1', 8, NULL, 0, NULL, 0, 0),
+(459, 9, 'Miteling', 'Miteling', 'Petit Acarus', 'Schattenmilbe', 'マイトリング', NULL, 10, '26.2', '26.9', 4, NULL, 0, NULL, 0, 1),
+(460, 5, 'Opo-opo', 'Opo-opo', 'Opo-opo', 'Opo-Opo', 'オポオポ', NULL, 10, '27.7', '23.6', 7, NULL, 0, NULL, 0, 0),
+(777, 856, '426th Order Pickman Bu Ga', '426th Order Pickman Bu Ga', 'Bu Ga Piocheur Du 426e Ordre', 'Bu Ga Vom 426. Orden', 'ピックマン426 ブ・ガ', NULL, 2, '31.8', '13.2', 10, 1, 1, 1, 1, 0),
+(462, 2188, 'Pumice Golem', 'Pumice Golem', 'Golem De Pierre Ponce', 'Bimsgolem', 'パミスゴーレム', NULL, 10, '15.4', '30.8', 28, NULL, 0, NULL, 0, 0),
+(463, 533, 'Shifty-eyed Prospector', 'Shifty-eyed Prospector', 'Prospecteur Suspect', 'Rastlos[a] Geologe', 'うさんくさい山師', NULL, 10, '16.5', '29.3', 30, NULL, 1, NULL, 0, 0),
+(464, 40, 'Shroud Hare', 'Shroud Hare', 'Arion De Sombrelinceul', 'Glitscher', 'シュラウドアリオン', NULL, 10, '20.9', '30.5', 24, NULL, 0, NULL, 0, 0),
+(465, 552, 'Stone Golem', 'Stone Golem', 'Golem De Pierre', 'Steingolem', 'ストーンゴーレム', NULL, 10, '17.4', '28.2', 25, NULL, 1, NULL, 0, 0),
+(466, 174, 'Watchwolf', 'Watchwolf', 'Loup De Garde', 'Wachwolf', 'ウォッチウルフ', NULL, 10, '20.8', '19.1', 46, 3, 0, NULL, 1, 0),
+(467, 453, 'Wood Wailer Sentry', 'Wood Wailer Sentry', 'Sentinelle Des Vigiles Sombres', 'Wache[p] Des Klageregiments', '鬼哭隊の衛士', NULL, 10, '19.3', '25.9', 35, NULL, 0, NULL, 0, 1),
+(468, 224, 'Ziz', 'Ziz', 'Ziz', 'Ziz', 'ジズ', NULL, 10, '16.9', '27.2', 28, NULL, 0, NULL, 0, 0),
+(469, 1817, '4th Cohort Eques', '4th Cohort Eques', 'Eques De La 4e Cohorte', 'Eques[p] Der IV. Kohorte', 'IVコホルス・エクエス', NULL, 11, '13.1', '7.2', 48, NULL, 0, NULL, 0, 0),
+(470, 1815, '4th Cohort Hoplomachus', '4th Cohort Hoplomachus', 'Hoplomachus De La 4e Cohorte', 'Hoplomachus[p] Der IV. Kohorte', 'IVコホルス・ホプロマクス', NULL, 11, '12.4', '6.4', 48, 3, 0, NULL, 1, 0),
+(471, 1365, '4th Cohort Imaginifer', '4th Cohort Imaginifer', 'Imaginifer De La 4e Cohorte', 'Imaginifer[p] Der IV. Kohorte', 'IVコホルス・イマギニファー', NULL, 11, '13.6', '7.1', 20, NULL, 1, NULL, 0, 0),
+(472, 1816, '4th Cohort Laquearius', '4th Cohort Laquearius', 'Laquearius De La 4e Cohorte', 'Laquearius[p] Der IV. Kohorte', 'IVコホルス・ラクエリウス', NULL, 11, '10.1', '6.6', 48, NULL, 0, NULL, 0, 0),
+(473, 1818, '4th Cohort Secutor', '4th Cohort Secutor', 'Secutor De La 4e Cohorte', 'Secutor[p] Der IV. Kohorte', 'IVコホルス・セクトール', NULL, 11, '10.0', '5.6', 48, 3, 0, NULL, 1, 0),
+(474, 1819, '4th Cohort Signifer', '4th Cohort Signifer', 'Signifer De La 4e Cohorte', 'Signifer[p] Der IV. Kohorte', 'IVコホルス・シグニフェル', NULL, 11, '11.6', '7.4', 48, NULL, 0, NULL, 0, 0),
+(475, 1364, '4th Cohort Triarius', '4th Cohort Triarius', 'Triarius De La 4e Cohorte', 'Triarius[p] Der IV. Kohorte', 'IVコホルス・トリアリウス', NULL, 11, '14.1', '7.3', 20, NULL, 1, NULL, 0, 0),
+(476, 1820, '4th Cohort Vanguard', '4th Cohort Vanguard', 'Avant-garde De La 4e Cohorte', 'Frontbrecher[p] Der IV. Kohorte', 'IVコホルス・ヴァンガード', NULL, 11, '13.3', '6.2', 49, 3, 0, NULL, 1, 0),
+(477, 1366, '4th Cohort War Hound', '4th Cohort War Hound', 'Chien De Guerre De La 4e Cohorte', 'Kriegshund[p] Der IV. Kohorte', 'IVコホルス・ウォーハウンド', NULL, 11, '13.6', '7.0', 20, NULL, 1, NULL, 0, 0),
+(478, 13, 'Arbor Buzzard', 'Arbor Buzzard', 'Busard', 'Baumkronen-Bussard', 'バザード', NULL, 11, '16.3', '15.7', 13, NULL, 0, NULL, 0, 1),
+(479, 309, 'Bloated Bogy', 'Bloated Bogy', 'épouvantôme Boursouflé', 'Aufgebläht[a] Spukgespenst', 'ブローテッド・ボギー', NULL, 11, '13.0', '11.9', 20, NULL, 1, NULL, 0, 0),
+(480, 1039, 'Blood-eyed Buzzard', 'Blood-eyed Buzzard', 'Busard Aux Yeux Rouges', 'Blutaugen-Bussard', 'ブラッドアイ・バザード', NULL, 11, '23.9', '19.0', 12, NULL, 0, NULL, 0, 0),
+(481, 316, 'Bomb', 'Bomb', 'Bombo', 'Bomber', 'ボム', NULL, 11, '27.7', '16.4', 11, NULL, 0, NULL, 0, 0),
+(482, 867, 'Bubbly Bernie', 'Bubbly Bernie', 'Bernie Le Bulleux', 'Blubbernd[a] Bernie', 'バブリーバーニー', NULL, 11, '15.9', '16.1', 13, 1, 1, 181, 1, 0),
+(483, 287, 'Cactuar', 'Cactuar', 'Cactuar', 'Kaktor', 'カクター', NULL, 11, '27.7', '24.0', 3, NULL, 0, NULL, 0, 0),
+(484, 277, 'Copper Coblyn', 'Copper Coblyn', 'Coblyn De Cuivre', 'Kupfer-Kobalos', 'カッパーコブラン', NULL, 11, '27.4', '16.8', 11, NULL, 0, NULL, 0, 0),
+(485, 869, 'Daddy Longlegs', 'Daddy Longlegs', 'Faucheux', 'Opa Langbein', 'ダディーロングレッグ', NULL, 11, '14.5', '6.7', 22, NULL, 1, NULL, 0, 0),
+(486, 305, 'Desert Peiste', 'Desert Peiste', 'Peiste Du Désert', 'Wüsten-Peiste', 'ペイスト', NULL, 11, '24.7', '20.7', 10, NULL, 0, NULL, 0, 0),
+(487, 1033, 'Dirty Mongrel', 'Dirty Mongrel', 'Houret Sale', 'Schmutzig[a] Mischling', 'ダーティ・モングレル', NULL, 11, '23.4', '19.1', 12, NULL, 0, NULL, 0, 0),
+(488, 865, 'Doomed Gigantoad', 'Doomed Gigantoad', 'Crapaud Maudit', 'Verderbnis-Karpfenkröte', 'ドゥーム・ギガントード', NULL, 11, '24.3', '21.4', 9, 1, 1, 176, 1, 0),
+(489, 896, 'Dune Bogy', 'Dune Bogy', 'épouvantôme Des Dunes', 'Dünen-Spukgespenst', 'デューンボギー', NULL, 11, '13.3', '12.0', 17, NULL, 1, NULL, 0, 0),
+(490, 302, 'Dusty Mongrel', 'Dusty Mongrel', 'Houret Poussiéreux', 'Verwahrlost[a] Mischling', 'モングレル', NULL, 11, '25.4', '19.9', 10, NULL, 0, NULL, 0, 1),
+(491, 1034, 'Fire Bomb', 'Fire Bomb', 'Bombo Incendiaire', 'Feuerbomber', 'ファイアボム', NULL, 11, '24.9', '18.2', 11, NULL, 0, NULL, 0, 0),
+(492, 1324, 'Flustered Fisher', 'Flustered Fisher', 'Pêcheur Dans L\'embarras', 'Nervös[a] Fischer', '困り果てた漁師', NULL, 11, '15.9', '16.6', 1, NULL, 1, NULL, 0, 0),
+(493, 283, 'Goblin Mugger', 'Goblin Mugger', 'Détrousseur Gobelin', 'Goblin-Räuber', 'ゴブリン・マガー', NULL, 11, '18.8', '25.9', 8, NULL, 0, NULL, 0, 0),
+(494, 1036, 'Guillotine Beak', 'Guillotine Beak', 'Bec-couperet', 'Guillotinenschnabel', 'ギロチンビーク', NULL, 11, '16.8', '14.5', 12, NULL, 0, NULL, 0, 0),
+(495, 282, 'Hammer Beak', 'Hammer Beak', 'Bec-marteau', 'Hammerschnabel', 'ハンマービーク', NULL, 11, '24.8', '22.9', 8, NULL, 0, NULL, 0, 1),
+(496, 217, 'Laughing Toad', 'Laughing Toad', 'Crapaud Rieur', 'Lachkröte', 'ラフィングトード', NULL, 11, '14.7', '6.2', 23, NULL, 0, NULL, 0, 0),
+(497, 278, 'Lead Coblyn', 'Lead Coblyn', 'Coblyn De Plomb', 'Blei-Kobalos', 'レッドコブラン', NULL, 11, '14.0', '10.8', 21, NULL, 0, NULL, 0, 0),
+(498, 1032, 'Loamshell', 'Loamshell', 'Coqueterre', 'Lehmschale', 'ロームシェル', NULL, 11, '24.6', '17.7', 10, NULL, 0, NULL, 0, 0),
+(499, 312, 'Moondrip Blastmaster', 'Moondrip Blastmaster', 'Pilonneur De Gouttelune', 'Mondtropfen-Sprengmeister', 'ムーン・ブラストマスター', NULL, 11, '17.8', '6.6', 24, NULL, 0, NULL, 0, 0),
+(500, 314, 'Moondrip Piledriver', 'Moondrip Piledriver', 'Artificier De Gouttelune', 'Mondtropfen-Ramme', 'ムーン・パイルドライバー', NULL, 11, '18.3', '6.6', 24, NULL, 0, NULL, 0, 0),
+(501, 310, 'Moondrip Stonehauler', 'Moondrip Stonehauler', 'Hercheur De Gouttelune', 'Mondtropfen-Steineschlepper', 'ムーン・ストーンハウラー', NULL, 11, '18.3', '6.8', 24, NULL, 0, NULL, 0, 0),
+(502, 308, 'Orobon', 'Orobon', 'Orobon', 'Orobon', 'オロボン', NULL, 11, '19.4', '16.6', 5, NULL, 0, NULL, 0, 1),
+(503, 503, 'Plump Orobon', 'Plump Orobon', 'Orobon Pansu', 'Fett[a] Orobon', 'プランプ・オロボン', NULL, 11, '16.7', '16.2', 9, NULL, 0, NULL, 0, 0),
+(504, 1041, 'Pyrite Coblyn', 'Pyrite Coblyn', 'Coblyn De Pyrite', 'Pyrit-Kobalos', 'パイライトコブラン', NULL, 11, '25.4', '26.1', 7, NULL, 0, NULL, 0, 0),
+(505, 276, 'Rusty Coblyn', 'Rusty Coblyn', 'Coblyn Rouillé', 'Rostig[a] Kobalos', 'ラスティコブラン', NULL, 11, '18.8', '29.5', 8, NULL, 0, NULL, 0, 0),
+(506, 265, 'Sandtoad', 'Sandtoad', 'Crapaud Des Sables', 'Sandkröte', 'サンドトード', NULL, 11, '21.2', '23.6', 9, NULL, 0, NULL, 0, 0),
+(507, 1011, 'Scale Eater', 'Scale Eater', 'Basilic Lépidophage', 'Schuppenfresser', '賞金首：スケールイーター', NULL, 11, '24.3', '18.6', 14, NULL, 0, NULL, 0, 0),
+(508, 635, 'Scaphite', 'Scaphite', 'Scaphite', 'Scaphit', 'スカフィテ', NULL, 11, '17.3', '14.9', 14, NULL, 0, NULL, 0, 0),
+(510, 902, 'Shipment Of Brass Cogs', 'Shipment Of Brass Cogs', 'Matériel Pour Le Marteau', 'Ladung[p] Bronzezahnräder', '杭打塔の資材', NULL, 11, '19.8', '27.0', 8, NULL, 1, NULL, 0, 0),
+(511, 1037, 'Softskin Peiste', 'Softskin Peiste', 'Peiste à Peau Tendre', 'Samthaut-Peiste', 'ソフトスキン・ペイスト', NULL, 11, '18.7', '17.0', 12, NULL, 0, NULL, 0, 0),
+(512, 1035, 'Soulless Chrisom', 'Soulless Chrisom', 'Chrémeau Sans âme', 'Seelenlos[a] Taufkleid', 'ソウルレス・クリソム', NULL, 11, '24.1', '18.9', 15, NULL, 0, NULL, 0, 0),
+(513, 262, 'Star Marmot', 'Star Marmot', 'Marmotte', 'Stern-Murmelhörnchen', 'マーモット', NULL, 11, '20.3', '27.2', 2, NULL, 0, NULL, 0, 1),
+(514, 298, 'Sun Midge Swarm', 'Sun Midge Swarm', 'Nuée De Moucherons Soleil', 'Sonnenmückenschwarm', 'サンミッヂ・スウォーム', NULL, 11, '16.6', '15.8', 12, NULL, 0, NULL, 0, 0),
+(515, 636, 'Thickshell', 'Thickshell', 'Coquépaisse', 'Panzerschale', 'シックシェル', NULL, 11, '15.6', '17.0', 13, NULL, 0, NULL, 0, 0),
+(516, 1038, 'Tomahawk Beak', 'Tomahawk Beak', 'Bec-tomahawk', 'Tomahawkschnabel', 'トマホークビーク', NULL, 11, '24.8', '25.5', 8, NULL, 0, NULL, 0, 0),
+(517, 1322, 'Worried Worker', 'Worried Worker', 'Ouvrier Dans L\'embarras', 'Besorgt[a] Arbeiter', '困り果てた作業員', NULL, 11, '22.6', '27.8', 6, NULL, 1, NULL, 0, 0),
+(518, 284, 'Yarzon Feeder', 'Yarzon Feeder', 'Yarzon Nourricier', 'Gefräßig[a] Yarzon', 'ヤーゾン・フィーダー', NULL, 11, '24.1', '27.4', 4, NULL, 0, NULL, 0, 0),
+(519, 227, 'Yarzon Scavenger', 'Yarzon Scavenger', 'Yarzon Charognard', 'Aas-Yarzon', 'ヤーゾン・スカベンジャー', NULL, 11, '14.7', '7.2', 26, NULL, 0, NULL, 0, 1),
+(520, 2425, 'Alpha Ziz', 'Alpha Ziz', 'Ziz Alpha', 'Alpha-Ziz', 'アルファ・ジズ', NULL, 12, '22.2', '33.9', 48, NULL, 0, NULL, 0, 0),
+(521, 246, 'Amalj\'aa Impaler', 'Amalj\'aa Impaler', 'Empaleur Amalj\'aa', 'Amalj\'aa-Aufspießer', 'アマルジャ・インペイラー', NULL, 12, '22.4', '16.4', 6, NULL, 0, NULL, 0, 0),
+(522, 254, 'Amalj\'aa Striker', 'Amalj\'aa Striker', 'Cogneur Amalj\'aa', 'Amalj\'aa-Schläger', 'アマルジャ・ストライカー', NULL, 12, '22.1', '16.9', 6, NULL, 0, NULL, 0, 0),
+(523, 293, 'Antling Sentry', 'Antling Sentry', 'Fourmi Sentinelle', 'Treiberameisen-Wache', 'アントリング・セントリー', NULL, 12, '16.6', '14.2', 12, NULL, 0, NULL, 0, 0),
+(524, 292, 'Antling Soldier', 'Antling Soldier', 'Fourmi Soldat', 'Treiberameisen-Soldat', 'アントリング・ソルジャー', NULL, 12, '22.4', '19.9', 10, NULL, 0, NULL, 0, 0),
+(525, 294, 'Antling Worker', 'Antling Worker', 'Fourmi Ouvrière', 'Treiberameisen-Arbeiter', 'アントリング・ワーカー', NULL, 12, '23.3', '17.1', 5, NULL, 0, NULL, 0, 0),
+(526, 872, 'Babaroon Halfshell', 'Babaroon Halfshell', 'Babaroon Mimollet', 'Babaroon Halbschale', '半熟のババルン', NULL, 12, '15.9', '19.2', 9, 1, 1, 191, 1, 0),
+(527, 328, 'Baron Von Quiveron III Esquire', 'Baron Von Quiveron III Esquire', 'Baron Quiveron Troisième Du Nom', 'Baron[p] Von Quiveron III.', 'サー・キヴロン男爵III世', NULL, 12, '24.1', '21.2', 12, NULL, 0, NULL, 0, 0),
+(528, 288, 'Cochineal Cactuar', 'Cochineal Cactuar', 'Cactuar Nopal', 'Koschenillen-Kaktor', 'コチニールカクター', NULL, 12, '24.4', '19.9', 11, NULL, 0, NULL, 0, 0),
+(529, 289, 'Eft', 'Eft', 'Jeune Triton', 'Molch', 'エフト', NULL, 12, '23.2', '18.8', 10, NULL, 0, NULL, 0, 0),
+(530, 244, 'Giant Tortoise', 'Giant Tortoise', 'Tortue Géante', 'Riesenschildkröte', 'ジャイアントトータス', NULL, 12, '19.5', '19.0', 12, NULL, 0, NULL, 0, 1),
+(531, 870, 'Grishild The Ungood', 'Grishild The Ungood', 'Grishild La Terreur', 'Grausam[a] Grishild', '無頼のグリスヒルド', NULL, 12, '21.0', '25.8', 5, NULL, 1, NULL, 0, 0),
+(532, 632, 'Huge Hornet', 'Huge Hornet', 'Frelon Géant', 'Riesenhornisse', 'ヒュージ・ホーネット', NULL, 12, '21.9', '26.7', 1, NULL, 0, NULL, 0, 0),
+(533, 1348, 'Hungry Hobbledehoy', 'Hungry Hobbledehoy', 'Fille Affamée', 'Hungrig[a] Mädchen', '腹を減らした少女', NULL, 12, '23.1', '16.6', 10, NULL, 1, NULL, 0, 0),
+(534, 1352, 'Kindly Father', 'Kindly Father', 'Pêcheur à La Fibre Paternelle', 'Rücksichtsvoll[a] Vater', '息子想いの漁師', NULL, 12, '20.5', '24.2', 1, NULL, 1, NULL, 0, 0),
+(535, 875, 'Nest Commander', 'Nest Commander', 'Commandante Du Nid', 'Nestkommandant', 'ネストコマンダー', NULL, 12, '17.7', '14.5', 12, 1, 1, 197, 1, 0),
+(776, 868, 'Crier Briareos', 'Crier Briareos', 'Briarée L\'inconsolable', 'Griesgram Briareos', '悲嘆のブリアレオス', NULL, 11, '13.7', '10.5', 21, 1, 1, 7, 1, 0),
+(537, 266, 'Qiqirn Shellsweeper', 'Qiqirn Shellsweeper', 'Qiqirn Casse-coquille', 'Qiqirn-Panzerbrecher', 'キキルン・シェルスウィーパー', NULL, 12, '16.6', '19.5', 9, NULL, 0, NULL, 0, 0),
+(538, 330, 'Quiveron Attendant', 'Quiveron Attendant', 'Domestique Des Quiveron', 'Quiveron-Handlanger', 'キヴロン家の使用人', NULL, 12, '24.5', '21.2', 11, NULL, 0, NULL, 0, 0),
+(539, 326, 'Quiveron Guard', 'Quiveron Guard', 'Garde Des Quiveron', 'Quiveron-Wache', 'キヴロン家の侍衛', NULL, 12, '24.5', '21.2', 11, NULL, 0, NULL, 0, 0),
+(775, 51, 'Alpha Anole', 'Alpha Anole', 'Anolis Alpha', 'Alpha-Anolis', 'アルファ・アノール', NULL, 7, '31.0', '21.0', 9, 1, 1, 4, 1, 0),
+(541, 318, 'Snapping Shrew', 'Snapping Shrew', 'Musaraigne Agressive', 'Schnappspitzmull', 'スナッピング・シュルー', NULL, 12, '22.2', '25.8', 3, NULL, 0, NULL, 0, 0),
+(542, 874, 'Spitfire', 'Spitfire', 'Crachefeu', 'Spitfire', 'スピットファイア', NULL, 12, '18.2', '23.5', 7, 1, 1, 29, 1, 0),
+(543, 317, 'Spriggan Graverobber', 'Spriggan Graverobber', 'Spriggan Pilleur De Tombe', 'Grabräuber-Spriggan', 'スプリガン・グレイブラバー', NULL, 12, '17.9', '23.6', 7, NULL, 0, NULL, 0, 0),
+(544, 1276, 'Stone Torch', 'Stone Torch', 'Torche D\'acier', 'Eisenschein-Soldat', '鉄灯団の衛兵', NULL, 12, '21.7', '17.9', 35, NULL, 0, NULL, 0, 0),
+(545, 279, 'Sun Bat', 'Sun Bat', 'Chauve-souris Du Soleil', 'Sonnenfledermaus', 'サンバット', NULL, 12, '23.2', '19.5', 13, NULL, 0, NULL, 0, 0),
+(546, 2426, 'Territorial Axe Beak', 'Territorial Axe Beak', 'Bec-pic Territorial', 'Hinterhältig[a] Pelisaurus', 'テリトリアル・アクスビーク', NULL, 12, '22.5', '33.7', 48, NULL, 0, NULL, 0, 0),
+(547, 216, 'Toxic Toad', 'Toxic Toad', 'Crapaud Toxique', 'Giftkröte', 'トキシックトード', NULL, 12, '27.0', '19.2', 14, NULL, 0, NULL, 0, 0),
+(548, 1250, 'Aldebrand', 'Aldebrand', 'Aldebrand', 'Aldebrand', 'アルデブランド', NULL, 13, '22.2', '21.6', 1, NULL, 1, NULL, 0, 0),
+(549, 256, 'Amalj\'aa Bruiser', 'Amalj\'aa Bruiser', 'Tabasseur Amalj\'aa', 'Amalj\'aa-Kraftprotz', 'アマルジャ・ブルーザー', NULL, 13, '24.8', '20.5', 23, NULL, 0, NULL, 0, 1),
+(550, 250, 'Amalj\'aa Hunter', 'Amalj\'aa Hunter', 'Chasseur Amalj\'aa', 'Amalj\'aa-Jäger', 'アマルジャ・ハンター', NULL, 13, '20.1', '27.5', 18, NULL, 1, NULL, 0, 0),
+(551, 247, 'Amalj\'aa Javelinier', 'Amalj\'aa Javelinier', 'Javelinier Amalj\'aa', 'Amalj\'aa-Speerwerfer', 'アマルジャ・ジャベリナー', NULL, 13, '20.0', '27.3', 18, NULL, 1, NULL, 0, 0),
+(552, 251, 'Amalj\'aa Ranger', 'Amalj\'aa Ranger', 'Ranger Amalj\'aa', 'Amalj\'aa-Waldläufer', 'アマルジャ・レンジャー', NULL, 13, '24.8', '21.6', 27, NULL, 1, NULL, 0, 0),
+(553, 900, 'Amalj\'aa Supply Crate', 'Amalj\'aa Supply Crate', 'Caisse De Ravitaillement Amalj\'aa', 'Amalj\'aa-Vorratskiste', 'アマルジャ軍の軍需物資', NULL, 13, '20.4', '27.0', 18, NULL, 1, NULL, 0, 0),
+(554, 281, 'Axe Beak', 'Axe Beak', 'Bec-pic', 'Pelisaurus', 'アクスビーク', NULL, 13, '24.2', '19.1', 26, NULL, 0, NULL, 0, 0),
+(555, 1311, 'Bandit Archer', 'Bandit Archer', 'Bandit Archer', 'Räuberisch[a] Schütze', 'バンディット・アーチャー', NULL, 13, '26.7', '18.5', 28, NULL, 0, NULL, 0, 0),
+(556, 1310, 'Bandit Mage', 'Bandit Mage', 'Bandit Mage', 'Räuberisch[a] Zauberer', 'バンディット・メイジ', NULL, 13, '26.6', '18.7', 28, NULL, 0, NULL, 0, 0),
+(557, 1309, 'Bandit Trapper', 'Bandit Trapper', 'Bandit Trappeur', 'Räuberisch[a] Fallensteller', 'バンディット・トラッパー', NULL, 13, '26.8', '19.0', 28, NULL, 0, NULL, 0, 0),
+(558, 1246, 'Bertram', 'Bertram', 'Bertram', 'Bertram', 'バートラム', NULL, 13, '22.4', '21.4', 1, NULL, 1, NULL, 0, 0),
+(559, 1199, 'Blowfly Swarm', 'Blowfly Swarm', 'Nuée De Mouches Bleues', 'Aasfliegenschwarm', 'ブロウフライ・スウォーム', NULL, 13, '13.2', '22.4', 16, NULL, 0, NULL, 0, 0),
+(560, 1255, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 13, '24.2', '22.8', 25, NULL, 1, NULL, 0, 0),
+(561, 296, 'Bumble Beetle', 'Bumble Beetle', 'Scarabourdon', 'Brummkäfer', 'バンブルビートル', NULL, 13, '27.8', '17.0', 25, NULL, 0, NULL, 0, 1),
+(562, 1245, 'Chachamun', 'Chachamun', 'Chachamun', 'Chachamun', '武具屋 チャチャムン', NULL, 13, '22.3', '21.4', 5, NULL, 1, NULL, 0, 0),
+(563, 301, 'Chasm Buzzard', 'Chasm Buzzard', 'Busard Des Gouffres', 'Schlucht-Bussard', 'キャズム・バザード', NULL, 13, '21.8', '19.9', 25, NULL, 0, NULL, 0, 0),
+(564, 1350, 'Dry Slug', 'Dry Slug', 'Limace Déshydratée', 'Trockenschnecke', 'ドライスラッグ', NULL, 13, '13.8', '20.8', 14, NULL, 1, NULL, 0, 0),
+(565, 1047, 'Drybone Tuco-tuco', 'Drybone Tuco-tuco', 'Tuco-tuco Des Os Desséchés', 'Knochenbleich-Tukotuko', 'ドライボーン・ツコツコ', NULL, 13, '16.1', '24.1', 24, NULL, 0, NULL, 0, 0),
+(566, 1371, 'Flame Private', 'Flame Private', 'Soldat 3e Classe Des Sables', 'Legionär[p] 3. Klasse', '不滅隊二等闘兵', NULL, 13, '25.1', '20.0', 22, NULL, 1, NULL, 0, 1),
+(567, 1275, 'Flame Recruit', 'Flame Recruit', 'Soldat Des Immortels', 'Legionsrekrut', '不滅隊の兵卒', NULL, 13, '12.9', '25.0', 44, NULL, 0, NULL, 0, 1),
+(774, 1666, 'Pulxio Of The Short Gale', 'Pulxio Of The Short Gale', 'Pulxio', 'Pulxio', '風狂のプルシオ', NULL, 8, '20.0', '10.0', 49, 1, 1, 25, 1, 0),
+(569, 271, 'Golden Fleece', 'Golden Fleece', 'Toison D\'or', 'Goldvlies', 'ゴールデンフリース', NULL, 13, '26.0', '25.2', 40, 3, 0, NULL, 1, 0),
+(570, 1249, 'Jajanzo', 'Jajanzo', 'Jajanzo', 'Jajanzo', 'ジャジャンゾ', NULL, 13, '24.1', '23.6', 1, NULL, 1, NULL, 0, 0),
+(571, 1251, 'Ligart', 'Ligart', 'Ligart', 'Ligart', 'リガート', NULL, 13, '23.9', '24.4', 1, NULL, 1, NULL, 0, 0),
+(572, 634, 'Mirrorknight', 'Mirrorknight', 'Chevalier Miroir', 'Speglidae', 'ミラーナイト', NULL, 13, '26.9', '26.5', 42, 3, 0, NULL, 1, 0),
+(573, 273, 'Myotragus Billy', 'Myotragus Billy', 'Bouquetin Myotragus', 'Myotragus-Bock', 'ミオトラグス・ビリー', NULL, 13, '16.5', '28.6', 16, NULL, 0, NULL, 0, 0),
+(574, 274, 'Myotragus Nanny', 'Myotragus Nanny', 'étagne Myotragus', 'Myotragus-Geiß', 'ミオトラグス・ナニー', NULL, 13, '18.4', '22.5', 18, NULL, 0, NULL, 0, 0),
+(575, 1242, 'Nayokk Roh', 'Nayokk Roh', 'Nayokk Roh Le Trafiquant', 'Nayokk Roh', '人買のナヨク・ロー', NULL, 13, '23.5', '24.6', 26, NULL, 1, NULL, 0, 0),
+(576, 272, 'Phurble', 'Phurble', 'Poiluche', 'Flausch', 'ファーブル', NULL, 13, '23.4', '21.6', 25, NULL, 0, NULL, 0, 0),
+(577, 268, 'Qiqirn Roerunner', 'Qiqirn Roerunner', 'Qiqirn Gobe-oisillon', 'Qiqirn-Läufer', 'キキルン・ロウランナー', NULL, 13, '23.8', '23.3', 26, NULL, 0, NULL, 0, 0),
+(578, 1244, 'Qiqirn Trafficker', 'Qiqirn Trafficker', 'Qiqirn Fricoteur', 'Qiqirn-Streuner', 'キキルン・トラフィッカー', NULL, 13, '23.8', '24.3', 26, NULL, 1, NULL, 0, 0),
+(579, 1125, 'Ravenous Billygoat', 'Ravenous Billygoat', 'Bouquetin Insatiable', 'Gefräßig[a] Steinbock', 'ラヴェナス・ビリー', NULL, 13, '15.2', '23.5', 24, NULL, 0, NULL, 0, 0),
+(580, 319, 'Rotting Corpse', 'Rotting Corpse', 'Cadavre Putrescent', 'Verrottend[a] Leiche', 'ロッティング・コープス', NULL, 13, '14.6', '16.4', 17, NULL, 0, NULL, 0, 0),
+(581, 322, 'Rotting Noble', 'Rotting Noble', 'Noble Putrescent', 'Verrottend[a] Edelmann', 'ロッティング・ノーブル', NULL, 13, '14.6', '16.3', 17, NULL, 0, NULL, 0, 0),
+(582, 1248, 'Rururaji', 'Rururaji', 'Rururaji', 'Rururaji', 'ルルラジ', NULL, 13, '22.1', '21.5', 1, NULL, 1, NULL, 0, 0),
+(583, 1223, 'Steelquill Tuco-tuco', 'Steelquill Tuco-tuco', 'Tuco-tuco à Piquants Durs', 'Stahlfeder-Tukotuko', 'スチールクイル・ツコツコ', NULL, 13, '12.4', '26.5', 12, NULL, 1, NULL, 0, 0),
+(584, 486, 'Stinging Syrphid Cloud', 'Stinging Syrphid Cloud', 'Nuage De Syrphes Piquants', 'Stechend[a] Mistfliegenwolke', 'スティンギング・サーフィド', NULL, 13, '15.7', '22.0', 24, NULL, 0, NULL, 0, 0),
+(585, 1247, 'Tiny Aurochs', 'Tiny Aurochs', 'Tiny Aurochs', 'Winzig[a] Ochse', 'タイニー・オーロクス', NULL, 13, '21.8', '21.7', 1, NULL, 1, NULL, 0, 0),
+(586, 306, 'Tuco-tuco', 'Tuco-tuco', 'Tuco-tuco', 'Tukotuko', 'ツコツコ', NULL, 13, '13.1', '18.7', 17, NULL, 0, NULL, 0, 0),
+(587, 1198, 'Vandalous Imp', 'Vandalous Imp', 'Imp Vandale', 'Randale-Imp', 'ヴァンドロス・インプ', NULL, 13, '14.4', '18.7', 16, NULL, 0, NULL, 0, 0),
+(588, 1711, 'Abducted Ala Mhigan', 'Abducted Ala Mhigan', 'Engagé De Force Mhigois', 'Entführt[a] Mhigit', '拐われたアラミゴ人', NULL, 14, '18.5', '19.6', 1, NULL, 1, NULL, 0, 0),
+(589, 1984, 'Ala Mhigan Youth', 'Ala Mhigan Youth', 'Jeune Mhigois', 'Mhigisch[a] Jüngling', 'アラミゴ人の若者', NULL, 14, '17.7', '10.4', 27, NULL, 0, NULL, 0, 0),
+(591, 249, 'Amalj\'aa Archer', 'Amalj\'aa Archer', 'Archer Amalj\'aa', 'Amalj\'aa-Bogenschütze', 'アマルジャ・アーチャー', NULL, 14, '20.9', '23.9', 47, 4, 0, NULL, 1, 1),
+(592, 1388, 'Amalj\'aa Brigand', 'Amalj\'aa Brigand', 'Brigand Amalj\'aa', 'Amalj\'aa-Brigant', 'アマルジャ・ブリガンド', NULL, 14, '20.7', '21.7', 45, NULL, 0, NULL, 0, 0),
+(593, 260, 'Amalj\'aa Divinator', 'Amalj\'aa Divinator', 'Divinateur Amalj\'aa', 'Amalj\'aa-Weissager', 'アマルジャ・ディヴィネーター', NULL, 14, '25.1', '34.5', 32, 3, 0, NULL, 1, 0),
+(594, 2155, 'Amalj\'aa Halberdier', 'Amalj\'aa Halberdier', 'Hallebardier Amalj\'aa', 'Amalj\'aa-Hellebardier', 'アマルジャ・ハルバルディア', NULL, 14, '25.9', '35.1', 32, 3, 0, NULL, 1, 0),
+(595, 245, 'Amalj\'aa Lancer', 'Amalj\'aa Lancer', 'Lancier Amalj\'aa', 'Amalj\'aa-Pikenier', 'アマルジャ・ランサー', NULL, 14, '18.6', '20.9', 15, 4, 0, NULL, 1, 1),
+(596, 253, 'Amalj\'aa Pugilist', 'Amalj\'aa Pugilist', 'Pugiliste Amalj\'aa', 'Amalj\'aa-Faustkämpfer', 'アマルジャ・ピュージャリスト', NULL, 14, '19.2', '26.0', 47, 4, 0, NULL, 1, 1),
+(597, 1389, 'Amalj\'aa Scavenger', 'Amalj\'aa Scavenger', 'Charognard Amalj\'aa', 'Amalj\'aa-Plünderer', 'アマルジャ・スカベンジャー', NULL, 14, '20.3', '21.7', 45, NULL, 0, NULL, 0, 0),
+(598, 259, 'Amalj\'aa Seer', 'Amalj\'aa Seer', 'Voyant Amalj\'aa', 'Amalj\'aa-Seher', 'アマルジャ・シーア', NULL, 14, '21.4', '15.0', 26, NULL, 0, NULL, 0, 0),
+(599, 252, 'Amalj\'aa Sniper', 'Amalj\'aa Sniper', 'Tireur Amalj\'aa', 'Amalj\'aa-Scharfschütze', 'アマルジャ・スナイパー', NULL, 14, '26.0', '34.8', 32, 4, 0, NULL, 1, 0),
+(600, 258, 'Amalj\'aa Thaumaturge', 'Amalj\'aa Thaumaturge', 'Occultiste Amalj\'aa', 'Amalj\'aa-Thaumaturg', 'アマルジャ・サーマタージ', NULL, 14, '16.8', '25.5', 45, NULL, 0, NULL, 0, 0),
+(601, 307, 'Angler', 'Angler', 'Lotte', 'Anglerfisch', 'アングラー', NULL, 14, '15.9', '20.4', 28, NULL, 0, NULL, 0, 0),
+(602, 1505, 'Aspidochelone', 'Aspidochelone', 'Aspidochélon', 'Aspidochelone', 'アスピドケロン', NULL, 14, '20.3', '20.8', 46, 1, 1, 213, 1, 0),
+(603, 1344, 'Augmented Battle Drake', 'Augmented Battle Drake', 'Draconide De Combat Amélioré', 'Gestärkt[a] Kampf-Drakon', '強化型バトルドレイク', NULL, 14, '16.7', '11.8', 25, NULL, 1, NULL, 0, 0),
+(604, 1277, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 14, '16.5', '15.0', 35, NULL, 0, NULL, 0, 1),
+(605, 2511, 'Bronze Tortoise', 'Bronze Tortoise', 'Tortue De Bronze', 'Bronzeschildkröte', 'ブロンズトータス', NULL, 14, '19.3', '21.0', 43, NULL, 0, NULL, 0, 0),
+(606, 332, 'Corpse Brigade Firedancer', 'Corpse Brigade Firedancer', 'Sorcier De La Brigade Des Cadavres', 'Leichenbrigaden-Feuerteufel', '骸旅団の魔術兵', NULL, 14, '22.3', '9.6', 28, NULL, 0, NULL, 0, 0),
+(607, 331, 'Corpse Brigade Knuckledancer', 'Corpse Brigade Knuckledancer', 'Lutteur De La Brigade Des Cadavres', 'Leichenbrigaden-Knöcheltänzer', '骸旅団の格闘兵', NULL, 14, '22.2', '9.6', 28, NULL, 0, NULL, 0, 0),
+(608, 2332, 'Dapper Zombie', 'Dapper Zombie', 'Zombi Bien Mis', 'Galant[a] Zombie', 'ゾンビー・ジェントルマン', NULL, 14, '15.9', '26.0', 43, NULL, 1, NULL, 0, 0),
+(609, 2191, 'Dune Angler', 'Dune Angler', 'Lotte Des Dunes', 'Dünen-Anglerfisch', 'デューン・アングラー', NULL, 14, '19.9', '31.1', 31, NULL, 0, NULL, 0, 0),
+(610, 323, 'Fallen Mage', 'Fallen Mage', 'Mage Déchu', 'Gefallen[a] Magier', 'フォールン・メイジ', NULL, 14, '19.3', '16.6', 26, NULL, 0, NULL, 0, 0),
+(611, 321, 'Fallen Pikeman', 'Fallen Pikeman', 'Lancier Déchu', 'Gefallen[a] Pikenier', 'フォールン・パイクマン', NULL, 14, '21.5', '38.8', 34, NULL, 0, NULL, 0, 0),
+(612, 320, 'Fallen Soldier', 'Fallen Soldier', 'Soldat Déchu', 'Gefallen[a] Soldat', 'フォールン・ソルジャー', NULL, 14, '19.1', '16.7', 26, NULL, 0, NULL, 0, 0),
+(613, 324, 'Fallen Wizard', 'Fallen Wizard', 'Magicien Déchu', 'Gefallen[a] Zauberer', 'フォールン・ウィザード', NULL, 14, '19.5', '38.7', 34, 4, 0, NULL, 1, 0),
+(614, 1343, 'Flame Scout', 'Flame Scout', 'éclaireur Des Immortels', 'Legionskundschafter', '不滅隊の偵察兵', NULL, 14, '17.7', '17.9', 18, NULL, 1, NULL, 0, 1),
+(615, 2354, 'Flamecrest Afajj Koh', 'Flamecrest Afajj Koh', 'Afajj Koh', 'Flammenkranz Afajj Koh', '火印のアファジ・コー', NULL, 14, '26.2', '21.4', 48, 1, 1, 304, 1, 0),
+(616, 2368, 'Flamefang Commander', 'Flamefang Commander', 'Commandant Croc De Feu', 'Flammenfang-Kommandant', 'フレイム・コマンダー', NULL, 14, '32.3', '20.8', 49, NULL, 1, NULL, 0, 0),
+(617, 2369, 'Flamefang Elite', 'Flamefang Elite', 'Combattant D\'élite Croc De Feu', 'Flammenfang-Elitekrieger', 'フレイム・エリート', NULL, 14, '32.3', '20.8', 49, NULL, 1, NULL, 0, 0),
+(618, 1390, 'Flaming Beacon', 'Flaming Beacon', 'Brasière Enflammée', 'Flammenkessel', '燃える聖火台', NULL, 14, '16.0', '23.6', 43, NULL, 0, NULL, 0, 0),
+(619, 882, 'Gisfrid The Grinder', 'Gisfrid The Grinder', 'Gisfrid Le Transgresseur', 'Gisfrid der Gnadenloser', '破戒のギスフリッド', NULL, 14, '23.6', '10.7', 28, 1, 1, 231, 1, 0),
+(620, 2053, 'Hired Bow', 'Hired Bow', 'Archer Stipendié', 'Söldner-Bogenschützin', '雇われの弓術士', NULL, 14, '19.4', '14.4', 40, NULL, 0, NULL, 0, 0),
+(621, 2052, 'Hired Fist', 'Hired Fist', 'Pugiliste Stipendié', 'Söldner-Faustkämpferin', '雇われの格闘士', NULL, 14, '19.6', '14.1', 40, NULL, 0, NULL, 0, 0),
+(622, 1878, 'Ifrit\'s Beacon', 'Ifrit\'s Beacon', 'Pilier Du Feu Sacré', 'Ifrits Kessel', '焔神イフリートの聖火台', NULL, 14, '32.6', '20.2', 49, NULL, 0, NULL, 0, 0),
+(623, 1877, 'Infernal Beacon', 'Infernal Beacon', 'Torchère Infernale', 'Infernokessel', '燃え盛る聖火台', NULL, 14, '23.7', '25.4', 46, NULL, 0, NULL, 0, 0),
+(624, 243, 'Iron Tortoise', 'Iron Tortoise', 'Tortue De Fer', 'Eisenschildkröte', 'アイアントータス', NULL, 14, '16.1', '24.9', 46, 3, 0, NULL, 1, 0),
+(625, 564, 'Potter Wasp Swarm', 'Potter Wasp Swarm', 'Nuée De Guêpes Maçonnes', 'Lehmfliegenschwarm', 'ポッターワスプ・スウォーム', NULL, 14, '15.0', '13.6', 25, NULL, 0, NULL, 0, 0),
+(626, 1278, 'Ranger Of The Drake', 'Ranger Of The Drake', 'Chasseuse De La Tribu Des U', 'Drakon-Jägerin', 'ウ族の狩人', NULL, 14, '16.5', '29.8', 29, NULL, 0, NULL, 0, 0),
+(627, 889, 'Ranger Of The Drake', 'Ranger Of The Drake', 'Chasseuse De La Tribu Des U', 'Drakon-Jägerin', 'ウ族の狩人', NULL, 14, '14.5', '32.0', 25, NULL, 1, NULL, 0, 0),
+(628, 1993, 'Rockskin Peiste', 'Rockskin Peiste', 'Peiste à Peau Dure', 'Steinhaut-Peiste', 'ロックスキン・ペイスト', NULL, 14, '16.5', '12.8', 28, NULL, 0, NULL, 0, 0),
+(629, 285, 'Russet Yarzon', 'Russet Yarzon', 'Yarzon Brun', 'Rotbraun[a] Yarzon', 'ラセット・ヤーゾン', NULL, 14, '12.7', '32.2', 31, 4, 0, NULL, 1, 0),
+(630, 286, 'Sabotender', 'Sabotender', 'Pampa', 'Sabotender', 'サボテンダー', NULL, 14, '20.3', '7.9', 25, NULL, 0, NULL, 0, 0),
+(631, 303, 'Sandskin Peiste', 'Sandskin Peiste', 'Peiste Sablon', 'Sandhaut-Peiste', 'サンドスキン・ペイスト', NULL, 14, '21.0', '9.6', 26, NULL, 0, NULL, 0, 0),
+(632, 280, 'Sandstone Golem', 'Sandstone Golem', 'Golem De Grès', 'Sandstein-Golem', 'サンドストーン・ゴーレム', NULL, 14, '23.1', '12.1', 29, NULL, 0, NULL, 0, 0),
+(633, 290, 'Sandworm', 'Sandworm', 'Ver Des Sables', 'Sandwurm', 'サンドウォーム', NULL, 14, '14.5', '31.8', 29, 4, 0, NULL, 1, 0),
+(634, 132, 'Smoke Bomb', 'Smoke Bomb', 'Bombo Fumigène', 'Rauchbomber', 'スモークボム', NULL, 14, '19.0', '35.5', 32, 4, 0, NULL, 1, 0),
+(635, 264, 'Sundrake', 'Sundrake', 'Draconide Du Soleil', 'Drakon', 'ドレイク', NULL, 14, '24.3', '36.7', 32, 3, 0, NULL, 1, 0),
+(636, 1999, 'Tempered Brand', 'Tempered Brand', 'Mage Belahdien', 'Besessen[a] Magier', 'ベラフディアン・メイジ', NULL, 14, '19.6', '17.1', 26, NULL, 0, NULL, 0, 0),
+(637, 338, 'Tempered Champion', 'Tempered Champion', 'Lutteur Subjugué', 'Abgeklärt[a] Faustkämpfer', 'テンパード・チャンピオン', NULL, 14, '18.1', '19.4', 42, NULL, 1, NULL, 0, 0),
+(638, 337, 'Tempered Gladiator', 'Tempered Gladiator', 'Gladiateur Subjugué', 'Abgeklärt[a] Gladiator', 'テンパード・グラディエーター', NULL, 14, '21.2', '19.9', 46, NULL, 1, NULL, 0, 0),
+(639, 2361, 'Tempered Huntress', 'Tempered Huntress', 'Chasseuse Subjuguée', 'Besessen[a] Jägerin', 'テンパード・ハンター', NULL, 14, '21.1', '21.9', 43, NULL, 0, NULL, 0, 0),
+(640, 339, 'Tempered Orator', 'Tempered Orator', 'Psalmodieur Subjugué', 'Abgeklärt[a] Redner', 'テンパード・オラター', NULL, 14, '18.1', '19.3', 46, 3, 1, NULL, 1, 0),
+(641, 1998, 'Tempered Sword', 'Tempered Sword', 'Soldat Belahdien', 'Besessen[a] Soldat', 'ベラフディアン・ソルジャー', NULL, 14, '19.5', '16.9', 26, NULL, 0, NULL, 0, 0),
+(642, 918, 'U\'kahmuli', 'U\'kahmuli', 'U\'kahmuli', 'U\'kahmuli', 'ウ・カムリ', NULL, 14, '14.7', '30.3', 25, NULL, 1, NULL, 0, 0),
+(643, 920, 'U\'konelua', 'U\'konelua', 'U\'konelua', 'U\'konelua', 'ウ・コネルア', NULL, 14, '14.6', '29.9', 25, NULL, 1, NULL, 0, 0),
+(644, 922, 'U\'lolamo', 'U\'lolamo', 'U\'lolamo', 'U\'lolamo', 'ウ・ローラモ', NULL, 14, '15.3', '29.5', 25, NULL, 1, NULL, 0, 0),
+(645, 921, 'U\'ndomii', 'U\'ndomii', 'U\'ndomii', 'U\'ndomii', 'ウ・ンドミィ', NULL, 14, '14.9', '29.8', 25, NULL, 1, NULL, 0, 0),
+(646, 919, 'U\'ralka', 'U\'ralka', 'U\'ralka', 'U\'ralka', 'ウ・ラルカ', NULL, 14, '14.8', '30.1', 25, NULL, 1, NULL, 0, 0),
+(647, 912, 'Wildfire Sprite', 'Wildfire Sprite', 'élémentaire Exergonique', 'Lauffeuer-Exergon', 'ワイルドファイアスプライト', NULL, 14, '24.3', '26.4', 48, NULL, 0, NULL, 0, 0),
+(648, 1838, 'Zahar\'ak Archer', 'Zahar\'ak Archer', 'Archer De Zahar\'ak', 'Zahar\'ak-Bogenschütze', 'ザハラク・アーチャー', NULL, 14, '23.1', '22.0', 49, 3, 0, NULL, 1, 0),
+(649, 1841, 'Zahar\'ak Battle Drake', 'Zahar\'ak Battle Drake', 'Draconide De Zahar\'ak', 'Zahar\'ak-Kampf-Drakon', 'ザハラク・バトルドレイク', NULL, 14, '30.3', '19.9', 48, 3, 0, NULL, 1, 0),
+(650, 2303, 'Zahar\'ak Fortune-teller', 'Zahar\'ak Fortune-teller', 'Augure De Zahar\'ak', 'Zahar\'ak-Wahrsager', 'ザハラク・フォーチュンテラー', NULL, 14, '30.6', '18.8', 49, NULL, 0, NULL, 0, 0),
+(651, 1837, 'Zahar\'ak Lancer', 'Zahar\'ak Lancer', 'Lancier De Zahar\'ak', 'Zahar\'ak-Pikenier', 'ザハラク・ランサー', NULL, 14, '24.8', '20.8', 49, NULL, 0, NULL, 0, 0),
+(652, 1839, 'Zahar\'ak Pugilist', 'Zahar\'ak Pugilist', 'Pugiliste De Zahar\'ak', 'Zahar\'ak-Faustkämpfer', 'ザハラク・ピュージャリスト', NULL, 14, '32.2', '20.0', 49, 3, 0, NULL, 1, 0),
+(653, 1840, 'Zahar\'ak Thaumaturge', 'Zahar\'ak Thaumaturge', 'Occultiste De Zahar\'ak', 'Zahar\'ak-Thaumaturg', 'ザハラク・サーマタージ', NULL, 14, '29.8', '18.9', 49, 3, 0, NULL, 1, 0),
+(655, 2296, 'Zanr\'ak Archer', 'Zanr\'ak Archer', 'Archer De Zanr\'ak', 'Zanr\'ak-Bogenschütze', 'ザンラク・アーチャー', NULL, 14, '24.7', '26.5', 49, NULL, 1, NULL, 0, 0),
+(656, 2297, 'Zanr\'ak Lancer', 'Zanr\'ak Lancer', 'Lancier De Zanr\'ak', 'Zanr\'ak-Pikenier', 'ザンラク・ランサー', NULL, 14, '24.0', '24.4', 48, NULL, 0, NULL, 0, 0),
+(657, 1880, 'Zanr\'ak Pugilist', 'Zanr\'ak Pugilist', 'Pugiliste De Zanr\'ak', 'Zanr\'ak-Faustkämpfer', 'ザンラク・ピュージャリスト', NULL, 14, '24.4', '26.3', 49, NULL, 0, NULL, 0, 0),
+(658, 1879, 'Zanr\'ak Thaumaturge', 'Zanr\'ak Thaumaturge', 'Occultiste De Zanr\'ak', 'Zanr\'ak-Thaumaturg', 'ザンラク・サーマタージ', NULL, 14, '25.0', '26.3', 48, NULL, 0, NULL, 0, 0),
+(659, 53, '3rd Cohort Hoplomachus', '3rd Cohort Hoplomachus', 'Hoplomachus De La 3e Cohorte', 'Hoplomachus[p] Der III. Kohorte', 'IIIコホルス・ホプロマクス', NULL, 15, '16.8', '18.6', 49, 3, 0, NULL, 1, 1),
+(660, 2120, '7th Cohort Eques', '7th Cohort Eques', 'Eques De La 7e Cohorte', 'Eques[p] Der VII. Kohorte', 'VIIコホルス・エクエス', NULL, 15, '12.2', '13.1', 50, NULL, 0, NULL, 0, 0),
+(661, 242, 'Ahriman', 'Ahriman', 'Ahriman', 'Ahriman', 'アーリマン', NULL, 15, '22.2', '23.1', 46, 3, 0, NULL, 1, 0),
+(662, 1508, 'Arimaspi', 'Arimaspi', 'Arimaspe', 'Arimaspi', 'アリマスピ', NULL, 15, '25.3', '20.4', 49, 1, 1, 223, 1, 0),
+(663, 304, 'Basilisk', 'Basilisk', 'Basilic', 'Basilisk', 'バジリスク', NULL, 15, '23.1', '23.3', 49, 3, 0, NULL, 1, 0),
+(773, 1515, 'Sekhmet', 'Sekhmet', 'Sekhmet', 'Sekhmet', 'セクメト', NULL, 3, '18.0', '28.0', 34, 1, 1, 27, 1, 0),
+(665, 270, 'Grenade', 'Grenade', 'Grenado', 'Granate', 'グレネード', NULL, 15, '21.4', '14.4', 49, 3, 0, NULL, 1, 1),
+(666, 269, 'Magitek Vanguard', 'Magitek Vanguard', 'Avant-garde Magitek', 'Magitek-Frontbrecher', '魔導ヴァンガード', NULL, 15, '16.6', '15.6', 49, NULL, 0, NULL, 0, 0),
+(667, 275, 'Quartz Doblyn', 'Quartz Doblyn', 'Doblyn De Quartz', 'Quarz-Dobalos', 'クォーツドブラン', NULL, 15, '30.4', '26.1', 49, 3, 0, NULL, 1, 1),
+(668, 1718, 'Wary Merchant', 'Wary Merchant', 'Marchand Circonspect', 'Erschöpft[a] Händler', '慎重な商人', NULL, 15, '22.7', '23.1', 46, NULL, 1, NULL, 0, 0),
+(669, 59, '3rd Cohort Eques', '3rd Cohort Eques', 'Eques De La 3e Cohorte', 'Eques[p] Der III. Kohorte', 'IIIコホルス・エクエス', NULL, 16, '20.1', '20.9', 21, NULL, 0, NULL, 0, 1),
+(670, 58, '3rd Cohort Laquearius', '3rd Cohort Laquearius', 'Laquearius De La 3e Cohorte', 'Laquearius[p] Der III. Kohorte', 'IIIコホルス・ラクエリウス', NULL, 16, '17.1', '16.0', 22, NULL, 0, NULL, 1, 1),
+(671, 60, '3rd Cohort Secutor', '3rd Cohort Secutor', 'Secutor De La 3e Cohorte', 'Secutor[p] Der III. Kohorte', 'IIIコホルス・セクトール', NULL, 16, '19.5', '26.6', 49, NULL, 0, NULL, 0, 1),
+(672, 61, '3rd Cohort Signifer', '3rd Cohort Signifer', 'Signifer De La 3e Cohorte', 'Signifer[p] Der III. Kohorte', 'IIIコホルス・シグニフェル', NULL, 16, '18.5', '15.7', 49, 4, 0, NULL, 1, 1),
+(673, 1850, 'Baritine Croc', 'Baritine Croc', 'Croco Baryton', 'Baritogator', 'バリトンダイル', NULL, 16, '4.1', '22.0', 40, 3, 0, NULL, 1, 0),
+(674, 1183, 'Bateleur', 'Bateleur', 'Bateleur Des Dunes', 'Gaukler', 'バテラー', NULL, 16, '17.5', '17.7', 39, NULL, 0, NULL, 0, 0),
+(676, 788, 'Biast', 'Biast', 'Biast', 'Smei', 'ビアスト', NULL, 16, '17.7', '29.5', 45, 3, 0, NULL, 1, 0),
+(677, 1761, 'Blizzard Biast', 'Blizzard Biast', 'Biast Des Blizzards', 'Schneesturm-Smei', 'ブリザード・ビアスト', NULL, 16, '12.8', '18.1', 44, NULL, 0, NULL, 0, 0),
+(678, 2156, 'Chinchilla', 'Chinchilla', 'Chinchilla', 'Chinchilla', 'チンチラ', NULL, 16, '16.4', '20.2', 39, NULL, 0, NULL, 0, 0),
+(679, 1712, 'Coerthan Porter', 'Coerthan Porter', 'Livreur Du Coerthas', 'Coerthisch[a] Träger', 'クルザスの荷運び人', NULL, 16, '25.9', '21.2', 1, NULL, 1, NULL, 0, 0),
+(680, 1762, 'Downcast Hippocerf', 'Downcast Hippocerf', 'Hippocerf Rejeté', 'Niedergeschlagen[a] Hippocerf', 'ダウンキャスト・ヒッポセルフ', NULL, 16, '13.9', '18.5', 44, NULL, 0, NULL, 0, 0),
+(681, 1849, 'Downy Aevis', 'Downy Aevis', 'Eibis Duveteux', 'Flaum-Avis', 'ダウニーエイビス', NULL, 16, '24.1', '8.1', 38, 4, 0, NULL, 1, 0),
+(682, 637, 'Dragonfly', 'Dragonfly', 'Draguêpe', 'Drachycera', 'ドラゴンフライ', NULL, 16, '9.8', '12.8', 37, 3, 0, NULL, 1, 0),
+(683, 784, 'Feral Croc', 'Feral Croc', 'Crocodile Sauvage', 'Domigator', 'ワイルドダイル', NULL, 16, '25.6', '24.5', 33, 3, 0, NULL, 1, 0),
+(684, 1429, 'Gargamelle', 'Gargamelle', 'Gargamelle', 'Gargamelle', 'ガルガメル', NULL, 16, '34.2', '13.8', 39, 1, 1, 244, 1, 0),
+(685, 785, 'Giant Logger', 'Giant Logger', 'Géant Bûcheron', 'Riesen-Henker', 'ジャイアント・ロガー', NULL, 16, '13.6', '25.3', 46, 3, 0, NULL, 1, 0),
+(686, 786, 'Giant Lugger', 'Giant Lugger', 'Géant Jouteur', 'Riesen-Fäller', 'ジャイアント・ラガー', NULL, 16, '12.2', '26.7', 46, 3, 0, NULL, 1, 0),
+(687, 787, 'Giant Reader', 'Giant Reader', 'Géant Devin', 'Riesen-Häuptling', 'ジャイアント・リーダー', NULL, 16, '15.8', '26.7', 46, 3, 0, NULL, 1, 0),
+(688, 1612, 'Highland Goobbue', 'Highland Goobbue', 'Goobbue Des Hautes Terres', 'Hochland-Goobbue', 'ハイランド・グゥーブー', NULL, 16, '26.8', '19.6', 35, 4, 0, NULL, 1, 0),
+(689, 790, 'Hippocerf', 'Hippocerf', 'Hippocerf', 'Hippocerf', 'ヒッポセルフ', NULL, 16, '8.5', '20.5', 40, 3, 0, NULL, 1, 0),
+(690, 1581, 'House Durendaire Guard', 'House Durendaire Guard', 'Sentinelle Des Durendaire', 'Durendaire-Gardist', 'デュランデル家の衛兵', NULL, 16, '27.0', '28.2', 43, NULL, 0, NULL, 0, 0),
+(691, 1862, 'House Fortemps Engineer', 'House Fortemps Engineer', 'Ingénieur Des Fortemps', 'Fortemps-Techniker', 'フォルタン家の工兵', NULL, 16, '26.4', '15.9', 34, NULL, 1, NULL, 0, 0);
 INSERT INTO `mobs_arr` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `lvl`, `slain`, `is_fate`, `id_fate`, `is_visible`, `is_multiple`) VALUES
-(710, 1434, 'Roc', 'Roc', 'Roc', 'Roc', 'ロック', NULL, 16, 21.4, 17.8, 39, 1, 1, 255, 1, 0),
-(711, 1432, 'Rongeur', 'Rongeur', 'Rongeur D\'os', 'Rongeur', 'ロンジュール', NULL, 16, 12.5, 23.6, 45, 1, 1, 248, 1, 0),
-(712, 1436, 'Sateli Hueloc Of The South Wind', 'Sateli Hueloc Of The South Wind', 'Sateli Hueloc Du Vent Du Sud', 'Sateli Heuloc Des Südwinds', '南風のサテリ・フェロック', NULL, 16, 35.3, 20.9, 49, NULL, 1, NULL, 0, 0),
-(713, 1447, 'Second Eye', 'Second Eye', 'Deuxième œil', 'Zweit[a] Auge', 'ステロペスの弟子', NULL, 16, 15.5, 20.5, 39, NULL, 1, NULL, 0, 0),
-(714, 1438, 'Sethuli Hueloc Of The West Wind', 'Sethuli Hueloc Of The West Wind', 'Sethuli Hueloc Du Vent De L\'Est', 'Sethuli Heuloc Des Südwinds', '西風のセトゥリ・フェロック', NULL, 16, 34.7, 21.9, 49, NULL, 1, NULL, 0, 0),
-(715, 110, 'Skeleton Soldier', 'Skeleton Soldier', 'Soldat Squelette', 'Skelettkrieger', 'スケルトン・ソルジャー', NULL, 16, 7.0, 7.5, 16, NULL, 0, NULL, 0, 0),
-(716, 653, 'Snow Wolf', 'Snow Wolf', 'Loup Des Neiges', 'Schneewolf', 'スノウウルフ', NULL, 16, 15.9, 31.6, 46, 3, 0, NULL, 1, 0),
-(717, 659, 'Snow Wolf Pup', 'Snow Wolf Pup', 'Louveteau Des Neiges', 'Schneewolf', 'スノウウルフ・パッブ', NULL, 16, 28.3, 15.1, 37, 4, 0, NULL, 1, 0),
-(718, 1611, 'Snowstorm Goobbue', 'Snowstorm Goobbue', 'Goobbue Des Neiges', 'Schneesturm-Goobbue', 'スノウストーム・グゥーブー', NULL, 16, 22.6, 17.1, 39, 3, 0, NULL, 1, 0),
-(719, 1437, 'Sotoli Hueloc Of The East Wind', 'Sotoli Hueloc Of The East Wind', 'Sotoli Hueloc Du Vent De L\'Ouest', 'Sotoli Heuloc Des Ostwinds', '東風のソトリ・フェロック', NULL, 16, 35.4, 21.7, 49, NULL, 1, NULL, 0, 0),
-(720, 1445, 'Steropes', 'Steropes', 'Steropes', 'Steropes', 'ステロペス', NULL, 16, 15.8, 20.3, 39, NULL, 1, NULL, 0, 0),
-(721, 1435, 'Sutali Hueloc Of The North Wind', 'Sutali Hueloc Of The North Wind', 'Sutali Hueloc Du Vent Du Nord', 'Sutali Heuloc Des Nordwinds', '北風のスタリ・フェロック', NULL, 16, 34.5, 20.6, 49, NULL, 1, NULL, 0, 0),
-(722, 1440, 'Svara', 'Svara', 'Svara', 'Svara', 'スヴァラ', NULL, 16, 26.9, 8.1, 38, NULL, 1, NULL, 0, 0),
-(723, 1182, 'Taurus', 'Taurus', 'Taurus', 'Taurus', 'タウルス', NULL, 16, 32.8, 15.5, 39, 4, 0, NULL, 1, 0),
-(724, 657, 'Thrustaevis', 'Thrustaevis', 'Eibis Azuré', 'Sturm-Avis', 'スラストエイビス', NULL, 16, 25.8, 8.5, 35, NULL, 1, NULL, 0, 0),
-(725, 658, 'Vodoriga', 'Vodoriga', 'Vodoriga', 'Vodoriga', 'ヴォドリガ', NULL, 16, 27.4, 14.1, 38, 3, 0, NULL, 1, 0),
-(726, 417, 'Wharf Rat', 'Wharf Rat', 'Rat', 'Dockratte', 'ラット', NULL, 16, 22.1, 24.6, 2, NULL, 0, NULL, 0, 1),
-(727, 2918, 'Will-o\'-the-wyke', 'Will-o\'-the-wyke', 'Feu Fugace', 'Wirrlicht', 'ウィル・オ・ザ・ワイクス', NULL, 16, 35.2, 15.0, 38, NULL, 0, NULL, 0, 0),
-(728, 1811, '5th Cohort Eques', '5th Cohort Eques', 'Eques De La 5e Cohorte', 'Eques[p] Der V. Kohorte', 'Vコホルス・エクエス', NULL, 17, 12.7, 16.0, 46, 3, 0, NULL, 1, 0),
-(729, 1809, '5th Cohort Hoplomachus', '5th Cohort Hoplomachus', 'Hoplomachus De La 5e Cohorte', 'Hoplomachus[p] Der V. Kohorte', 'Vコホルス・ホプロマクス', NULL, 17, 12.2, 16.5, 46, 3, 0, NULL, 1, 0),
-(730, 1810, '5th Cohort Laquearius', '5th Cohort Laquearius', 'Laquearius De La 5e Cohorte', 'Laquearius[p] Der V. Kohorte', 'Vコホルス・ラクエリウス', NULL, 17, 11.9, 11.9, 46, NULL, 0, NULL, 0, 0),
-(731, 1812, '5th Cohort Secutor', '5th Cohort Secutor', 'Secutor De La 5e Cohorte', 'Secutor[p] Der V. Kohorte', 'Vコホルス・セクトール', NULL, 17, 10.2, 14.9, 46, NULL, 0, NULL, 0, 0),
-(732, 1813, '5th Cohort Signifer', '5th Cohort Signifer', 'Signifer De La 5e Cohorte', 'Signifer[p] Der V. Kohorte', 'Vコホルス・シグニフェル', NULL, 17, 9.4, 14.0, 46, 3, 0, NULL, 1, 0),
-(733, 1814, '5th Cohort Vanguard', '5th Cohort Vanguard', 'Avant-garde De La 5e Cohorte', 'Frontbrecher[p] Der V. Kohorte', 'Vコホルス・ヴァンガード', NULL, 17, 10.6, 15.2, 47, NULL, 0, NULL, 0, 0),
-(734, 3179, '6th Cohort Vanguard', '6th Cohort Vanguard', 'Avant-garde De La 6e Cohorte', 'Frontbrecher[p] Der VI. Kohorte', 'VIコホルス・ヴァンガード', NULL, 17, 10.8, 15.8, 50, NULL, 0, NULL, 0, 0),
-(735, 1766, 'Beggar Bonze', 'Beggar Bonze', 'Bonze Mendiant', 'Begas-Bonze', 'ベガー・ボンズ', NULL, 17, 24.2, 10.5, 50, NULL, 0, NULL, 0, 0),
-(736, 1767, 'Beggar Shramana', 'Beggar Shramana', 'Shramana Mendiant', 'Begas-Shramana', 'ベガー・シャモン', NULL, 17, 23.8, 11.9, 50, NULL, 0, NULL, 0, 0),
-(737, 1771, 'Beggar Sozu', 'Beggar Sozu', 'Sôzu Mendiant', 'Begas-Sozu', 'ベガー・ソーズ', NULL, 17, 23.2, 11.4, 49, NULL, 0, NULL, 0, 0),
-(738, 1859, 'Box Of Documents', 'Box Of Documents', 'Liste De Découvertes', 'Kiste[p] Mit Fundstücken', '財団の調査資材', NULL, 17, 29.9, 13.3, 46, NULL, 1, NULL, 0, 0),
-(739, 1607, 'Budding Morbol', 'Budding Morbol', 'Morbol Bourgeonnant', 'Keimend[a] Morbol', 'ブディング・モルボル', NULL, 17, 14.0, 12.7, 41, NULL, 1, NULL, 0, 0),
-(740, 650, 'Daring Harrier', 'Daring Harrier', 'Harceleur Casse-cou', 'Waghalsig[a] Plünderer', 'デアリング・ハリアー', NULL, 17, 17.3, 15.7, 45, 3, 0, NULL, 1, 0),
-(741, 1769, 'Denizen Of The Dark', 'Denizen Of The Dark', 'Dahaka Ténébreux', 'Dunkel-Lamantinaut', 'ダーク・ダハーカ', NULL, 17, 14.0, 0.2, 49, NULL, 0, NULL, 0, 0),
-(742, 1770, 'Foul River Hapalit', 'Foul River Hapalit', 'Hapalit De Rufétide', 'Faulbach-Hapalit', 'ファウルリバー・ハパリット', NULL, 17, 24.1, 11.0, 49, NULL, 0, NULL, 0, 0),
-(743, 649, 'Gigas Bhikkhu', 'Gigas Bhikkhu', 'Gigas Bhikkhu', 'Gigas-Bhikku', 'ギガース・ビク', NULL, 17, 33.2, 16.2, 49, 3, 0, NULL, 1, 0),
-(744, 646, 'Gigas Bonze', 'Gigas Bonze', 'Gigas Bonze', 'Gigas-Bonze', 'ギガース・ボンズ', NULL, 17, 28.6, 12.3, 46, NULL, 0, NULL, 0, 0),
-(745, 647, 'Gigas Shramana', 'Gigas Shramana', 'Gigas Shramana', 'Gigas-Shramana', 'ギガース・シャモン', NULL, 17, 30.0, 14.1, 46, NULL, 0, NULL, 0, 0),
-(746, 648, 'Gigas Sozu', 'Gigas Sozu', 'Gigas Sôzu', 'Gigas-Sozu', 'ギガース・ソーズ', NULL, 17, 27.8, 10.2, 46, NULL, 0, NULL, 0, 0),
-(747, 1776, 'Gorn The Garrgh', 'Gorn The Garrgh', 'Gorn Le Garrgh', 'Gorn Garrgh', '賞金首：ゴーン・ザ・ガー', NULL, 17, 25.4, 11.3, 49, NULL, 0, NULL, 0, 0),
-(748, 793, 'Hapalit', 'Hapalit', 'Hapalit', 'Hapalit', 'ハパリット', NULL, 17, 31.3, 5.2, 48, 3, 0, NULL, 1, 0),
-(749, 652, 'Hexing Harrier', 'Hexing Harrier', 'Harceleur Ensorceleur', 'Hexend[a] Plünderin', 'ヘキシング・ハリアー', NULL, 17, 16.3, 15.4, 45, NULL, 0, NULL, 0, 0),
-(750, 789, 'Hippogryph', 'Hippogryph', 'Hippogriffe', 'Hippogryph', 'ヒッポグリフ', NULL, 17, 33.1, 11.2, 46, NULL, 0, NULL, 0, 0),
-(751, 2234, 'Imperial Hoplomachus', 'Imperial Hoplomachus', 'Hoplomachus Impérial', 'Hoplomachus', 'インペリアル・ホプロマクス', NULL, 17, 13.1, 0.1, 46, NULL, 0, NULL, 0, 0),
-(752, 2235, 'Imperial Secutor', 'Imperial Secutor', 'Secutor Impérial', 'Secutor', 'インペリアル・セクトール', NULL, 17, 13.1, 0.1, 46, NULL, 0, NULL, 0, 0),
-(753, 2236, 'Imperial Signifer', 'Imperial Signifer', 'Signifer Impérial', 'Signifer', 'インペリアル・シグニフェル', NULL, 17, 13.0, 0.2, 46, NULL, 0, NULL, 0, 0),
-(754, 1851, 'Lake Cobra', 'Lake Cobra', 'Cobra Des Lacs', 'Seekobra', 'レイクコブラ', NULL, 17, 26.7, 13.3, 45, 3, 0, NULL, 1, 0),
-(772, 1526, 'Peryton', 'Peryton', 'Peryton', 'Peryton', 'ペリュトン', NULL, 6, 15.0, 18.0, 30, 1, 1, 24, 1, 0),
-(756, 2237, 'Magitek Packer', 'Magitek Packer', 'Bardeur Magitek', 'Magitek-Stapler', '魔導パッカー', NULL, 17, 13.2, 0.1, 49, NULL, 0, NULL, 0, 0),
-(757, 27, 'Nix', 'Nix', 'Nix', 'Nöck', 'ニクス', NULL, 17, 17.4, 9.8, 44, 3, 0, NULL, 1, 0),
-(758, 2172, 'Porter', 'Porter', 'Transporteur', 'Sankt Coinach-Bote', '聖コイナク財団の荷運び人', NULL, 17, 29.9, 13.3, 1, NULL, 1, NULL, 0, 0),
-(759, 1442, 'Porus', 'Porus', 'Porus', 'Porus', 'ポリュス', NULL, 17, 31.1, 5.4, 48, 1, 1, 274, 1, 0),
-(760, 1774, 'Ragged Hippogryph', 'Ragged Hippogryph', 'Hippogriffe Pelé', 'Zerlumpt[a] Hippogryph', 'ラゲッド・ヒッポグリフ', NULL, 17, 23.7, 10.6, 47, NULL, 0, NULL, 0, 0),
-(761, 651, 'Raging Harrier', 'Raging Harrier', 'Harceleur Enragé', 'Wütend[a] Plünderer', 'レイジング・ハリアー', NULL, 17, 16.8, 17.2, 45, 3, 0, NULL, 1, 0),
-(762, 2673, 'Rampant Cobra', 'Rampant Cobra', 'Cobra Envahisseur', 'Wild[a] Kobra', 'ラムペット・コブラ', NULL, 17, 27.7, 12.4, 50, NULL, 0, NULL, 0, 0),
-(763, 1707, 'Rugged Researcher', 'Rugged Researcher', 'Archéologue Préoccupé', 'Zäh[a] Forscher', '筋骨逞しい調査員', NULL, 17, 22.4, 7.3, 45, NULL, 1, NULL, 0, 0),
-(764, 1584, 'Seasoned Adventurer', 'Seasoned Adventurer', 'Sentinelle Chevronnée', 'Erfahren[a] Abenteurer', '手練れの冒険者', NULL, 17, 33.1, 11.3, 40, NULL, 0, NULL, 0, 0),
-(765, 1717, 'Son Of Saint Coinach', 'Son Of Saint Coinach', 'Archéologue De Saint-Coinach', 'Sankt Coinachs-Forscher[p]', '聖コイナク財団の調査員', NULL, 17, 30.2, 12.0, 1, NULL, 1, NULL, 0, 0),
-(766, 1757, 'Winter Nix', 'Winter Nix', 'Nix Hivernal', 'Winter-Nöck', 'ウィンター・ニクス', NULL, 17, 23.4, 11.4, 44, NULL, 0, NULL, 0, 0),
-(767, 873, 'Vodyanoi', 'Vodyanoi', 'Vodyanoi', 'Vodyanoi', 'ヴォジャノーイ', NULL, 12, 27.6, 19.6, 14, 1, 1, 31, 1, 0),
-(782, 1507, 'Whitespark Hepugg Roh', 'Whitespark Hepugg Roh', 'Hepugg Roh L\'étincelant', 'Weißfunken Hepugg Roh', '火打のハプグ・ロー', NULL, 14, 32.0, 19.0, 50, 1, 1, 34, 1, 0),
-(783, 29, 'Dullahan', 'Dullahan', 'Dullahan', 'Dullahan', 'デュラハン', NULL, 10, 21.0, 21.0, 47, 3, 0, NULL, 1, 0),
-(784, 871, 'Guguroon Wetnose', 'Guguroon Wetnose', 'Guguroon Lèvecoude', 'Saufnase Guguroon', '飲んべえググルン', NULL, 12, 19.0, 20.0, 7, 1, 1, 13, 1, 0),
-(785, 885, 'Ulhuadshi', 'Ulhuadshi', 'Ulhuadshi', 'Ulhuadshi', 'ウルハドシ', NULL, 14, 14.0, 30.0, 32, 1, 1, 30, 1, 0),
-(786, 343, 'Aermswys The Stained', 'Aermswys The Stained', 'Aermswys La Marquée', 'Aermswys [t] Gezeichnet[a]', '刻印のエルムスイス', NULL, 4, 13.0, 16.0, 49, 1, 1, 3, 1, 0),
-(787, 114, 'Ice Sprite', 'Ice Sprite', 'élémentaire De Glace', 'Eis-Exergon', 'アイススプライト', NULL, 16, 25.3, 20.1, 36, 4, 0, NULL, 1, 1),
-(788, 512, 'Alux', 'Alux', 'Alux', 'Alux', 'アルシュ', NULL, 7, 25.0, 25.0, 9, 1, 1, 5, 1, 0),
-(789, 1527, 'Number 128', 'Number 128', 'Numéro 128', 'Nummer 128', 'ナンバー128', NULL, 6, 14.0, 15.0, 34, 1, 1, 21, 1, 0),
-(790, 1610, 'Voluptuous Vivian', 'Voluptuous Vivian', 'Viviane La Voluptueuse', 'Unersättlich[a] Vivian', 'ボラプチュア・ビビアン', NULL, 17, 13.0, 10.0, 44, 1, 1, 33, 1, 0),
-(791, 563, 'Aurelia', 'Aurelia', 'Aurélie', 'Aurelia', 'オーレリア', NULL, 1, 19.6, 20.8, 5, NULL, 0, NULL, 0, 1),
-(793, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 1, 24.9, 16.9, 8, NULL, 0, NULL, 0, 1),
-(794, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 1, 23.2, 25.1, 3, NULL, 0, NULL, 0, 1),
+(692, 1582, 'House Fortemps Guard', 'House Fortemps Guard', 'Sentinelle Des Fortemps', 'Fortemps-Gardist', 'フォルタン家の衛兵', NULL, 16, '26.6', '16.1', 31, NULL, 0, NULL, 0, 0),
+(693, 1847, 'House Fortemps Herald', 'House Fortemps Herald', 'Héraut Des Fortemps', 'Fortemps-Herold', 'フォルタン家の伝令', NULL, 16, '25.9', '19.1', 36, NULL, 1, NULL, 0, 0),
+(694, 1990, 'House Fortemps Knight', 'House Fortemps Knight', 'Chevalier Des Fortemps', 'Fortemps-Ritter', 'フォルタン家の騎兵', NULL, 16, '24.6', '16.1', 37, NULL, 0, NULL, 0, 0),
+(695, 1716, 'Ishgardian Astrologian', 'Ishgardian Astrologian', 'Astrologue Ishgardais', 'Ishgarder Astrologe', 'イシュガルドの占星術士', NULL, 16, '26.0', '18.9', 33, NULL, 1, NULL, 0, 0),
+(696, 1583, 'Ishgardian Sentry', 'Ishgardian Sentry', 'Sentinelle Ishgardaise', 'Ishgard-Gardist', '神殿騎士団の衛兵', NULL, 16, '18.8', '15.8', 41, NULL, 0, NULL, 0, 0),
+(697, 661, 'Ixali Stillbeak', 'Ixali Stillbeak', 'Ixal Bec-serein', 'Ixal-Stillschnabel', 'イクサル・スチルビーク', NULL, 16, '32.3', '27.3', 37, NULL, 0, NULL, 0, 0),
+(698, 660, 'Ixali Wildtalon', 'Ixali Wildtalon', 'Ixal Serres-folles', 'Ixal-Wildkralle', 'イクサル・ワイルドタロン', NULL, 16, '32.1', '27.5', 30, 3, 0, NULL, 1, 0),
+(699, 2355, 'Kozol Nomotl The Turbulent', 'Kozol Nomotl The Turbulent', 'Kozol Nomotl', 'Sturmböe Kozol Nomotl', '風標のコゾル・ノモトル', NULL, 16, '34.1', '19.4', 49, 1, 1, 268, 1, 0),
+(700, 1430, 'Lutin', 'Lutin', 'Follet De Glace', 'Lutin', 'リュタン', NULL, 16, '15.8', '20.7', 39, 1, 1, 18, 1, 0),
+(701, 645, 'Mudpuppy', 'Mudpuppy', 'Protée', 'Olm', 'マッドパピー', NULL, 16, '18.2', '30.9', 44, 4, 0, NULL, 1, 1),
+(702, 1843, 'Natalan Boldwing', 'Natalan Boldwing', 'Aile-hardie De Natalan', 'Natalan-Mutschwinge', 'ナタラン・ボールドウィング', NULL, 16, '33.5', '24.1', 49, 3, 0, NULL, 1, 0),
+(703, 1845, 'Natalan Fogcaller', 'Natalan Fogcaller', 'Embrumeur De Natalan', 'Natalan-Nebelrufer', 'ナタラン・フォグコーラー', NULL, 16, '32.7', '18.2', 49, 3, 0, NULL, 1, 0),
+(704, 1844, 'Natalan Swiftbeak', 'Natalan Swiftbeak', 'Bec-vif De Natalan', 'Natalan-Flinkschnabel', 'ナタラン・スウィフトビーク', NULL, 16, '34.6', '20.7', 49, 3, 0, NULL, 1, 0),
+(705, 1846, 'Natalan Watchwolf', 'Natalan Watchwolf', 'Loup De Natalan', 'Natalan-Wachwolf', 'ナタラン・ウォッチウルフ', NULL, 16, '34.2', '20.2', 48, 4, 0, NULL, 1, 0),
+(706, 1842, 'Natalan Windtalon', 'Natalan Windtalon', 'Serres-vent De Natalan', 'Natalan-Windkralle', 'ナタラン・ウィンドタロン', NULL, 16, '31.7', '17.4', 49, 4, 0, NULL, 1, 0),
+(708, 795, 'Ornery Karakul', 'Ornery Karakul', 'Karakul Rageur', 'Karakul', 'カラクール', NULL, 16, '24.8', '19.6', 36, 3, 0, NULL, 1, 0),
+(709, 794, 'Redhorn Ogre', 'Redhorn Ogre', 'Ogre Corne-rouge', 'Rothorn-Oger', 'レッドホーン・オーガ', NULL, 16, '29.7', '11.5', 35, 4, 0, NULL, 1, 0),
+(710, 1434, 'Roc', 'Roc', 'Roc', 'Roc', 'ロック', NULL, 16, '21.4', '17.8', 39, 1, 1, 255, 1, 0),
+(711, 1432, 'Rongeur', 'Rongeur', 'Rongeur D\'os', 'Rongeur', 'ロンジュール', NULL, 16, '12.5', '23.6', 45, 1, 1, 248, 1, 0),
+(712, 1436, 'Sateli Hueloc Of The South Wind', 'Sateli Hueloc Of The South Wind', 'Sateli Hueloc Du Vent Du Sud', 'Sateli Heuloc Des Südwinds', '南風のサテリ・フェロック', NULL, 16, '35.3', '20.9', 49, NULL, 1, NULL, 0, 0),
+(713, 1447, 'Second Eye', 'Second Eye', 'Deuxième œil', 'Zweit[a] Auge', 'ステロペスの弟子', NULL, 16, '15.5', '20.5', 39, NULL, 1, NULL, 0, 0),
+(714, 1438, 'Sethuli Hueloc Of The West Wind', 'Sethuli Hueloc Of The West Wind', 'Sethuli Hueloc Du Vent De L\'Est', 'Sethuli Heuloc Des Südwinds', '西風のセトゥリ・フェロック', NULL, 16, '34.7', '21.9', 49, NULL, 1, NULL, 0, 0),
+(715, 110, 'Skeleton Soldier', 'Skeleton Soldier', 'Soldat Squelette', 'Skelettkrieger', 'スケルトン・ソルジャー', NULL, 16, '7.0', '7.5', 16, NULL, 0, NULL, 0, 0),
+(716, 653, 'Snow Wolf', 'Snow Wolf', 'Loup Des Neiges', 'Schneewolf', 'スノウウルフ', NULL, 16, '15.9', '31.6', 46, 3, 0, NULL, 1, 0),
+(717, 659, 'Snow Wolf Pup', 'Snow Wolf Pup', 'Louveteau Des Neiges', 'Schneewolf', 'スノウウルフ・パッブ', NULL, 16, '28.3', '15.1', 37, 4, 0, NULL, 1, 0),
+(718, 1611, 'Snowstorm Goobbue', 'Snowstorm Goobbue', 'Goobbue Des Neiges', 'Schneesturm-Goobbue', 'スノウストーム・グゥーブー', NULL, 16, '22.6', '17.1', 39, 3, 0, NULL, 1, 0),
+(719, 1437, 'Sotoli Hueloc Of The East Wind', 'Sotoli Hueloc Of The East Wind', 'Sotoli Hueloc Du Vent De L\'Ouest', 'Sotoli Heuloc Des Ostwinds', '東風のソトリ・フェロック', NULL, 16, '35.4', '21.7', 49, NULL, 1, NULL, 0, 0),
+(720, 1445, 'Steropes', 'Steropes', 'Steropes', 'Steropes', 'ステロペス', NULL, 16, '15.8', '20.3', 39, NULL, 1, NULL, 0, 0),
+(721, 1435, 'Sutali Hueloc Of The North Wind', 'Sutali Hueloc Of The North Wind', 'Sutali Hueloc Du Vent Du Nord', 'Sutali Heuloc Des Nordwinds', '北風のスタリ・フェロック', NULL, 16, '34.5', '20.6', 49, NULL, 1, NULL, 0, 0),
+(722, 1440, 'Svara', 'Svara', 'Svara', 'Svara', 'スヴァラ', NULL, 16, '26.9', '8.1', 38, NULL, 1, NULL, 0, 0),
+(723, 1182, 'Taurus', 'Taurus', 'Taurus', 'Taurus', 'タウルス', NULL, 16, '32.8', '15.5', 39, 4, 0, NULL, 1, 0),
+(724, 657, 'Thrustaevis', 'Thrustaevis', 'Eibis Azuré', 'Sturm-Avis', 'スラストエイビス', NULL, 16, '25.8', '8.5', 35, NULL, 1, NULL, 0, 0),
+(725, 658, 'Vodoriga', 'Vodoriga', 'Vodoriga', 'Vodoriga', 'ヴォドリガ', NULL, 16, '27.4', '14.1', 38, 3, 0, NULL, 1, 0),
+(726, 417, 'Wharf Rat', 'Wharf Rat', 'Rat', 'Dockratte', 'ラット', NULL, 16, '22.1', '24.6', 2, NULL, 0, NULL, 0, 1),
+(727, 2918, 'Will-o\'-the-wyke', 'Will-o\'-the-wyke', 'Feu Fugace', 'Wirrlicht', 'ウィル・オ・ザ・ワイクス', NULL, 16, '35.2', '15.0', 38, NULL, 0, NULL, 0, 0),
+(728, 1811, '5th Cohort Eques', '5th Cohort Eques', 'Eques De La 5e Cohorte', 'Eques[p] Der V. Kohorte', 'Vコホルス・エクエス', NULL, 17, '12.7', '16.0', 46, 3, 0, NULL, 1, 0),
+(729, 1809, '5th Cohort Hoplomachus', '5th Cohort Hoplomachus', 'Hoplomachus De La 5e Cohorte', 'Hoplomachus[p] Der V. Kohorte', 'Vコホルス・ホプロマクス', NULL, 17, '12.2', '16.5', 46, 3, 0, NULL, 1, 0),
+(730, 1810, '5th Cohort Laquearius', '5th Cohort Laquearius', 'Laquearius De La 5e Cohorte', 'Laquearius[p] Der V. Kohorte', 'Vコホルス・ラクエリウス', NULL, 17, '11.9', '11.9', 46, NULL, 0, NULL, 0, 0),
+(731, 1812, '5th Cohort Secutor', '5th Cohort Secutor', 'Secutor De La 5e Cohorte', 'Secutor[p] Der V. Kohorte', 'Vコホルス・セクトール', NULL, 17, '10.2', '14.9', 46, NULL, 0, NULL, 0, 0),
+(732, 1813, '5th Cohort Signifer', '5th Cohort Signifer', 'Signifer De La 5e Cohorte', 'Signifer[p] Der V. Kohorte', 'Vコホルス・シグニフェル', NULL, 17, '9.4', '14.0', 46, 3, 0, NULL, 1, 0),
+(733, 1814, '5th Cohort Vanguard', '5th Cohort Vanguard', 'Avant-garde De La 5e Cohorte', 'Frontbrecher[p] Der V. Kohorte', 'Vコホルス・ヴァンガード', NULL, 17, '10.6', '15.2', 47, NULL, 0, NULL, 0, 0),
+(734, 3179, '6th Cohort Vanguard', '6th Cohort Vanguard', 'Avant-garde De La 6e Cohorte', 'Frontbrecher[p] Der VI. Kohorte', 'VIコホルス・ヴァンガード', NULL, 17, '10.8', '15.8', 50, NULL, 0, NULL, 0, 0),
+(735, 1766, 'Beggar Bonze', 'Beggar Bonze', 'Bonze Mendiant', 'Begas-Bonze', 'ベガー・ボンズ', NULL, 17, '24.2', '10.5', 50, NULL, 0, NULL, 0, 0),
+(736, 1767, 'Beggar Shramana', 'Beggar Shramana', 'Shramana Mendiant', 'Begas-Shramana', 'ベガー・シャモン', NULL, 17, '23.8', '11.9', 50, NULL, 0, NULL, 0, 0),
+(737, 1771, 'Beggar Sozu', 'Beggar Sozu', 'Sôzu Mendiant', 'Begas-Sozu', 'ベガー・ソーズ', NULL, 17, '23.2', '11.4', 49, NULL, 0, NULL, 0, 0),
+(738, 1859, 'Box Of Documents', 'Box Of Documents', 'Liste De Découvertes', 'Kiste[p] Mit Fundstücken', '財団の調査資材', NULL, 17, '29.9', '13.3', 46, NULL, 1, NULL, 0, 0),
+(739, 1607, 'Budding Morbol', 'Budding Morbol', 'Morbol Bourgeonnant', 'Keimend[a] Morbol', 'ブディング・モルボル', NULL, 17, '14.0', '12.7', 41, NULL, 1, NULL, 0, 0),
+(740, 650, 'Daring Harrier', 'Daring Harrier', 'Harceleur Casse-cou', 'Waghalsig[a] Plünderer', 'デアリング・ハリアー', NULL, 17, '17.3', '15.7', 45, 3, 0, NULL, 1, 0),
+(741, 1769, 'Denizen Of The Dark', 'Denizen Of The Dark', 'Dahaka Ténébreux', 'Dunkel-Lamantinaut', 'ダーク・ダハーカ', NULL, 17, '14.0', '0.2', 49, NULL, 0, NULL, 0, 0),
+(742, 1770, 'Foul River Hapalit', 'Foul River Hapalit', 'Hapalit De Rufétide', 'Faulbach-Hapalit', 'ファウルリバー・ハパリット', NULL, 17, '24.1', '11.0', 49, NULL, 0, NULL, 0, 0),
+(743, 649, 'Gigas Bhikkhu', 'Gigas Bhikkhu', 'Gigas Bhikkhu', 'Gigas-Bhikku', 'ギガース・ビク', NULL, 17, '33.2', '16.2', 49, 3, 0, NULL, 1, 0),
+(744, 646, 'Gigas Bonze', 'Gigas Bonze', 'Gigas Bonze', 'Gigas-Bonze', 'ギガース・ボンズ', NULL, 17, '28.6', '12.3', 46, NULL, 0, NULL, 0, 0),
+(745, 647, 'Gigas Shramana', 'Gigas Shramana', 'Gigas Shramana', 'Gigas-Shramana', 'ギガース・シャモン', NULL, 17, '30.0', '14.1', 46, NULL, 0, NULL, 0, 0),
+(746, 648, 'Gigas Sozu', 'Gigas Sozu', 'Gigas Sôzu', 'Gigas-Sozu', 'ギガース・ソーズ', NULL, 17, '27.8', '10.2', 46, NULL, 0, NULL, 0, 0),
+(747, 1776, 'Gorn The Garrgh', 'Gorn The Garrgh', 'Gorn Le Garrgh', 'Gorn Garrgh', '賞金首：ゴーン・ザ・ガー', NULL, 17, '25.4', '11.3', 49, NULL, 0, NULL, 0, 0),
+(748, 793, 'Hapalit', 'Hapalit', 'Hapalit', 'Hapalit', 'ハパリット', NULL, 17, '31.3', '5.2', 48, 3, 0, NULL, 1, 0),
+(749, 652, 'Hexing Harrier', 'Hexing Harrier', 'Harceleur Ensorceleur', 'Hexend[a] Plünderin', 'ヘキシング・ハリアー', NULL, 17, '16.3', '15.4', 45, NULL, 0, NULL, 0, 0),
+(750, 789, 'Hippogryph', 'Hippogryph', 'Hippogriffe', 'Hippogryph', 'ヒッポグリフ', NULL, 17, '33.1', '11.2', 46, NULL, 0, NULL, 0, 0),
+(751, 2234, 'Imperial Hoplomachus', 'Imperial Hoplomachus', 'Hoplomachus Impérial', 'Hoplomachus', 'インペリアル・ホプロマクス', NULL, 17, '13.1', '0.1', 46, NULL, 0, NULL, 0, 0),
+(752, 2235, 'Imperial Secutor', 'Imperial Secutor', 'Secutor Impérial', 'Secutor', 'インペリアル・セクトール', NULL, 17, '13.1', '0.1', 46, NULL, 0, NULL, 0, 0),
+(753, 2236, 'Imperial Signifer', 'Imperial Signifer', 'Signifer Impérial', 'Signifer', 'インペリアル・シグニフェル', NULL, 17, '13.0', '0.2', 46, NULL, 0, NULL, 0, 0),
+(754, 1851, 'Lake Cobra', 'Lake Cobra', 'Cobra Des Lacs', 'Seekobra', 'レイクコブラ', NULL, 17, '26.7', '13.3', 45, 3, 0, NULL, 1, 0),
+(772, 1526, 'Peryton', 'Peryton', 'Peryton', 'Peryton', 'ペリュトン', NULL, 6, '15.0', '18.0', 30, 1, 1, 24, 1, 0),
+(756, 2237, 'Magitek Packer', 'Magitek Packer', 'Bardeur Magitek', 'Magitek-Stapler', '魔導パッカー', NULL, 17, '13.2', '0.1', 49, NULL, 0, NULL, 0, 0),
+(757, 27, 'Nix', 'Nix', 'Nix', 'Nöck', 'ニクス', NULL, 17, '17.4', '9.8', 44, 3, 0, NULL, 1, 0),
+(758, 2172, 'Porter', 'Porter', 'Transporteur', 'Sankt Coinach-Bote', '聖コイナク財団の荷運び人', NULL, 17, '29.9', '13.3', 1, NULL, 1, NULL, 0, 0),
+(759, 1442, 'Porus', 'Porus', 'Porus', 'Porus', 'ポリュス', NULL, 17, '31.1', '5.4', 48, 1, 1, 274, 1, 0),
+(760, 1774, 'Ragged Hippogryph', 'Ragged Hippogryph', 'Hippogriffe Pelé', 'Zerlumpt[a] Hippogryph', 'ラゲッド・ヒッポグリフ', NULL, 17, '23.7', '10.6', 47, NULL, 0, NULL, 0, 0),
+(761, 651, 'Raging Harrier', 'Raging Harrier', 'Harceleur Enragé', 'Wütend[a] Plünderer', 'レイジング・ハリアー', NULL, 17, '16.8', '17.2', 45, 3, 0, NULL, 1, 0),
+(762, 2673, 'Rampant Cobra', 'Rampant Cobra', 'Cobra Envahisseur', 'Wild[a] Kobra', 'ラムペット・コブラ', NULL, 17, '27.7', '12.4', 50, NULL, 0, NULL, 0, 0),
+(763, 1707, 'Rugged Researcher', 'Rugged Researcher', 'Archéologue Préoccupé', 'Zäh[a] Forscher', '筋骨逞しい調査員', NULL, 17, '22.4', '7.3', 45, NULL, 1, NULL, 0, 0),
+(764, 1584, 'Seasoned Adventurer', 'Seasoned Adventurer', 'Sentinelle Chevronnée', 'Erfahren[a] Abenteurer', '手練れの冒険者', NULL, 17, '33.1', '11.3', 40, NULL, 0, NULL, 0, 0),
+(765, 1717, 'Son Of Saint Coinach', 'Son Of Saint Coinach', 'Archéologue De Saint-Coinach', 'Sankt Coinachs-Forscher[p]', '聖コイナク財団の調査員', NULL, 17, '30.2', '12.0', 1, NULL, 1, NULL, 0, 0),
+(766, 1757, 'Winter Nix', 'Winter Nix', 'Nix Hivernal', 'Winter-Nöck', 'ウィンター・ニクス', NULL, 17, '23.4', '11.4', 44, NULL, 0, NULL, 0, 0),
+(767, 873, 'Vodyanoi', 'Vodyanoi', 'Vodyanoi', 'Vodyanoi', 'ヴォジャノーイ', NULL, 12, '27.6', '19.6', 14, 1, 1, 31, 1, 0),
+(782, 1507, 'Whitespark Hepugg Roh', 'Whitespark Hepugg Roh', 'Hepugg Roh L\'étincelant', 'Weißfunken Hepugg Roh', '火打のハプグ・ロー', NULL, 14, '32.0', '19.0', 50, 1, 1, 34, 1, 0),
+(783, 29, 'Dullahan', 'Dullahan', 'Dullahan', 'Dullahan', 'デュラハン', NULL, 10, '21.0', '21.0', 47, 3, 0, NULL, 1, 0),
+(784, 871, 'Guguroon Wetnose', 'Guguroon Wetnose', 'Guguroon Lèvecoude', 'Saufnase Guguroon', '飲んべえググルン', NULL, 12, '19.0', '20.0', 7, 1, 1, 13, 1, 0),
+(785, 885, 'Ulhuadshi', 'Ulhuadshi', 'Ulhuadshi', 'Ulhuadshi', 'ウルハドシ', NULL, 14, '14.0', '30.0', 32, 1, 1, 30, 1, 0),
+(786, 343, 'Aermswys The Stained', 'Aermswys The Stained', 'Aermswys La Marquée', 'Aermswys [t] Gezeichnet[a]', '刻印のエルムスイス', NULL, 4, '13.0', '16.0', 49, 1, 1, 3, 1, 0),
+(787, 114, 'Ice Sprite', 'Ice Sprite', 'élémentaire De Glace', 'Eis-Exergon', 'アイススプライト', NULL, 16, '25.3', '20.1', 36, 4, 0, NULL, 1, 1),
+(788, 512, 'Alux', 'Alux', 'Alux', 'Alux', 'アルシュ', NULL, 7, '25.0', '25.0', 9, 1, 1, 5, 1, 0),
+(789, 1527, 'Number 128', 'Number 128', 'Numéro 128', 'Nummer 128', 'ナンバー128', NULL, 6, '14.0', '15.0', 34, 1, 1, 21, 1, 0),
+(790, 1610, 'Voluptuous Vivian', 'Voluptuous Vivian', 'Viviane La Voluptueuse', 'Unersättlich[a] Vivian', 'ボラプチュア・ビビアン', NULL, 17, '13.0', '10.0', 44, 1, 1, 33, 1, 0),
+(791, 563, 'Aurelia', 'Aurelia', 'Aurélie', 'Aurelia', 'オーレリア', NULL, 1, '19.6', '20.8', 5, NULL, 0, NULL, 0, 1),
+(793, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 1, '24.9', '16.9', 8, NULL, 0, NULL, 0, 1),
+(794, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 1, '23.2', '25.1', 3, NULL, 0, NULL, 0, 1),
 (795, 1604, 'Pack Chocobo', 'Pack Chocobo', 'Chocobo De Bât', 'Karawanen-Chocobo', '荷運びチョコボ', NULL, 1, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
 (797, 1332, 'Storm Private', 'Storm Private', 'Soldat 3e Classe Des Tempêtes', 'Sturmmariner', '黒渦団二等甲兵', NULL, 1, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(799, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 1, 17.9, 17.4, 60, NULL, 0, NULL, 0, 1),
-(800, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 1, 13.0, 15.4, 13, NULL, 0, NULL, 0, 1),
-(801, 417, 'Wharf Rat', 'Wharf Rat', 'Rat', 'Dockratte', 'ラット', NULL, 1, 23.5, 22.9, 2, NULL, 0, NULL, 0, 1),
-(802, 399, 'Wild Jackal', 'Wild Jackal', 'Chacal Sauvage', 'Wild[a] Schakal', 'ジャッカル', NULL, 1, 14.4, 10.9, 12, NULL, 0, NULL, 0, 1),
+(799, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 1, '17.9', '17.4', 60, NULL, 0, NULL, 0, 1),
+(800, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 1, '13.0', '15.4', 13, NULL, 0, NULL, 0, 1),
+(801, 417, 'Wharf Rat', 'Wharf Rat', 'Rat', 'Dockratte', 'ラット', NULL, 1, '23.5', '22.9', 2, NULL, 0, NULL, 0, 1),
+(802, 399, 'Wild Jackal', 'Wild Jackal', 'Chacal Sauvage', 'Wild[a] Schakal', 'ジャッカル', NULL, 1, '14.4', '10.9', 12, NULL, 0, NULL, 0, 1),
 (803, 981, 'Yellowjacket', 'Yellowjacket', 'Casaque Jaune', 'Gelbjacken-Seesoldat', 'イエロージャケット陸戦兵', NULL, 1, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(804, 1272, 'Yellowjacket Patrol', 'Yellowjacket Patrol', 'Casaque Jaune', 'Gelbjacken-Wache', 'イエロージャケット警備兵', NULL, 1, 21.3, 24.1, 35, NULL, 0, NULL, 0, 1),
-(806, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 2, 21.3, 38.6, 15, NULL, 0, NULL, 0, 1),
-(807, 129, 'Firefly', 'Firefly', 'Luciole', 'Leuchtkäfer', 'ファイアフライ', NULL, 2, 26.5, 36.8, 11, NULL, 0, NULL, 0, 1),
-(808, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 2, 22.1, 23.1, 1, NULL, 0, NULL, 0, 1),
-(809, 561, 'Megalocrab', 'Megalocrab', 'Mégalocrabe', 'Megalokrabbe', 'メガロクラブ', NULL, 2, 21.2, 37.6, 11, NULL, 0, NULL, 0, 1),
-(810, 354, 'Mossless Goobbue', 'Mossless Goobbue', 'Goobbue Dépouillé', 'Flechten-Goobbue', 'モスレスグゥーブー', NULL, 2, 25.5, 26.4, 12, NULL, 0, NULL, 0, 1),
+(804, 1272, 'Yellowjacket Patrol', 'Yellowjacket Patrol', 'Casaque Jaune', 'Gelbjacken-Wache', 'イエロージャケット警備兵', NULL, 1, '21.3', '24.1', 35, NULL, 0, NULL, 0, 1),
+(806, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 2, '21.3', '38.6', 15, NULL, 0, NULL, 0, 1),
+(807, 129, 'Firefly', 'Firefly', 'Luciole', 'Leuchtkäfer', 'ファイアフライ', NULL, 2, '26.5', '36.8', 11, NULL, 0, NULL, 0, 1),
+(808, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 2, '22.1', '23.1', 1, NULL, 0, NULL, 0, 1),
+(809, 561, 'Megalocrab', 'Megalocrab', 'Mégalocrabe', 'Megalokrabbe', 'メガロクラブ', NULL, 2, '21.2', '37.6', 11, NULL, 0, NULL, 0, 1),
+(810, 354, 'Mossless Goobbue', 'Mossless Goobbue', 'Goobbue Dépouillé', 'Flechten-Goobbue', 'モスレスグゥーブー', NULL, 2, '25.5', '26.4', 12, NULL, 0, NULL, 0, 1),
 (811, 1604, 'Pack Chocobo', 'Pack Chocobo', 'Chocobo De Bât', 'Karawanen-Chocobo', '荷運びチョコボ', NULL, 2, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(812, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 2, 33.5, 19.2, 35, NULL, 0, NULL, 0, 1),
-(813, 405, 'Tiny Mandragora', 'Tiny Mandragora', 'Mini-mandragore', 'Winzig[a] Mandragora', 'タイニー・マンドラゴラ', NULL, 2, 33.7, 18.4, 8, NULL, 0, NULL, 0, 1),
-(815, 417, 'Wharf Rat', 'Wharf Rat', 'Rat', 'Dockratte', 'ラット', NULL, 2, 22.1, 24.6, 1, NULL, 0, NULL, 0, 1),
-(816, 393, 'Wild Dodo', 'Wild Dodo', 'Dodo', 'Dodo', 'ドードー', NULL, 2, 28.8, 20.4, 4, NULL, 0, NULL, 0, 1),
-(817, 399, 'Wild Jackal', 'Wild Jackal', 'Chacal Sauvage', 'Wild[a] Schakal', 'ジャッカル', NULL, 2, 21.0, 32.7, 10, NULL, 0, NULL, 0, 1),
-(818, 115, 'Wind Sprite', 'Wind Sprite', 'élémentaire De Vent', 'Wind-Exergon', 'ウィンドスプライト', NULL, 2, 34.7, 14.3, 9, NULL, 0, NULL, 0, 1),
+(812, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 2, '33.5', '19.2', 35, NULL, 0, NULL, 0, 1),
+(813, 405, 'Tiny Mandragora', 'Tiny Mandragora', 'Mini-mandragore', 'Winzig[a] Mandragora', 'タイニー・マンドラゴラ', NULL, 2, '33.7', '18.4', 8, NULL, 0, NULL, 0, 1),
+(815, 417, 'Wharf Rat', 'Wharf Rat', 'Rat', 'Dockratte', 'ラット', NULL, 2, '22.1', '24.6', 1, NULL, 0, NULL, 0, 1),
+(816, 393, 'Wild Dodo', 'Wild Dodo', 'Dodo', 'Dodo', 'ドードー', NULL, 2, '28.8', '20.4', 4, NULL, 0, NULL, 0, 1),
+(817, 399, 'Wild Jackal', 'Wild Jackal', 'Chacal Sauvage', 'Wild[a] Schakal', 'ジャッカル', NULL, 2, '21.0', '32.7', 10, NULL, 0, NULL, 0, 1),
+(818, 115, 'Wind Sprite', 'Wind Sprite', 'élémentaire De Vent', 'Wind-Exergon', 'ウィンドスプライト', NULL, 2, '34.7', '14.3', 9, NULL, 0, NULL, 0, 1),
 (819, 981, 'Yellowjacket', 'Yellowjacket', 'Casaque Jaune', 'Gelbjacken-Seesoldat', 'イエロージャケット陸戦兵', NULL, 2, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(820, 1326, 'Aismurl Goldmember', 'Aismurl Goldmember', 'Aismurl Membre-d\'or', 'Aismurl Goldzahn', '金満のアイスムル', NULL, 3, 32.5, 23.3, NULL, NULL, 1, NULL, 0, 0),
-(822, 270, 'Grenade', 'Grenade', 'Grenado', 'Granate', 'グレネード', NULL, 3, 29.1, 29.0, 31, 3, 0, NULL, 1, 1),
-(824, 379, 'Kobold Patrolman', 'Kobold Patrolman', 'Patrouilleur Kobold', 'Kobold-Grenzsoldat', 'コボルド・パトロールマン', NULL, 3, 27.9, 26.2, 34, NULL, 0, NULL, 0, 1),
-(825, 413, 'Mamool Ja Executioner', 'Mamool Ja Executioner', 'Exécuteur Mamool Ja', 'Mamool Ja-Henker', 'マムージャ・エクスキューショナー', NULL, 3, 24.3, 20.3, 29, 4, 0, NULL, 1, 1),
-(826, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 3, 21.7, 22.5, 36, NULL, 0, NULL, 0, 1),
-(827, 2964, 'The Garlok', 'The Garlok', 'Garlok', 'Garlok', 'ガーロック', NULL, 3, 31.7, 36.3, NULL, NULL, 0, NULL, 0, 0),
-(828, 115, 'Wind Sprite', 'Wind Sprite', 'élémentaire De Vent', 'Wind-Exergon', 'ウィンドスプライト', NULL, 3, 28.8, 26.6, 31, NULL, 0, NULL, 0, 1),
-(829, 13, 'Arbor Buzzard', 'Arbor Buzzard', 'Busard', 'Baumkronen-Bussard', 'バザード', NULL, 4, 30.9, 28.6, 13, NULL, 0, NULL, 0, 1),
-(831, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 4, 31.7, 28.6, 14, NULL, 0, NULL, 0, 1),
-(833, 1399, 'Selene', 'Selene', 'Selene', 'Selene', 'フェアリー・セレネ', NULL, 4, 27.6, 26.4, NULL, NULL, 0, NULL, 0, 0),
-(834, 344, 'Shallowclaw Reaver', 'Shallowclaw Reaver', 'Griffe Des Pillards Du Serpent', 'Flachkrallen-Plünderer', '海蛇の爪', NULL, 4, 5.0, 16.3, NULL, NULL, 0, NULL, 0, 0),
-(835, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 4, 19.6, 22.6, 48, NULL, 0, NULL, 0, 1),
-(836, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 4, 17.0, 19.7, 44, NULL, 0, NULL, 0, 1),
+(820, 1326, 'Aismurl Goldmember', 'Aismurl Goldmember', 'Aismurl Membre-d\'or', 'Aismurl Goldzahn', '金満のアイスムル', NULL, 3, '32.5', '23.3', NULL, NULL, 1, NULL, 0, 0),
+(822, 270, 'Grenade', 'Grenade', 'Grenado', 'Granate', 'グレネード', NULL, 3, '29.1', '29.0', 31, 3, 0, NULL, 1, 1),
+(824, 379, 'Kobold Patrolman', 'Kobold Patrolman', 'Patrouilleur Kobold', 'Kobold-Grenzsoldat', 'コボルド・パトロールマン', NULL, 3, '27.9', '26.2', 34, NULL, 0, NULL, 0, 1),
+(825, 413, 'Mamool Ja Executioner', 'Mamool Ja Executioner', 'Exécuteur Mamool Ja', 'Mamool Ja-Henker', 'マムージャ・エクスキューショナー', NULL, 3, '24.3', '20.3', 29, 4, 0, NULL, 1, 1),
+(826, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 3, '21.7', '22.5', 36, NULL, 0, NULL, 0, 1),
+(827, 2964, 'The Garlok', 'The Garlok', 'Garlok', 'Garlok', 'ガーロック', NULL, 3, '31.7', '36.3', NULL, NULL, 0, NULL, 0, 0),
+(828, 115, 'Wind Sprite', 'Wind Sprite', 'élémentaire De Vent', 'Wind-Exergon', 'ウィンドスプライト', NULL, 3, '28.8', '26.6', 31, NULL, 0, NULL, 0, 1),
+(829, 13, 'Arbor Buzzard', 'Arbor Buzzard', 'Busard', 'Baumkronen-Bussard', 'バザード', NULL, 4, '30.9', '28.6', 13, NULL, 0, NULL, 0, 1),
+(831, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 4, '31.7', '28.6', 14, NULL, 0, NULL, 0, 1),
+(833, 1399, 'Selene', 'Selene', 'Selene', 'Selene', 'フェアリー・セレネ', NULL, 4, '27.6', '26.4', NULL, NULL, 0, NULL, 0, 0),
+(834, 344, 'Shallowclaw Reaver', 'Shallowclaw Reaver', 'Griffe Des Pillards Du Serpent', 'Flachkrallen-Plünderer', '海蛇の爪', NULL, 4, '5.0', '16.3', NULL, NULL, 0, NULL, 0, 0),
+(835, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 4, '19.6', '22.6', 48, NULL, 0, NULL, 0, 1),
+(836, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 4, '17.0', '19.7', 44, NULL, 0, NULL, 0, 1),
 (837, 981, 'Yellowjacket', 'Yellowjacket', 'Casaque Jaune', 'Gelbjacken-Seesoldat', 'イエロージャケット陸戦兵', NULL, 4, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(838, 1272, 'Yellowjacket Patrol', 'Yellowjacket Patrol', 'Casaque Jaune', 'Gelbjacken-Wache', 'イエロージャケット警備兵', NULL, 4, 27.5, 25.8, 35, NULL, 0, NULL, 0, 1),
-(839, 296, 'Bumble Beetle', 'Bumble Beetle', 'Scarabourdon', 'Brummkäfer', 'バンブルビートル', NULL, 5, 14.3, 25.0, 20, NULL, 0, NULL, 0, 1),
-(840, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 5, 33.9, 24.6, 60, NULL, 0, NULL, 0, 1),
-(841, 369, 'Kobold Pitman', 'Kobold Pitman', 'Mineur Kobold', 'Kobold-Steiger', 'コボルド・ピットマン', NULL, 5, 28.8, 18.7, 34, 4, 0, NULL, 1, 1),
-(842, 414, 'Mamool Ja Breeder', 'Mamool Ja Breeder', 'éleveur Mamool Ja', 'Mamool Ja-Brüter', 'マムージャ・ブリーダー', NULL, 5, 33.4, 25.8, 31, 3, 0, NULL, 1, 1),
-(843, 415, 'Mamool Ja Sophist', 'Mamool Ja Sophist', 'Sophiste Mamool Ja', 'Mamool Ja-Sophist', 'マムージャ・ソフィスト', NULL, 5, 35.6, 24.2, 31, NULL, 0, NULL, 0, 1),
-(847, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 5, 28.9, 23.1, 36, NULL, 0, NULL, 0, 1),
-(848, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 5, 29.3, 25.0, 31, NULL, 0, NULL, 0, 1),
-(849, 2475, 'Alpha Basilisk', 'Alpha Basilisk', 'Basilic Alpha', 'Alpha-Basilisk', 'アルファ・バジリスク', NULL, 6, 22.8, 14.3, NULL, NULL, 0, NULL, 0, 0),
-(850, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 6, 21.3, 15.4, 60, NULL, 0, NULL, 0, 1),
-(851, 270, 'Grenade', 'Grenade', 'Grenado', 'Granate', 'グレネード', NULL, 6, 21.4, 14.4, 41, 3, 0, NULL, 1, 1),
-(852, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 6, 16.1, 17.0, 34, NULL, 0, NULL, 0, 1),
-(853, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 6, 25.2, 18.5, 34, 4, 0, NULL, 1, 1),
+(838, 1272, 'Yellowjacket Patrol', 'Yellowjacket Patrol', 'Casaque Jaune', 'Gelbjacken-Wache', 'イエロージャケット警備兵', NULL, 4, '27.5', '25.8', 35, NULL, 0, NULL, 0, 1),
+(839, 296, 'Bumble Beetle', 'Bumble Beetle', 'Scarabourdon', 'Brummkäfer', 'バンブルビートル', NULL, 5, '14.3', '25.0', 20, NULL, 0, NULL, 0, 1),
+(840, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 5, '33.9', '24.6', 60, NULL, 0, NULL, 0, 1),
+(841, 369, 'Kobold Pitman', 'Kobold Pitman', 'Mineur Kobold', 'Kobold-Steiger', 'コボルド・ピットマン', NULL, 5, '28.8', '18.7', 34, 4, 0, NULL, 1, 1),
+(842, 414, 'Mamool Ja Breeder', 'Mamool Ja Breeder', 'éleveur Mamool Ja', 'Mamool Ja-Brüter', 'マムージャ・ブリーダー', NULL, 5, '33.4', '25.8', 31, 3, 0, NULL, 1, 1),
+(843, 415, 'Mamool Ja Sophist', 'Mamool Ja Sophist', 'Sophiste Mamool Ja', 'Mamool Ja-Sophist', 'マムージャ・ソフィスト', NULL, 5, '35.6', '24.2', 31, NULL, 0, NULL, 0, 1),
+(847, 1273, 'Storm Recruit', 'Storm Recruit', 'Soldat Du Maelstrom', 'Mahlstrom-Rekrut', '黒渦団の兵卒', NULL, 5, '28.9', '23.1', 36, NULL, 0, NULL, 0, 1),
+(848, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 5, '29.3', '25.0', 31, NULL, 0, NULL, 0, 1),
+(849, 2475, 'Alpha Basilisk', 'Alpha Basilisk', 'Basilic Alpha', 'Alpha-Basilisk', 'アルファ・バジリスク', NULL, 6, '22.8', '14.3', NULL, NULL, 0, NULL, 0, 0),
+(850, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 6, '21.3', '15.4', 60, NULL, 0, NULL, 0, 1),
+(851, 270, 'Grenade', 'Grenade', 'Grenado', 'Granate', 'グレネード', NULL, 6, '21.4', '14.4', 41, 3, 0, NULL, 1, 1),
+(852, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 6, '16.1', '17.0', 34, NULL, 0, NULL, 0, 1),
+(853, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 6, '25.2', '18.5', 34, 4, 0, NULL, 1, 1),
 (854, 1332, 'Storm Private', 'Storm Private', 'Soldat 3e Classe Des Tempêtes', 'Sturmmariner', '黒渦団二等甲兵', NULL, 6, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(855, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 6, 19.3, 17.3, 60, NULL, 0, NULL, 0, 1),
-(857, 13, 'Arbor Buzzard', 'Arbor Buzzard', 'Busard', 'Baumkronen-Bussard', 'バザード', NULL, 7, 28.9, 29.8, 11, NULL, 0, NULL, 0, 1),
-(858, 43, 'Chigoe', 'Chigoe', 'Chigoe', 'Stechmücke', 'チゴー', NULL, 7, 27.2, 18.1, 5, NULL, 0, NULL, 0, 1),
-(859, 129, 'Firefly', 'Firefly', 'Luciole', 'Leuchtkäfer', 'ファイアフライ', NULL, 7, 19.9, 28.1, 12, NULL, 0, NULL, 0, 1),
-(860, 37, 'Ground Squirrel', 'Ground Squirrel', 'écureuil', 'Baumhörnchen', 'スクウィレル', NULL, 7, 21.8, 17.9, 2, NULL, 0, NULL, 0, 1),
-(861, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 7, 17.7, 21.9, 34, NULL, 0, NULL, 0, 1),
-(862, 32, 'Microchu', 'Microchu', 'Microtyugh', 'Mikrochu', 'コチュー', NULL, 7, 29.8, 20.7, 8, NULL, 0, NULL, 0, 1),
-(863, 236, 'Revenant', 'Revenant', 'Revenant', 'Wiedergänger', 'レブナント', NULL, 7, 11.4, 19.8, 32, 4, 0, NULL, 1, 1),
-(865, 238, 'Stroper', 'Stroper', 'Storoper', 'Todesweide', 'ストローパー', NULL, 7, 13.5, 21.6, 31, 4, 0, NULL, 1, 1),
-(866, 128, 'Treant Sapling', 'Treant Sapling', 'Pousse De Tréant', 'Baumschrat-Ableger', 'トレント・サップリング', NULL, 7, 29.5, 23.2, 17, NULL, 0, NULL, 0, 1),
-(867, 39, 'Tree Slug', 'Tree Slug', 'Limace Arboricole', 'Baumschnecke', 'ツリースラッグ', NULL, 7, 16.1, 23.3, 14, NULL, 0, NULL, 0, 1),
-(868, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 7, 24.1, 24.2, 7, NULL, 0, NULL, 0, 1),
-(870, 453, 'Wood Wailer Sentry', 'Wood Wailer Sentry', 'Sentinelle Des Vigiles Sombres', 'Wache[p] Des Klageregiments', '鬼哭隊の衛士', NULL, 7, 17.4, 19.0, 35, NULL, 0, NULL, 0, 1),
-(871, 59, '3rd Cohort Eques', '3rd Cohort Eques', 'Eques De La 3e Cohorte', 'Eques[p] Der III. Kohorte', 'IIIコホルス・エクエス', NULL, 8, 29.1, 20.8, 42, NULL, 0, NULL, 0, 1),
-(872, 53, '3rd Cohort Hoplomachus', '3rd Cohort Hoplomachus', 'Hoplomachus De La 3e Cohorte', 'Hoplomachus[p] Der III. Kohorte', 'IIIコホルス・ホプロマクス', NULL, 8, 32.7, 20.7, 44, 3, 0, NULL, 1, 1),
-(873, 58, '3rd Cohort Laquearius', '3rd Cohort Laquearius', 'Laquearius De La 3e Cohorte', 'Laquearius[p] Der III. Kohorte', 'IIIコホルス・ラクエリウス', NULL, 8, 29.2, 20.8, 42, NULL, 0, NULL, 1, 1),
-(874, 60, '3rd Cohort Secutor', '3rd Cohort Secutor', 'Secutor De La 3e Cohorte', 'Secutor[p] Der III. Kohorte', 'IIIコホルス・セクトール', NULL, 8, 19.5, 26.6, 21, NULL, 0, NULL, 0, 1),
-(875, 61, '3rd Cohort Signifer', '3rd Cohort Signifer', 'Signifer De La 3e Cohorte', 'Signifer[p] Der III. Kohorte', 'IIIコホルス・シグニフェル', NULL, 8, 32.4, 20.6, 44, 4, 0, NULL, 1, 1),
-(876, 225, 'Goblin Hunter', 'Goblin Hunter', 'Chasseur Gobelin', 'Goblin-Jäger', 'ゴブリン・ハンター', NULL, 8, 13.8, 27.9, 11, NULL, 0, NULL, 0, 1),
-(877, 54, 'Hornet Swarm', 'Hornet Swarm', 'Nuée De Frelons', 'Hornissenschwarm', 'ホーネット・スウォーム', NULL, 8, 11.3, 23.9, 11, NULL, 0, NULL, 0, 1),
-(878, 497, 'Leafbleed Ochu', 'Leafbleed Ochu', 'Otyugh Feuillesang', 'Blattblut-Ochu', 'リーフブリード・オチュー', NULL, 8, 18.4, 27.2, 22, NULL, 0, NULL, 0, 1),
-(880, 175, 'Poisonous Flytrap', 'Poisonous Flytrap', 'Piège-mouche Vénéneux', 'Giftig[a] Fliegenfalle', 'ポイズン・フライトラップ', NULL, 8, 18.4, 27.3, 22, NULL, 0, NULL, 0, 1),
-(882, 199, 'Stumbling Funguar', 'Stumbling Funguar', 'Fungus Trébuchant', 'Stolper-Fungus', 'スタンブリング・ファンガー', NULL, 8, 15.5, 26.9, 18, NULL, 0, NULL, 0, 1),
-(884, 39, 'Tree Slug', 'Tree Slug', 'Limace Arboricole', 'Baumschnecke', 'ツリースラッグ', NULL, 8, 12.9, 26.1, 12, NULL, 0, NULL, 0, 1),
-(885, 399, 'Wild Jackal', 'Wild Jackal', 'Chacal Sauvage', 'Wild[a] Schakal', 'ジャッカル', NULL, 8, 28.5, 21.1, 39, NULL, 0, NULL, 0, 1),
+(855, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 6, '19.3', '17.3', 60, NULL, 0, NULL, 0, 1),
+(857, 13, 'Arbor Buzzard', 'Arbor Buzzard', 'Busard', 'Baumkronen-Bussard', 'バザード', NULL, 7, '28.9', '29.8', 11, NULL, 0, NULL, 0, 1),
+(858, 43, 'Chigoe', 'Chigoe', 'Chigoe', 'Stechmücke', 'チゴー', NULL, 7, '27.2', '18.1', 5, NULL, 0, NULL, 0, 1),
+(859, 129, 'Firefly', 'Firefly', 'Luciole', 'Leuchtkäfer', 'ファイアフライ', NULL, 7, '19.9', '28.1', 12, NULL, 0, NULL, 0, 1),
+(860, 37, 'Ground Squirrel', 'Ground Squirrel', 'écureuil', 'Baumhörnchen', 'スクウィレル', NULL, 7, '21.8', '17.9', 2, NULL, 0, NULL, 0, 1),
+(861, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 7, '17.7', '21.9', 34, NULL, 0, NULL, 0, 1),
+(862, 32, 'Microchu', 'Microchu', 'Microtyugh', 'Mikrochu', 'コチュー', NULL, 7, '29.8', '20.7', 8, NULL, 0, NULL, 0, 1),
+(863, 236, 'Revenant', 'Revenant', 'Revenant', 'Wiedergänger', 'レブナント', NULL, 7, '11.4', '19.8', 32, 4, 0, NULL, 1, 1),
+(865, 238, 'Stroper', 'Stroper', 'Storoper', 'Todesweide', 'ストローパー', NULL, 7, '13.5', '21.6', 31, 4, 0, NULL, 1, 1),
+(866, 128, 'Treant Sapling', 'Treant Sapling', 'Pousse De Tréant', 'Baumschrat-Ableger', 'トレント・サップリング', NULL, 7, '29.5', '23.2', 17, NULL, 0, NULL, 0, 1),
+(867, 39, 'Tree Slug', 'Tree Slug', 'Limace Arboricole', 'Baumschnecke', 'ツリースラッグ', NULL, 7, '16.1', '23.3', 14, NULL, 0, NULL, 0, 1),
+(868, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 7, '24.1', '24.2', 7, NULL, 0, NULL, 0, 1),
+(870, 453, 'Wood Wailer Sentry', 'Wood Wailer Sentry', 'Sentinelle Des Vigiles Sombres', 'Wache[p] Des Klageregiments', '鬼哭隊の衛士', NULL, 7, '17.4', '19.0', 35, NULL, 0, NULL, 0, 1),
+(871, 59, '3rd Cohort Eques', '3rd Cohort Eques', 'Eques De La 3e Cohorte', 'Eques[p] Der III. Kohorte', 'IIIコホルス・エクエス', NULL, 8, '29.1', '20.8', 42, NULL, 0, NULL, 0, 1),
+(872, 53, '3rd Cohort Hoplomachus', '3rd Cohort Hoplomachus', 'Hoplomachus De La 3e Cohorte', 'Hoplomachus[p] Der III. Kohorte', 'IIIコホルス・ホプロマクス', NULL, 8, '32.7', '20.7', 44, 3, 0, NULL, 1, 1),
+(873, 58, '3rd Cohort Laquearius', '3rd Cohort Laquearius', 'Laquearius De La 3e Cohorte', 'Laquearius[p] Der III. Kohorte', 'IIIコホルス・ラクエリウス', NULL, 8, '29.2', '20.8', 42, NULL, 0, NULL, 1, 1),
+(874, 60, '3rd Cohort Secutor', '3rd Cohort Secutor', 'Secutor De La 3e Cohorte', 'Secutor[p] Der III. Kohorte', 'IIIコホルス・セクトール', NULL, 8, '19.5', '26.6', 21, NULL, 0, NULL, 0, 1),
+(875, 61, '3rd Cohort Signifer', '3rd Cohort Signifer', 'Signifer De La 3e Cohorte', 'Signifer[p] Der III. Kohorte', 'IIIコホルス・シグニフェル', NULL, 8, '32.4', '20.6', 44, 4, 0, NULL, 1, 1),
+(876, 225, 'Goblin Hunter', 'Goblin Hunter', 'Chasseur Gobelin', 'Goblin-Jäger', 'ゴブリン・ハンター', NULL, 8, '13.8', '27.9', 11, NULL, 0, NULL, 0, 1),
+(877, 54, 'Hornet Swarm', 'Hornet Swarm', 'Nuée De Frelons', 'Hornissenschwarm', 'ホーネット・スウォーム', NULL, 8, '11.3', '23.9', 11, NULL, 0, NULL, 0, 1),
+(878, 497, 'Leafbleed Ochu', 'Leafbleed Ochu', 'Otyugh Feuillesang', 'Blattblut-Ochu', 'リーフブリード・オチュー', NULL, 8, '18.4', '27.2', 22, NULL, 0, NULL, 0, 1),
+(880, 175, 'Poisonous Flytrap', 'Poisonous Flytrap', 'Piège-mouche Vénéneux', 'Giftig[a] Fliegenfalle', 'ポイズン・フライトラップ', NULL, 8, '18.4', '27.3', 22, NULL, 0, NULL, 0, 1),
+(882, 199, 'Stumbling Funguar', 'Stumbling Funguar', 'Fungus Trébuchant', 'Stolper-Fungus', 'スタンブリング・ファンガー', NULL, 8, '15.5', '26.9', 18, NULL, 0, NULL, 0, 1),
+(884, 39, 'Tree Slug', 'Tree Slug', 'Limace Arboricole', 'Baumschnecke', 'ツリースラッグ', NULL, 8, '12.9', '26.1', 12, NULL, 0, NULL, 0, 1),
+(885, 399, 'Wild Jackal', 'Wild Jackal', 'Chacal Sauvage', 'Wild[a] Schakal', 'ジャッカル', NULL, 8, '28.5', '21.1', 39, NULL, 0, NULL, 0, 1),
 (886, 526, 'Wood Wailer Lance', 'Wood Wailer Lance', 'Vigile Sombre', 'Klageregiment-Pikenier', '鬼哭隊の隊士', NULL, 8, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(887, 453, 'Wood Wailer Sentry', 'Wood Wailer Sentry', 'Sentinelle Des Vigiles Sombres', 'Wache[p] Des Klageregiments', '鬼哭隊の衛士', NULL, 8, 17.6, 26.7, 35, NULL, 0, NULL, 0, 1),
-(888, 59, '3rd Cohort Eques', '3rd Cohort Eques', 'Eques De La 3e Cohorte', 'Eques[p] Der III. Kohorte', 'IIIコホルス・エクエス', NULL, 9, 20.1, 20.9, 23, NULL, 0, NULL, 0, 1),
-(889, 58, '3rd Cohort Laquearius', '3rd Cohort Laquearius', 'Laquearius De La 3e Cohorte', 'Laquearius[p] Der III. Kohorte', 'IIIコホルス・ラクエリウス', NULL, 9, 22.7, 20.9, 22, NULL, 0, NULL, 1, 1),
-(890, 61, '3rd Cohort Signifer', '3rd Cohort Signifer', 'Signifer De La 3e Cohorte', 'Signifer[p] Der III. Kohorte', 'IIIコホルス・シグニフェル', NULL, 9, 22.8, 21.0, 21, 4, 0, NULL, 1, 1),
-(891, 2972, 'Alpha Zu', 'Alpha Zu', 'Zu Alpha', 'Alpha-Montisaurus', 'アルファ・ズー', NULL, 9, 18.1, 26.6, NULL, NULL, 0, NULL, 0, 0),
-(893, 180, 'Leafbleed Roseling', 'Leafbleed Roseling', 'Roselette Feuillesang', 'Blattblut-Rösling', 'リーフブリード・ローズレット', NULL, 9, 23.6, 21.0, 19, NULL, 0, NULL, 0, 1),
-(895, 112, 'Lesser Kalong', 'Lesser Kalong', 'Kalong', 'Klein[a] Kalong', 'カロング', NULL, 9, 32.4, 25.5, 46, 3, 0, NULL, 1, 0),
-(897, 9, 'Miteling', 'Miteling', 'Petit Acarus', 'Schattenmilbe', 'マイトリング', NULL, 9, 25.4, 18.3, 26, NULL, 0, NULL, 0, 1),
-(900, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 9, 22.5, 22.8, 25, NULL, 0, NULL, 0, 1),
-(901, 15, 'Wild Hog', 'Wild Hog', 'Verrat Sauvage', 'Wildschwein', 'ワイルドホッグ', NULL, 9, 29.1, 25.6, 45, 3, 0, NULL, 1, 0),
-(902, 115, 'Wind Sprite', 'Wind Sprite', 'élémentaire De Vent', 'Wind-Exergon', 'ウィンドスプライト', NULL, 9, 18.6, 19.1, 22, NULL, 0, NULL, 0, 1),
-(903, 453, 'Wood Wailer Sentry', 'Wood Wailer Sentry', 'Sentinelle Des Vigiles Sombres', 'Wache[p] Des Klageregiments', '鬼哭隊の衛士', NULL, 9, 18.5, 26.1, 35, NULL, 0, NULL, 0, 1),
-(905, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 10, 29.9, 27.1, 2, NULL, 0, NULL, 0, 1),
-(907, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 10, 23.2, 24.9, 45, 4, 0, NULL, 1, 1),
-(908, 219, 'Qiqirn Beater', 'Qiqirn Beater', 'Qiqirn Rabatteur', 'Qiqirn-Schläger', 'キキルン・ビーター', NULL, 10, 21.9, 30.4, 29, NULL, 0, NULL, 0, 1),
-(909, 128, 'Treant Sapling', 'Treant Sapling', 'Pousse De Tréant', 'Baumschrat-Ableger', 'トレント・サップリング', NULL, 10, 27.1, 26.9, 12, NULL, 0, NULL, 0, 1),
+(887, 453, 'Wood Wailer Sentry', 'Wood Wailer Sentry', 'Sentinelle Des Vigiles Sombres', 'Wache[p] Des Klageregiments', '鬼哭隊の衛士', NULL, 8, '17.6', '26.7', 35, NULL, 0, NULL, 0, 1),
+(888, 59, '3rd Cohort Eques', '3rd Cohort Eques', 'Eques De La 3e Cohorte', 'Eques[p] Der III. Kohorte', 'IIIコホルス・エクエス', NULL, 9, '20.1', '20.9', 23, NULL, 0, NULL, 0, 1),
+(889, 58, '3rd Cohort Laquearius', '3rd Cohort Laquearius', 'Laquearius De La 3e Cohorte', 'Laquearius[p] Der III. Kohorte', 'IIIコホルス・ラクエリウス', NULL, 9, '22.7', '20.9', 22, NULL, 0, NULL, 1, 1),
+(890, 61, '3rd Cohort Signifer', '3rd Cohort Signifer', 'Signifer De La 3e Cohorte', 'Signifer[p] Der III. Kohorte', 'IIIコホルス・シグニフェル', NULL, 9, '22.8', '21.0', 21, 4, 0, NULL, 1, 1),
+(891, 2972, 'Alpha Zu', 'Alpha Zu', 'Zu Alpha', 'Alpha-Montisaurus', 'アルファ・ズー', NULL, 9, '18.1', '26.6', NULL, NULL, 0, NULL, 0, 0),
+(893, 180, 'Leafbleed Roseling', 'Leafbleed Roseling', 'Roselette Feuillesang', 'Blattblut-Rösling', 'リーフブリード・ローズレット', NULL, 9, '23.6', '21.0', 19, NULL, 0, NULL, 0, 1),
+(895, 112, 'Lesser Kalong', 'Lesser Kalong', 'Kalong', 'Klein[a] Kalong', 'カロング', NULL, 9, '32.4', '25.5', 46, 3, 0, NULL, 1, 0),
+(897, 9, 'Miteling', 'Miteling', 'Petit Acarus', 'Schattenmilbe', 'マイトリング', NULL, 9, '25.4', '18.3', 26, NULL, 0, NULL, 0, 1),
+(900, 56, 'Water Sprite', 'Water Sprite', 'élémentaire D\'eau', 'Wasser-Exergon', 'ウォータースプライト', NULL, 9, '22.5', '22.8', 25, NULL, 0, NULL, 0, 1),
+(901, 15, 'Wild Hog', 'Wild Hog', 'Verrat Sauvage', 'Wildschwein', 'ワイルドホッグ', NULL, 9, '29.1', '25.6', 45, 3, 0, NULL, 1, 0),
+(902, 115, 'Wind Sprite', 'Wind Sprite', 'élémentaire De Vent', 'Wind-Exergon', 'ウィンドスプライト', NULL, 9, '18.6', '19.1', 22, NULL, 0, NULL, 0, 1),
+(903, 453, 'Wood Wailer Sentry', 'Wood Wailer Sentry', 'Sentinelle Des Vigiles Sombres', 'Wache[p] Des Klageregiments', '鬼哭隊の衛士', NULL, 9, '18.5', '26.1', 35, NULL, 0, NULL, 0, 1),
+(905, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 10, '29.9', '27.1', 2, NULL, 0, NULL, 0, 1),
+(907, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 10, '23.2', '24.9', 45, 4, 0, NULL, 1, 1),
+(908, 219, 'Qiqirn Beater', 'Qiqirn Beater', 'Qiqirn Rabatteur', 'Qiqirn-Schläger', 'キキルン・ビーター', NULL, 10, '21.9', '30.4', 29, NULL, 0, NULL, 0, 1),
+(909, 128, 'Treant Sapling', 'Treant Sapling', 'Pousse De Tréant', 'Baumschrat-Ableger', 'トレント・サップリング', NULL, 10, '27.1', '26.9', 12, NULL, 0, NULL, 0, 1),
 (910, 526, 'Wood Wailer Lance', 'Wood Wailer Lance', 'Vigile Sombre', 'Klageregiment-Pikenier', '鬼哭隊の隊士', NULL, 10, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(911, 227, 'Yarzon Scavenger', 'Yarzon Scavenger', 'Yarzon Charognard', 'Aas-Yarzon', 'ヤーゾン・スカベンジャー', NULL, 10, 22.2, 31.1, 26, NULL, 0, NULL, 0, 1),
-(912, 1277, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 11, 20.6, 27.0, 8, NULL, 0, NULL, 0, 1),
-(913, 113, 'Earth Sprite', 'Earth Sprite', 'élémentaire De Terre', 'Erd-Exergon', 'アーススプライト', NULL, 11, 25.8, 21.6, 7, NULL, 0, NULL, 0, 1),
-(914, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 11, 23.0, 17.1, 24, NULL, 0, NULL, 0, 1),
-(915, 1275, 'Flame Recruit', 'Flame Recruit', 'Soldat Des Immortels', 'Legionsrekrut', '不滅隊の兵卒', NULL, 11, 27.9, 26.2, 35, NULL, 0, NULL, 0, 1),
-(916, 244, 'Giant Tortoise', 'Giant Tortoise', 'Tortue Géante', 'Riesenschildkröte', 'ジャイアントトータス', NULL, 11, 26.6, 23.9, 12, NULL, 0, NULL, 0, 1),
-(917, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 11, 28.0, 24.4, 3, NULL, 0, NULL, 0, 1),
-(918, 299, 'Nesting Buzzard', 'Nesting Buzzard', 'Jeune Busard', 'Nistend[a] Bussard', 'ネストリング・バザード', NULL, 11, 21.4, 25.5, 6, NULL, 0, NULL, 0, 1),
-(920, 234, 'Smallmouth Orobon', 'Smallmouth Orobon', 'Orobon Petite Gueule', 'Schmalmaul-Orobon', 'スモールマウス・オロボン', NULL, 11, 16.1, 16.3, 10, NULL, 0, NULL, 0, 1),
-(922, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 11, 16.2, 15.3, 21, NULL, 0, NULL, 0, 1),
-(923, 1277, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 12, 22.1, 33.0, 35, NULL, 0, NULL, 0, 1),
-(924, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 12, 21.5, 16.0, 25, NULL, 0, NULL, 0, 1),
-(925, 282, 'Hammer Beak', 'Hammer Beak', 'Bec-marteau', 'Hammerschnabel', 'ハンマービーク', NULL, 12, 19.7, 19.5, 6, NULL, 0, NULL, 0, 1),
-(926, 308, 'Orobon', 'Orobon', 'Orobon', 'Orobon', 'オロボン', NULL, 12, 19.7, 24.5, 5, NULL, 0, NULL, 0, 1),
-(929, 262, 'Star Marmot', 'Star Marmot', 'Marmotte', 'Stern-Murmelhörnchen', 'マーモット', NULL, 12, 20.3, 27.2, 1, NULL, 0, NULL, 0, 1),
-(930, 201, 'Syrphid Cloud', 'Syrphid Cloud', 'Nuage De Syrphes', 'Mistfliegenwolke', 'サーフィド・クラウド', NULL, 12, 20.2, 15.2, NULL, NULL, 0, NULL, 0, 1),
-(931, 249, 'Amalj\'aa Archer', 'Amalj\'aa Archer', 'Archer Amalj\'aa', 'Amalj\'aa-Bogenschütze', 'アマルジャ・アーチャー', NULL, 13, 17.0, 26.7, 15, 4, 0, NULL, 1, 1),
-(932, 245, 'Amalj\'aa Lancer', 'Amalj\'aa Lancer', 'Lancier Amalj\'aa', 'Amalj\'aa-Pikenier', 'アマルジャ・ランサー', NULL, 13, 11.0, 16.1, 15, 4, 0, NULL, 1, 1),
-(933, 253, 'Amalj\'aa Pugilist', 'Amalj\'aa Pugilist', 'Pugiliste Amalj\'aa', 'Amalj\'aa-Faustkämpfer', 'アマルジャ・ピュージャリスト', NULL, 13, 10.5, 18.2, 15, 4, 0, NULL, 1, 1),
-(934, 1277, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 13, 28.3, 22.5, 35, NULL, 0, NULL, 0, 1),
-(935, 1188, 'Doctore', 'Doctore', 'Laniste', 'Doctore', 'ドクトル', NULL, 13, 14.2, 10.5, NULL, NULL, 0, NULL, 0, 0),
-(936, 302, 'Dusty Mongrel', 'Dusty Mongrel', 'Houret Poussiéreux', 'Verwahrlost[a] Mischling', 'モングレル', NULL, 13, 16.4, 25.8, 15, NULL, 0, NULL, 0, 1),
-(937, 113, 'Earth Sprite', 'Earth Sprite', 'élémentaire De Terre', 'Erd-Exergon', 'アーススプライト', NULL, 13, 15.2, 23.5, 24, NULL, 0, NULL, 0, 1),
-(938, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 13, 13.8, 24.6, 21, NULL, 0, NULL, 0, 1),
-(939, 129, 'Firefly', 'Firefly', 'Luciole', 'Leuchtkäfer', 'ファイアフライ', NULL, 13, 24.4, 29.8, 19, NULL, 0, NULL, 0, 1),
+(911, 227, 'Yarzon Scavenger', 'Yarzon Scavenger', 'Yarzon Charognard', 'Aas-Yarzon', 'ヤーゾン・スカベンジャー', NULL, 10, '22.2', '31.1', 26, NULL, 0, NULL, 0, 1),
+(912, 1277, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 11, '20.6', '27.0', 8, NULL, 0, NULL, 0, 1),
+(913, 113, 'Earth Sprite', 'Earth Sprite', 'élémentaire De Terre', 'Erd-Exergon', 'アーススプライト', NULL, 11, '25.8', '21.6', 7, NULL, 0, NULL, 0, 1),
+(914, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 11, '23.0', '17.1', 24, NULL, 0, NULL, 0, 1),
+(915, 1275, 'Flame Recruit', 'Flame Recruit', 'Soldat Des Immortels', 'Legionsrekrut', '不滅隊の兵卒', NULL, 11, '27.9', '26.2', 35, NULL, 0, NULL, 0, 1),
+(916, 244, 'Giant Tortoise', 'Giant Tortoise', 'Tortue Géante', 'Riesenschildkröte', 'ジャイアントトータス', NULL, 11, '26.6', '23.9', 12, NULL, 0, NULL, 0, 1),
+(917, 49, 'Little Ladybug', 'Little Ladybug', 'Coccinelle', 'Marienkäfer', 'レディバグ', NULL, 11, '28.0', '24.4', 3, NULL, 0, NULL, 0, 1),
+(918, 299, 'Nesting Buzzard', 'Nesting Buzzard', 'Jeune Busard', 'Nistend[a] Bussard', 'ネストリング・バザード', NULL, 11, '21.4', '25.5', 6, NULL, 0, NULL, 0, 1),
+(920, 234, 'Smallmouth Orobon', 'Smallmouth Orobon', 'Orobon Petite Gueule', 'Schmalmaul-Orobon', 'スモールマウス・オロボン', NULL, 11, '16.1', '16.3', 10, NULL, 0, NULL, 0, 1),
+(922, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 11, '16.2', '15.3', 21, NULL, 0, NULL, 0, 1),
+(923, 1277, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 12, '22.1', '33.0', 35, NULL, 0, NULL, 0, 1),
+(924, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 12, '21.5', '16.0', 25, NULL, 0, NULL, 0, 1),
+(925, 282, 'Hammer Beak', 'Hammer Beak', 'Bec-marteau', 'Hammerschnabel', 'ハンマービーク', NULL, 12, '19.7', '19.5', 6, NULL, 0, NULL, 0, 1),
+(926, 308, 'Orobon', 'Orobon', 'Orobon', 'Orobon', 'オロボン', NULL, 12, '19.7', '24.5', 5, NULL, 0, NULL, 0, 1),
+(929, 262, 'Star Marmot', 'Star Marmot', 'Marmotte', 'Stern-Murmelhörnchen', 'マーモット', NULL, 12, '20.3', '27.2', 1, NULL, 0, NULL, 0, 1),
+(930, 201, 'Syrphid Cloud', 'Syrphid Cloud', 'Nuage De Syrphes', 'Mistfliegenwolke', 'サーフィド・クラウド', NULL, 12, '20.2', '15.2', NULL, NULL, 0, NULL, 0, 1),
+(931, 249, 'Amalj\'aa Archer', 'Amalj\'aa Archer', 'Archer Amalj\'aa', 'Amalj\'aa-Bogenschütze', 'アマルジャ・アーチャー', NULL, 13, '17.0', '26.7', 15, 4, 0, NULL, 1, 1),
+(932, 245, 'Amalj\'aa Lancer', 'Amalj\'aa Lancer', 'Lancier Amalj\'aa', 'Amalj\'aa-Pikenier', 'アマルジャ・ランサー', NULL, 13, '11.0', '16.1', 15, 4, 0, NULL, 1, 1),
+(933, 253, 'Amalj\'aa Pugilist', 'Amalj\'aa Pugilist', 'Pugiliste Amalj\'aa', 'Amalj\'aa-Faustkämpfer', 'アマルジャ・ピュージャリスト', NULL, 13, '10.5', '18.2', 15, 4, 0, NULL, 1, 1),
+(934, 1277, 'Brass Blade', 'Brass Blade', 'Lame De Cuivre', 'Messingklinge', '銅刃団の衛兵', NULL, 13, '28.3', '22.5', 35, NULL, 0, NULL, 0, 1),
+(935, 1188, 'Doctore', 'Doctore', 'Laniste', 'Doctore', 'ドクトル', NULL, 13, '14.2', '10.5', NULL, NULL, 0, NULL, 0, 0),
+(936, 302, 'Dusty Mongrel', 'Dusty Mongrel', 'Houret Poussiéreux', 'Verwahrlost[a] Mischling', 'モングレル', NULL, 13, '16.4', '25.8', 15, NULL, 0, NULL, 0, 1),
+(937, 113, 'Earth Sprite', 'Earth Sprite', 'élémentaire De Terre', 'Erd-Exergon', 'アーススプライト', NULL, 13, '15.2', '23.5', 24, NULL, 0, NULL, 0, 1),
+(938, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 13, '13.8', '24.6', 21, NULL, 0, NULL, 0, 1),
+(939, 129, 'Firefly', 'Firefly', 'Luciole', 'Leuchtkäfer', 'ファイアフライ', NULL, 13, '24.4', '29.8', 19, NULL, 0, NULL, 0, 1),
 (940, 1343, 'Flame Scout', 'Flame Scout', 'éclaireur Des Immortels', 'Legionskundschafter', '不滅隊の偵察兵', NULL, 13, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(941, 2925, 'Gatling', 'Gatling', 'Acanthor', 'Gatling', 'ガトリングス', NULL, 13, 12.9, 15.9, NULL, NULL, 0, NULL, 0, 0),
-(942, 275, 'Quartz Doblyn', 'Quartz Doblyn', 'Doblyn De Quartz', 'Quarz-Dobalos', 'クォーツドブラン', NULL, 13, 30.4, 26.1, 44, 3, 0, NULL, 1, 1),
-(943, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 13, 13.7, 23.3, 22, NULL, 0, NULL, 0, 1),
-(945, 256, 'Amalj\'aa Bruiser', 'Amalj\'aa Bruiser', 'Tabasseur Amalj\'aa', 'Amalj\'aa-Kraftprotz', 'アマルジャ・ブルーザー', NULL, 14, 18.7, 16.3, 23, NULL, 0, NULL, 0, 1),
-(946, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 14, 19.3, 12.0, 60, NULL, 0, NULL, 0, 1),
+(941, 2925, 'Gatling', 'Gatling', 'Acanthor', 'Gatling', 'ガトリングス', NULL, 13, '12.9', '15.9', NULL, NULL, 0, NULL, 0, 0),
+(942, 275, 'Quartz Doblyn', 'Quartz Doblyn', 'Doblyn De Quartz', 'Quarz-Dobalos', 'クォーツドブラン', NULL, 13, '30.4', '26.1', 44, 3, 0, NULL, 1, 1),
+(943, 1400, 'Topaz Carbuncle', 'Topaz Carbuncle', 'Carbuncle Topaze', 'Topas-Karfunkel', 'カーバンクル・トパーズ', NULL, 13, '13.7', '23.3', 22, NULL, 0, NULL, 0, 1),
+(945, 256, 'Amalj\'aa Bruiser', 'Amalj\'aa Bruiser', 'Tabasseur Amalj\'aa', 'Amalj\'aa-Kraftprotz', 'アマルジャ・ブルーザー', NULL, 14, '18.7', '16.3', 23, NULL, 0, NULL, 0, 1),
+(946, 1401, 'Emerald Carbuncle', 'Emerald Carbuncle', 'Carbuncle émeraude', 'Smaragd-Karfunkel', 'カーバンクル・エメラルド', NULL, 14, '19.3', '12.0', 60, NULL, 0, NULL, 0, 1),
 (948, 1371, 'Flame Private', 'Flame Private', 'Soldat 3e Classe Des Sables', 'Legionär[p] 3. Klasse', '不滅隊二等闘兵', NULL, 14, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(949, 1275, 'Flame Recruit', 'Flame Recruit', 'Soldat Des Immortels', 'Legionsrekrut', '不滅隊の兵卒', NULL, 14, 17.7, 18.3, 41, NULL, 0, NULL, 0, 1),
-(951, 59, '3rd Cohort Eques', '3rd Cohort Eques', 'Eques De La 3e Cohorte', 'Eques[p] Der III. Kohorte', 'IIIコホルス・エクエス', NULL, 15, 18.5, 16.9, 49, NULL, 0, NULL, 0, 1),
-(952, 58, '3rd Cohort Laquearius', '3rd Cohort Laquearius', 'Laquearius De La 3e Cohorte', 'Laquearius[p] Der III. Kohorte', 'IIIコホルス・ラクエリウス', NULL, 15, 17.1, 16.0, 49, NULL, 0, NULL, 1, 1),
-(953, 60, '3rd Cohort Secutor', '3rd Cohort Secutor', 'Secutor De La 3e Cohorte', 'Secutor[p] Der III. Kohorte', 'IIIコホルス・セクトール', NULL, 15, 18.7, 15.2, 49, NULL, 0, NULL, 0, 1),
-(954, 61, '3rd Cohort Signifer', '3rd Cohort Signifer', 'Signifer De La 3e Cohorte', 'Signifer[p] Der III. Kohorte', 'IIIコホルス・シグニフェル', NULL, 15, 18.5, 15.7, 49, 4, 0, NULL, 1, 1),
-(955, 113, 'Earth Sprite', 'Earth Sprite', 'élémentaire De Terre', 'Erd-Exergon', 'アーススプライト', NULL, 15, 24.6, 21.2, 49, NULL, 0, NULL, 0, 1),
-(956, 1275, 'Flame Recruit', 'Flame Recruit', 'Soldat Des Immortels', 'Legionsrekrut', '不滅隊の兵卒', NULL, 15, 22.1, 29.2, 50, NULL, 0, NULL, 0, 1),
-(957, 2927, 'Flame Sergeant Dalvag', 'Flame Sergeant Dalvag', 'Sergent-major Dalvag', 'Dalvag', '不滅のフェランド闘軍曹', NULL, 15, 23.5, 26.4, NULL, NULL, 0, NULL, 0, 0),
-(958, 1681, 'Lunatic Follower', 'Lunatic Follower', 'Partisan Dément', 'Wahnsinnig[a] Adept', 'ルナティック・フォロワー', NULL, 15, 9.6, 11.3, NULL, NULL, 0, NULL, 0, 0),
-(959, 1690, 'Lunatic Priest', 'Lunatic Priest', 'Prêtre Dément', 'Wahnsinnig[a] Priester', 'ルナティック・プリースト', NULL, 15, 10.6, 11.3, NULL, NULL, 0, NULL, 0, 0),
-(961, 2168, 'Bertha', 'Bertha', 'Canon Anti-dragon', 'Drachenhaubitze', '四連装対竜カノン砲', NULL, 16, 11.5, 6.6, NULL, NULL, 0, NULL, 0, 0),
-(962, 662, 'Ixali Boundwing', 'Ixali Boundwing', 'Ixal Aile-garrottée', 'Ixal-Bannschwinge', 'イクサル・バウンドウィング', NULL, 16, 32.5, 27.7, 30, 1, 0, NULL, 1, 1),
-(963, 663, 'Ixali Fearcaller', 'Ixali Fearcaller', 'Terroriseur Ixal', 'Ixal-Furchtrufer', 'イクサル・フィアコーラー', NULL, 16, 33.1, 15.5, 37, NULL, 0, NULL, 0, 1),
+(949, 1275, 'Flame Recruit', 'Flame Recruit', 'Soldat Des Immortels', 'Legionsrekrut', '不滅隊の兵卒', NULL, 14, '17.7', '18.3', 41, NULL, 0, NULL, 0, 1),
+(951, 59, '3rd Cohort Eques', '3rd Cohort Eques', 'Eques De La 3e Cohorte', 'Eques[p] Der III. Kohorte', 'IIIコホルス・エクエス', NULL, 15, '18.5', '16.9', 49, NULL, 0, NULL, 0, 1),
+(952, 58, '3rd Cohort Laquearius', '3rd Cohort Laquearius', 'Laquearius De La 3e Cohorte', 'Laquearius[p] Der III. Kohorte', 'IIIコホルス・ラクエリウス', NULL, 15, '17.1', '16.0', 49, NULL, 0, NULL, 1, 1),
+(953, 60, '3rd Cohort Secutor', '3rd Cohort Secutor', 'Secutor De La 3e Cohorte', 'Secutor[p] Der III. Kohorte', 'IIIコホルス・セクトール', NULL, 15, '18.7', '15.2', 49, NULL, 0, NULL, 0, 1),
+(954, 61, '3rd Cohort Signifer', '3rd Cohort Signifer', 'Signifer De La 3e Cohorte', 'Signifer[p] Der III. Kohorte', 'IIIコホルス・シグニフェル', NULL, 15, '18.5', '15.7', 49, 4, 0, NULL, 1, 1),
+(955, 113, 'Earth Sprite', 'Earth Sprite', 'élémentaire De Terre', 'Erd-Exergon', 'アーススプライト', NULL, 15, '24.6', '21.2', 49, NULL, 0, NULL, 0, 1),
+(956, 1275, 'Flame Recruit', 'Flame Recruit', 'Soldat Des Immortels', 'Legionsrekrut', '不滅隊の兵卒', NULL, 15, '22.1', '29.2', 50, NULL, 0, NULL, 0, 1),
+(957, 2927, 'Flame Sergeant Dalvag', 'Flame Sergeant Dalvag', 'Sergent-major Dalvag', 'Dalvag', '不滅のフェランド闘軍曹', NULL, 15, '23.5', '26.4', NULL, NULL, 0, NULL, 0, 0),
+(958, 1681, 'Lunatic Follower', 'Lunatic Follower', 'Partisan Dément', 'Wahnsinnig[a] Adept', 'ルナティック・フォロワー', NULL, 15, '9.6', '11.3', NULL, NULL, 0, NULL, 0, 0),
+(959, 1690, 'Lunatic Priest', 'Lunatic Priest', 'Prêtre Dément', 'Wahnsinnig[a] Priester', 'ルナティック・プリースト', NULL, 15, '10.6', '11.3', NULL, NULL, 0, NULL, 0, 0),
+(961, 2168, 'Bertha', 'Bertha', 'Canon Anti-dragon', 'Drachenhaubitze', '四連装対竜カノン砲', NULL, 16, '11.5', '6.6', NULL, NULL, 0, NULL, 0, 0),
+(962, 662, 'Ixali Boundwing', 'Ixali Boundwing', 'Ixal Aile-garrottée', 'Ixal-Bannschwinge', 'イクサル・バウンドウィング', NULL, 16, '32.5', '27.7', 30, 1, 0, NULL, 1, 1),
+(963, 663, 'Ixali Fearcaller', 'Ixali Fearcaller', 'Terroriseur Ixal', 'Ixal-Furchtrufer', 'イクサル・フィアコーラー', NULL, 16, '33.1', '15.5', 37, NULL, 0, NULL, 0, 1),
 (965, 1604, 'Pack Chocobo', 'Pack Chocobo', 'Chocobo De Bât', 'Karawanen-Chocobo', '荷運びチョコボ', NULL, 16, NULL, NULL, NULL, NULL, 1, NULL, 0, 1),
-(966, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 16, 7.5, 31.5, 48, 4, 0, NULL, 1, 1),
-(974, 852, 'Cuachac', 'Cuachac', 'Cuachag', 'Cuachac', 'クアハック', NULL, 2, 26.0, 25.0, 3, 1, 1, 37, 1, 0),
-(968, 114, 'Ice Sprite', 'Ice Sprite', 'élémentaire De Glace', 'Eis-Exergon', 'アイススプライト', NULL, 17, 24.2, 12.4, 46, 4, 0, NULL, 1, 1),
-(970, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 17, 32.9, 9.0, 46, NULL, 0, NULL, 0, 1),
-(971, 237, 'Morbol', 'Morbol', 'Morbol', 'Morbol', 'モルボル', NULL, 17, 13.9, 12.6, 44, 3, 0, NULL, 1, 1),
-(972, 645, 'Mudpuppy', 'Mudpuppy', 'Protée', 'Olm', 'マッドパピー', NULL, 17, 13.1, 10.3, 44, 4, 0, NULL, 1, 1),
-(973, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 17, 18.1, 8.5, 41, 4, 0, NULL, 1, 1),
-(975, 1665, 'Volxia Of The Blade', 'Volxia Of The Blade', 'Volxia', 'Volxia', '葉刃のヴォルキシア', NULL, 8, 29.0, 13.0, 47, 1, 1, 38, 1, 0),
-(976, 1431, 'Seps', 'Seps', 'Seps', 'Seps', 'セプス', NULL, 16, 8.0, 12.0, 40, 1, 1, 40, 1, 0),
-(977, 1525, 'Brounger', 'Brounger', 'Brounger', 'Brounger', 'ブラウンガー', NULL, 6, 25.1, 18.0, 34, 1, 1, 41, 1, 0),
-(978, 1530, 'Sebek', 'Sebek', 'Sebek', 'Sebek', 'セベク', NULL, 16, 5.0, 22.0, 40, 1, 1, 254, 1, 0),
-(979, 851, 'Chupacabra', 'Chupacabra', 'Chupacabra', 'Chupacabra', 'チュパカブラ', NULL, 1, 17.0, 9.0, 14, 1, 1, 129, 1, 0),
-(980, 1511, 'Bomb Baron', 'Bomb Baron', 'Bombo Baron', 'Bomber-Baron', 'ボムバロン', NULL, 15, 25.0, 23.0, 49, 1, 1, 351, 1, 0),
-(981, 877, 'Undertaker', 'Undertaker', 'Croque-mort', 'Totengräber', 'アンダーテイカー', NULL, 13, 14.0, 17.0, 17, 1, 1, 203, 1, 0),
-(982, 1504, 'Bagoly', 'Bagoly', 'Badouh', 'Badu', 'バドゥ', NULL, 13, 30.0, 25.0, 42, 1, 1, 292, 1, 0),
-(983, 866, 'Cactuar Jack', 'Cactuar Jack', 'Cactuar Jack', 'Kaktor Jack', 'カクタージャック', NULL, 11, 22.0, 23.0, 9, 1, 1, 177, 1, 0),
-(984, 884, 'Blackbile Maladd Chah', 'Blackbile Maladd Chah', 'Maladd Chah L\'ensorceleur', 'Schwarzgalle Maladd Chah', '呪言のマラド・チャー', NULL, 14, 25.0, 34.0, 32, 1, 1, 220, 1, 0),
-(986, 1661, 'Spiteful', 'Spiteful', 'Revanchard', 'Schadenfröhling', 'スパイトフル', NULL, 7, 11.0, 18.0, 43, 1, 1, 333, 1, 0),
-(987, 257, 'Diamondjaw Nezedd Gah', 'Diamondjaw Nezedd Gah', 'Nezedd Gah Mâchoire-de-diamant', 'Diamantmaul Nezedd Gah', '金剛のネゼド・ガー', NULL, 14, 17.0, 24.0, 50, 1, 1, 215, 1, 0),
-(988, 1433, 'Klythios', 'Klythios', 'Clytios', 'Klythios', 'クリュティオス', NULL, 16, 12.0, 25.0, 46, 1, 1, 252, 1, 0),
-(989, 1516, 'Jolly Green', 'Jolly Green', 'Géant Vert', 'Glüxi Grün', 'ジョリーグリーン', NULL, 3, 17.0, 31.0, 33, 1, 1, 307, 1, 0),
-(990, 1444, 'Gwyllgi', 'Gwyllgi', 'Gwyllgi', 'Gwyllgi', 'グウィルギ', NULL, 17, 27.0, 6.7, 46, 1, 1, 280, 1, 0),
-(991, 862, 'Tryptix Stumblemox', 'Tryptix Stumblemox', 'Tryptix Le Simplet', 'Tryptix Raffnix', '間抜のトリップティックス', NULL, 4, 26.0, 22.0, 18, 1, 1, 160, 1, 0),
-(992, 849, 'Menuis', 'Menuis', 'Menuis', 'Menuis', 'メヌイス', NULL, 1, 18.0, 17.0, 8, 1, 1, 117, 1, 0),
-(993, 2350, 'Proto Armor', 'Proto Armor', 'Protoarmure', 'Proto-Kampfmaschine', 'プロトアーマー', NULL, 8, 29.0, 21.0, 42, 1, 1, 400, 1, 0),
-(994, 1523, 'Ose', 'Ose', 'Ose', 'Ose', 'オセ', NULL, 6, 16.0, 15.0, 35, 1, 1, 319, 1, 0),
-(995, 446, 'Asipatra', 'Asipatra', 'Asipatra', 'Asipatra', 'アシパトラ', NULL, 7, 17.0, 22.0, 34, 1, 1, 47, 1, 0),
-(996, 861, 'Barometz', 'Barometz', 'Barometz', 'Barometz', 'バロメッツ', NULL, 4, 36.0, 28.0, 10, 1, 1, 158, 1, 0),
-(997, 1503, 'Aeetes', 'Aeetes', 'Éétès', 'Aeetes', 'アイエテス', NULL, 13, 27.0, 24.0, 42, 1, 1, 291, 1, 0),
-(998, 886, 'Simurgh', 'Simurgh', 'Simurgh', 'Simurgh', 'シームルグ', NULL, 5, 8.0, 21.0, 23, 1, 1, 164, 1, 0),
-(999, 1699, 'Bibireze Greysteel', 'Bibireze Greysteel', 'Bibireze Grisacier', 'Bibireze Graustahl', '純鉄のビビレゼ', NULL, 14, 21.0, 19.0, 46, 1, 1, 294, 1, 0),
-(1000, 1439, 'Gozol Itzcan The Hatchet', 'Gozol Itzcan The Hatchet', 'Gozol Itzcan Le Tronçonneur', 'Gozol Itzcan [t] Hammer[p]', '工匠のゴゾル・イツカン', NULL, 16, 33.0, 23.0, 50, 1, 1, 260, 1, 0),
-(1001, 1427, 'Downy Dunstan', 'Downy Dunstan', 'Dunstan Le Duveteux', 'Daunen-Dunstan', 'ダウニーダンスタン', NULL, 16, 27.0, 23.0, 36, 1, 1, 234, 1, 0),
-(1002, 1441, 'Nburu', 'Nburu', 'Nburu', 'Nburu', 'ンブル', 'Nburu', 17, 16.0, 14.2, 45, 1, 1, 271, 1, 0);
+(966, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 16, '7.5', '31.5', 48, 4, 0, NULL, 1, 1),
+(974, 852, 'Cuachac', 'Cuachac', 'Cuachag', 'Cuachac', 'クアハック', NULL, 2, '26.0', '25.0', 3, 1, 1, 37, 1, 0),
+(968, 114, 'Ice Sprite', 'Ice Sprite', 'élémentaire De Glace', 'Eis-Exergon', 'アイススプライト', NULL, 17, '24.2', '12.4', 46, 4, 0, NULL, 1, 1),
+(970, 117, 'Lightning Sprite', 'Lightning Sprite', 'élémentaire De Foudre', 'Blitz-Exergon', 'ライトニングスプライト', NULL, 17, '32.9', '9.0', 46, NULL, 0, NULL, 0, 1),
+(971, 237, 'Morbol', 'Morbol', 'Morbol', 'Morbol', 'モルボル', NULL, 17, '13.9', '12.6', 44, 3, 0, NULL, 1, 1),
+(972, 645, 'Mudpuppy', 'Mudpuppy', 'Protée', 'Olm', 'マッドパピー', NULL, 17, '13.1', '10.3', 44, 4, 0, NULL, 1, 1),
+(973, 46, 'Plasmoid', 'Plasmoid', 'Plasmoïde', 'Plasmodium', 'プラズモイド', NULL, 17, '18.1', '8.5', 41, 4, 0, NULL, 1, 1),
+(975, 1665, 'Volxia Of The Blade', 'Volxia Of The Blade', 'Volxia', 'Volxia', '葉刃のヴォルキシア', NULL, 8, '29.0', '13.0', 47, 1, 1, 38, 1, 0),
+(976, 1431, 'Seps', 'Seps', 'Seps', 'Seps', 'セプス', NULL, 16, '8.0', '12.0', 40, 1, 1, 40, 1, 0),
+(977, 1525, 'Brounger', 'Brounger', 'Brounger', 'Brounger', 'ブラウンガー', NULL, 6, '25.1', '18.0', 34, 1, 1, 41, 1, 0),
+(978, 1530, 'Sebek', 'Sebek', 'Sebek', 'Sebek', 'セベク', NULL, 16, '5.0', '22.0', 40, 1, 1, 254, 1, 0),
+(979, 851, 'Chupacabra', 'Chupacabra', 'Chupacabra', 'Chupacabra', 'チュパカブラ', NULL, 1, '17.0', '9.0', 14, 1, 1, 129, 1, 0),
+(980, 1511, 'Bomb Baron', 'Bomb Baron', 'Bombo Baron', 'Bomber-Baron', 'ボムバロン', NULL, 15, '25.0', '23.0', 49, 1, 1, 351, 1, 0),
+(981, 877, 'Undertaker', 'Undertaker', 'Croque-mort', 'Totengräber', 'アンダーテイカー', NULL, 13, '14.0', '17.0', 17, 1, 1, 203, 1, 0),
+(982, 1504, 'Bagoly', 'Bagoly', 'Badouh', 'Badu', 'バドゥ', NULL, 13, '30.0', '25.0', 42, 1, 1, 292, 1, 0),
+(983, 866, 'Cactuar Jack', 'Cactuar Jack', 'Cactuar Jack', 'Kaktor Jack', 'カクタージャック', NULL, 11, '22.0', '23.0', 9, 1, 1, 177, 1, 0),
+(984, 884, 'Blackbile Maladd Chah', 'Blackbile Maladd Chah', 'Maladd Chah L\'ensorceleur', 'Schwarzgalle Maladd Chah', '呪言のマラド・チャー', NULL, 14, '25.0', '34.0', 32, 1, 1, 220, 1, 0),
+(986, 1661, 'Spiteful', 'Spiteful', 'Revanchard', 'Schadenfröhling', 'スパイトフル', NULL, 7, '11.0', '18.0', 43, 1, 1, 333, 1, 0),
+(987, 257, 'Diamondjaw Nezedd Gah', 'Diamondjaw Nezedd Gah', 'Nezedd Gah Mâchoire-de-diamant', 'Diamantmaul Nezedd Gah', '金剛のネゼド・ガー', NULL, 14, '17.0', '24.0', 50, 1, 1, 215, 1, 0),
+(988, 1433, 'Klythios', 'Klythios', 'Clytios', 'Klythios', 'クリュティオス', NULL, 16, '12.0', '25.0', 46, 1, 1, 252, 1, 0),
+(989, 1516, 'Jolly Green', 'Jolly Green', 'Géant Vert', 'Glüxi Grün', 'ジョリーグリーン', NULL, 3, '17.0', '31.0', 33, 1, 1, 307, 1, 0),
+(990, 1444, 'Gwyllgi', 'Gwyllgi', 'Gwyllgi', 'Gwyllgi', 'グウィルギ', NULL, 17, '27.0', '6.7', 46, 1, 1, 280, 1, 0),
+(991, 862, 'Tryptix Stumblemox', 'Tryptix Stumblemox', 'Tryptix Le Simplet', 'Tryptix Raffnix', '間抜のトリップティックス', NULL, 4, '26.0', '22.0', 18, 1, 1, 160, 1, 0),
+(992, 849, 'Menuis', 'Menuis', 'Menuis', 'Menuis', 'メヌイス', NULL, 1, '18.0', '17.0', 8, 1, 1, 117, 1, 0),
+(993, 2350, 'Proto Armor', 'Proto Armor', 'Protoarmure', 'Proto-Kampfmaschine', 'プロトアーマー', NULL, 8, '29.0', '21.0', 42, 1, 1, 400, 1, 0),
+(994, 1523, 'Ose', 'Ose', 'Ose', 'Ose', 'オセ', NULL, 6, '16.0', '15.0', 35, 1, 1, 319, 1, 0),
+(995, 446, 'Asipatra', 'Asipatra', 'Asipatra', 'Asipatra', 'アシパトラ', NULL, 7, '17.0', '22.0', 34, 1, 1, 47, 1, 0),
+(996, 861, 'Barometz', 'Barometz', 'Barometz', 'Barometz', 'バロメッツ', NULL, 4, '36.0', '28.0', 10, 1, 1, 158, 1, 0),
+(997, 1503, 'Aeetes', 'Aeetes', 'Éétès', 'Aeetes', 'アイエテス', NULL, 13, '27.0', '24.0', 42, 1, 1, 291, 1, 0),
+(998, 886, 'Simurgh', 'Simurgh', 'Simurgh', 'Simurgh', 'シームルグ', NULL, 5, '8.0', '21.0', 23, 1, 1, 164, 1, 0),
+(999, 1699, 'Bibireze Greysteel', 'Bibireze Greysteel', 'Bibireze Grisacier', 'Bibireze Graustahl', '純鉄のビビレゼ', NULL, 14, '21.0', '19.0', 46, 1, 1, 294, 1, 0),
+(1000, 1439, 'Gozol Itzcan The Hatchet', 'Gozol Itzcan The Hatchet', 'Gozol Itzcan Le Tronçonneur', 'Gozol Itzcan [t] Hammer[p]', '工匠のゴゾル・イツカン', NULL, 16, '33.0', '23.0', 50, 1, 1, 260, 1, 0),
+(1001, 1427, 'Downy Dunstan', 'Downy Dunstan', 'Dunstan Le Duveteux', 'Daunen-Dunstan', 'ダウニーダンスタン', NULL, 16, '27.0', '23.0', 36, 1, 1, 234, 1, 0),
+(1002, 1441, 'Nburu', 'Nburu', 'Nburu', 'Nburu', 'ンブル', 'Nburu', 17, '16.0', '14.2', 45, 1, 1, 271, 1, 0);
 
 --
 -- Triggers `mobs_arr`
 --
+DROP TRIGGER IF EXISTS `mob_arr_del`;
 DELIMITER $$
 CREATE TRIGGER `mob_arr_del` AFTER DELETE ON `mobs_arr` FOR EACH ROW BEGIN
 	CALL update_etag('distances_arr');
@@ -2320,6 +2435,7 @@ CREATE TRIGGER `mob_arr_del` AFTER DELETE ON `mobs_arr` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_arr_ins`;
 DELIMITER $$
 CREATE TRIGGER `mob_arr_ins` AFTER INSERT ON `mobs_arr` FOR EACH ROW BEGIN
 	CALL update_etag('distances_arr');
@@ -2327,6 +2443,7 @@ CREATE TRIGGER `mob_arr_ins` AFTER INSERT ON `mobs_arr` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_arr_upd`;
 DELIMITER $$
 CREATE TRIGGER `mob_arr_upd` AFTER UPDATE ON `mobs_arr` FOR EACH ROW BEGIN
 	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.id_zone <> OLD.is_visible OR NEW.is_visible <> OLD.id_zone THEN
@@ -2340,198 +2457,353 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `mobs_ew`
+--
+
+DROP TABLE IF EXISTS `mobs_ew`;
+CREATE TABLE IF NOT EXISTS `mobs_ew` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
+  `x` decimal(3,1) UNSIGNED DEFAULT NULL,
+  `y` decimal(3,1) UNSIGNED DEFAULT NULL,
+  `z` decimal(3,1) DEFAULT NULL,
+  `lvl` tinyint DEFAULT NULL,
+  `slain` tinyint DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `id_zone` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=137 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
+
+--
+-- Dumping data for table `mobs_ew`
+--
+
+INSERT INTO `mobs_ew` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `z`, `lvl`, `slain`) VALUES
+(1, 0, 'akantha', 'Akantha', 'Acanthe', 'Akantha', 'アカンサ', '刺口花', 5, '29.2', '10.6', '0.0', 87, 1),
+(2, 0, 'bird of Elpis', 'Bird Of Elpis', 'Oiseau D\'Elpis', 'Elpisvogel', 'バード・オブ・エルピス', '厄尔庇斯之鸟', 5, '28.7', '20.6', '0.0', 86, 2),
+(3, 0, 'Elpis minotaur', 'Elpis Minotaur', 'Elpistauros', 'Elpis-Minotaurus', 'エルピスタウロス', '厄尔庇斯弥诺陶洛斯', 5, '12.9', '19.7', '0.0', 87, 2),
+(4, 0, 'gryps', 'Gryps', 'Grype', 'Gryps', 'グリュプス', '鹰头狮', 5, '11.1', '29.7', '0.0', 86, 2),
+(5, 0, 'harpuia', 'Harpuia', 'Harpyia', 'Harpuia', 'ハルピュイア', '哈耳庇厄鸟妖', 5, '15.7', '9.0', '0.0', 87, 1),
+(6, 0, 'hippe', 'Hippe', 'Hippe', 'Hippe', 'ヒッペー', '水马', 5, '31.8', '14.0', '0.0', 87, 2),
+(7, 0, 'lotis', 'Lotis', 'Lotis', 'Lotis', 'ロティス', '覆笼草', 5, '21.5', '7.0', '0.0', 87, 1),
+(8, 0, 'lykopersikon', 'Lykopersikon', 'Lycopersicum', 'Lykopersikon', 'リコペルシクム', '狼桃', 5, '29.7', '12.5', '0.0', 87, 2),
+(9, 0, 'melanion', 'Melanion', 'Mélanion', 'Melanion', 'メラニオン', '墨拉尼昂', 5, '9.3', '21.0', '0.0', 87, 2),
+(10, 0, 'monoceros', 'Monoceros', 'Monocéros', 'Monozeros', 'モノセロス', '墨拉尼昂', 5, '22.0', '29.9', '0.0', 86, 2),
+(11, 0, 'morbol marquis', 'Morbol Marquis', 'Marquis Morbol', 'Morbol-Markgraf', 'マーカス・モルボル', '侯爵魔界花', 5, '25.0', '9.9', '0.0', 87, 1),
+(12, 0, 'okyupete', 'Okyupete', 'Ocypète', 'Okypete', 'オキュペテ', '急速妖鸟', 5, '18.9', '23.9', '0.0', 86, 2),
+(13, 0, 'ophion', 'Ophion', 'Ophion', 'Ophion', 'オピオン', '兽身异蛇', 5, '25.5', '33.0', '0.0', 86, 1),
+(14, 0, 'ophiotauros', 'Ophiotauros', 'Ophiotauros', 'Ophiotauros', 'オピオタウロス', '蛇牛', 5, '12.9', '8.0', '0.0', 87, 1),
+(15, 0, 'pegasos', 'Pegasos', 'Pégasos', 'Pegasos', 'ペガソス', '飞天马', 5, '10.5', '13.4', '0.0', 87, 1),
+(16, 0, 'phanopsyche', 'Phanopsyche', 'Phanopsychée', 'Phanopsyche', 'ファノプシュケ', '明灵蛾', 5, '8.2', '35.2', '0.0', 86, 1),
+(17, 0, 'remora', 'Remora', 'Rémora', 'Remora', 'レモラ', '印鱼', 5, '30.8', '17.8', '0.0', 87, 2),
+(18, 0, 'yggdreant', 'Yggdreant', 'Yggdriade', 'Igdrya', 'イグドリア', '世树精', 5, '15.7', '27.6', '0.0', 86, 1),
+(19, 0, 'almasty', 'Almasty', 'Almasty', 'Alma', 'アルマスティ', '阿尔马斯提', 3, '28.1', '29.9', '0.0', 82, 1),
+(20, 0, 'automated avenger', 'Automated Avenger', 'Vengeur Autonome', 'Autonom[a] Rächer', 'オートマチック・アヴェンジャー', '自动化魔导复仇者', 3, '9.4', '11.9', '0.0', 83, 2),
+(21, 0, 'automated bit', 'Automated Bit', 'Drone Autonome', 'Autonom[a] Drohne', 'オートマチック・ビット', '自动化魔导浮游炮', 3, '26.8', '17.1', '0.0', 83, 2),
+(22, 0, 'automated cavalry', 'Automated Cavalry', 'Cavalier Autonome', 'Autonom[a] Reiter', 'オートマチック・キャバルリー', '自动化魔导骑兵', 3, '15.8', '19.3', '0.0', 83, 2),
+(23, 0, 'automated colossus', 'Automated Colossus', 'Colosse Autonome', 'Autonom[a] Colossus', 'オートマチック・コロッサス', '自动化魔导巨兵', 3, '24.7', '14.7', '0.0', 83, 2),
+(24, 0, 'automated death machine', 'Automated Death Machine', 'Mécacharogne Autonome', 'Autonom[a] Todesmaschine', 'オートマチック・デスマシーン', '自动化魔导死亡机器', 3, '25.2', '18.1', '0.0', 83, 3),
+(25, 0, 'automated roader', 'Automated Roader', 'Magna Rouleur Autonome', 'Autonom[a] Rotula', 'オートマチック・マグナローダー', '自动化魔导机车大魔', 3, '15.1', '9.5', '0.0', 83, 2),
+(26, 0, 'automated satellite', 'Automated Satellite', 'Satellite Autonome', 'Autonom[a] Satellit', 'オートマチック・サテライト', '自动化辅助机甲', 3, '18.2', '9.8', '0.0', 83, 2),
+(27, 0, 'automated slasher', 'Automated Slasher', 'Tailladeur Autonome', 'Autonom[a] Schlitzer', 'オートマチック・スラッシャー', '自动化魔导螳螂', 3, '29.5', '13.7', '0.0', 83, 2),
+(28, 0, 'canis lupinus', 'Canis Lupinus', 'Canis Lupinus', 'Canis Lupinus', 'カニスルピナス', '军用狼犬', 3, '20.0', '25.0', '0.0', 82, 3),
+(29, 0, 'ceruleum zoblyn', 'Ceruleum Zoblyn', 'Zoblyn De Céruleum', 'Erdseim-Zoblyn', 'セルリウムゾブラン', '青磷矿怪虫', 3, '28.5', '32.0', '0.0', 82, 2),
+(30, 0, 'Eblan bear', 'Eblan Bear', 'Ours D\'Éblana', 'Eblan-Bär', 'エブラーナベアー', '艾布拉纳熊', 3, '14.1', '25.6', '0.0', 82, 1),
+(31, 0, 'Eblan icetrap', 'Eblan Icetrap', 'Piège-glace D\'Éblana', 'Eblan-Eisfalle', 'エブラーナ・アイストラップ', '艾布拉纳寒冰陷阱草', 3, '29.3', '19.0', '0.0', 82, 2),
+(32, 0, 'Ilsabardian tursus', 'Ilsabardian Tursus', 'Tursus D\'Ilsabard', 'Ilsabard-Tursus', 'イルサバード・トゥルスス', '伊尔萨巴德苏斯水龙蜥', 3, '27.0', '31.5', '0.0', 83, 2),
+(33, 0, 'jotunn', 'Jotunn', 'Jötunn', 'Jötunn', 'ヨトゥン', '霜巨人', 3, '24.5', '22.2', '0.0', 82, 3),
+(34, 0, 'overgrown rose', 'Overgrown Rose', 'Rosier Envahissant', 'überwachsen[a] Rose', 'オーバーグロウン・ローズ', '过盛玫瑰', 3, '23.7', '28.1', '0.0', 82, 1),
+(35, 0, 'ovibos', 'Ovibos', 'Ovibos', 'Ovibos', 'オウヴィボス', '麝牛', 3, '17.5', '31.0', '0.0', 82, 1),
+(36, 0, 'caribou', 'Caribou', 'Caribou', 'Karibu', 'カリブー', '驯鹿', 1, '16.7', '6.3', '0.0', 80, 2),
+(37, 0, 'genomos', 'Genomos', 'Génomos', 'Genomos', 'ゲノーモス', '格诺莫斯', 1, '32.0', '25.4', '0.0', 81, 2),
+(38, 0, 'labyrinth screamer', 'Labyrinth Screamer', 'Piailleur Du Labyrinthos', 'Labyrinthos-Schriller', 'ラヴィリンソス・スクリーマー', '迷津尖叫雕', 1, '33.5', '16.0', '0.0', 80, 2),
+(39, 0, 'limascabra', 'Limascabra', 'Lima Scabra', 'Lima Scabra', 'リマスカブラ', '火焰贝', 1, '31.0', '9.0', '0.0', 80, 2),
+(40, 0, 'luncheon toad', 'Luncheon Toad', 'Poulet Des Montagnes', 'Bergkröte', 'マウンテンチキン', '山鸡', 1, '21.9', '12.7', '0.0', 81, 1),
+(41, 0, 'mythrilcap', 'Mythrilcap', 'Bolet De Mithril', 'Mithrilkappe', 'ミスリルキャップ', '秘银帽魔菇', 1, '37.8', '19.2', '0.0', 80, 1),
+(42, 0, 'northern snapweed', 'Northern Snapweed', 'Balsamine Du Nord', 'Nördlich[a] Schnappkraut', 'ノーザン・スナップウィード', '北境捕捉草', 1, '21.6', '10.5', '0.0', 81, 2),
+(43, 0, 'pephredo', 'Pephredo', 'Pemphrédo', 'Pephredo', 'ペプレド', '刻毒蜂', 1, '24.7', '15.6', '0.0', 80, 1),
+(44, 0, 'troll', 'Troll', 'Troll', 'Troll', 'トロル', '巨魔', 1, '27.2', '7.8', '0.0', 80, 1),
+(45, 0, 'yakow', 'Yakow', 'Dzo', 'Yakuh', 'ヤーコウ', '亚考牛', 1, '17.5', '12.9', '0.0', 81, 2),
+(46, 0, 'armalcolite', 'Armalcolite', 'Armalcolite', 'Armalcolit', 'アーマルコライト', '阿姆阿尔柯尔石', 4, '17.3', '28.8', '0.0', 83, 1),
+(47, 0, 'caretaker', 'Caretaker', 'Unité De Soin', 'Wärter', 'ケアテイカー', '代管机', 4, '11.2', '12.7', '0.0', 84, 1),
+(48, 0, 'daphnia', 'Daphnia', 'Daphnie', 'Daphnia', 'ダフニア', '月蚤', 4, '23.0', '19.0', '0.0', 84, 1),
+(49, 0, 'downfall alarum', 'Downfall Alarum', 'Alarum Rescapé', 'Alarm[p] Des Verderbens', 'ダウンフォール・アラーム', '坠落警报虫', 4, '32.1', '24.5', '0.0', 83, 1),
+(50, 0, 'downfall droid', 'Downfall Droid', 'Droïde Rescapé', 'Droide[p] Des Verderbens', 'ダウンフォール・ドロイド', '坠落机甲', 4, '33.5', '29.0', '0.0', 83, 1),
+(51, 0, 'downfall hunter', 'Downfall Hunter', 'Chasseur Rescapé', 'Jäger[p] Des Verderbens', 'ダウンフォール・ハンター', '坠落猎手', 4, '32.4', '25.7', '0.0', 83, 1),
+(52, 0, 'dynamite', 'Dynamite', 'Dynamite', 'Dynamit', 'ダイナマイト', '炸弹怪', 4, '12.0', '20.7', '0.0', 84, 2),
+(53, 0, 'mousse', 'Mousse', 'Mousse', 'Mousse', 'ムース', '慕斯怪', 4, '16.2', '26.6', '0.0', 84, 2),
+(54, 0, 'panopt', 'Panopt', 'Panopt', 'Panopt', 'パノプト', '帕诺普特', 4, '8.7', '31.8', '0.0', 83, 2),
+(55, 0, 'regolith', 'Regolith', 'Régolithe', 'Regolith', 'レゴリス', '月壤', 4, '26.0', '34.0', '0.0', 83, 1),
+(56, 0, 'scraper', 'Scraper', 'Unité De Recyclage', 'Schaber', 'スクレーパー', '刮削机', 4, '30.1', '11.3', '0.0', 84, 3),
+(57, 0, 'supporter', 'Supporter', 'Unité D\'assistance', 'Support', 'サポーター', '协助机', 4, '14.0', '11.6', '0.0', 84, 3),
+(58, 0, 'sweeper', 'Sweeper', 'Ratisseur', 'Feger', 'スウィーパー', '清扫者', 4, '11.3', '34.9', '0.0', 83, 2),
+(59, 0, 'thinker', 'Thinker', 'Penseur', 'Denker', 'シンカー', '思考之物', 4, '19.8', '22.5', '0.0', 83, 1),
+(60, 0, 'trimmer', 'Trimmer', 'Sécateur', 'Schlitzer', 'トリマー', '准金属', 4, '21.4', '32.2', '0.0', 83, 2),
+(61, 0, 'wanderer', 'Wanderer', 'Vagabond', 'Streuner', 'ワンダラー', '彷徨之物', 4, '25.9', '25.5', '0.0', 83, 2),
+(62, 0, 'weeper', 'Weeper', 'Lamenteur', 'Schluchzer', 'ウィーパー', '叹息之物', 4, '28.7', '32.0', '0.0', 83, 1),
+(63, 0, 'Akyaali crab', 'Akyaali Crab', 'Crabe D\'Akyaali', 'Akyaali-Krabbe', 'アキャーリクラブ', '白滨蟹', 2, '13.0', '27.4', '0.0', 80, 2),
+(64, 0, 'asvattha', 'Asvattha', 'Asvattha', 'Asvattha', 'アシュヴァッタ', '阿输陀花', 2, '28.1', '12.2', '0.0', 85, 2),
+(65, 0, 'bhujamga', 'Bhujamga', 'Bhujanga', 'Bhujamga', 'ブンジャンガ', '曲蛇', 2, '27.0', '17.4', '0.0', 80, 2),
+(66, 0, 'chamrosh', 'Chamrosh', 'Chamrosh', 'Chamrosh', 'チャムロッシュ', '查姆洛什鸟', 2, '11.4', '13.2', '0.0', 81, 2),
+(67, 0, 'gaja', 'Gaja', 'Gaja', 'Gaja', 'ガジャ', '伽迦象', 2, '23.4', '31.6', '0.0', 80, 1),
+(68, 0, 'guhasaya', 'Guhasaya', 'Guhasaya', 'Guhasaya', 'グハーシャヤ', '洞虎', 2, '27.1', '27.8', '0.0', 85, 2),
+(69, 0, 'hamsa', 'Hamsa', 'Hamsa', 'Hamsa', 'ハンサ', '桓娑鸟', 2, '19.7', '26.3', '0.0', 80, 2),
+(70, 0, 'kacchapa', 'Kacchapa', 'Kacchapa', 'Kacchapa', 'カチャパ', '喀恰帕龟', 2, '22.1', '33.2', '0.0', 80, 1),
+(71, 0, 'manjusaka', 'Manjusaka', 'Manjusaka', 'Manjusaka', 'マンジュサカ', '彼岸妖红花', 2, '14.3', '10.7', '0.0', 81, 2),
+(72, 0, 'odqan', 'Odqan', 'Odqan', 'Odqan', 'オドカン', '斡德罕', 2, '23.8', '18.9', '0.0', 85, 1),
+(73, 0, 'pisaca', 'Pisaca', 'Pishacha', 'Pisaca', 'ピシャーチャ', '毕舍遮', 2, '18.6', '20.9', '0.0', 80, 2),
+(74, 0, 'sotormurg', 'Sotormurg', 'Suturmurg', 'Sotormurg', 'シュトラムルグ', '鸵鸟', 2, '17.2', '18.0', '0.0', 81, 1),
+(75, 0, 'starmite', 'Starmite', 'Starmite', 'Sternmilbe', 'スターマイト', '星甲虫', 2, '17.7', '9.7', '0.0', 81, 1),
+(76, 0, 'Thavnairian jhammel', 'Thavnairian Jhammel', 'Jhammel De Thavnair', 'Thavnair-Jhammel', 'サベネアンジャムメル', '萨维奈长颈骆', 2, '18.7', '11.5', '0.0', 81, 1),
+(77, 0, 'ufiti', 'Ufiti', 'Babouin', 'Gorilla', 'バブーン', '黑猩猩', 2, '25.9', '18.0', '0.0', 85, 2),
+(78, 0, 'vajralangula', 'Vajralangula', 'Vajralangula', 'Vajralangula', 'ヴァジュララングラ', '金刚尾', 2, '13.8', '18.5', '0.0', 81, 2),
+(79, 0, 'valras', 'Valras', 'Vaalaras', 'Vaalaras', 'ヴァルラス', '海象', 2, '8.5', '17.2', '0.0', 81, 1),
+(80, 0, 'Beta', 'Beta', 'Bêta', 'Beta', 'ベータ', '贝塔', 6, '35.5', '28.4', '0.0', 89, 1),
+(81, 0, 'broken Omicron', 'Broken Omicron', 'Omicron Défectueux', 'Defekt[a] Omikron', 'ブロークン・オミクロン', '破损的奥密克戎', 6, '34.6', '26.8', '0.0', 89, 1),
+(82, 0, 'Delta', 'Delta', 'Delta', 'Delta', 'デルタ', '德尔塔', 6, '32.5', '29.4', '0.0', 89, 1),
+(83, 0, 'drifting Ea', 'Drifting Ea', 'Éa à La Dérive', 'Treibend[a] Ea', 'ドリフティング・イーア', '游荡的异亚', 6, '20.6', '11.3', '0.0', 89, 3),
+(84, 0, 'Lambda', 'Lambda', 'Lambda', 'Lambda', 'ラムダ', '拉姆达', 6, '35.9', '25.6', '0.0', 89, 1),
+(85, 0, 'level tricker', 'Level Tricker', 'Piégeur De Niveau', 'Schummler', 'レベルトリッカー', '等级欺骗仪', 6, '31.9', '26.7', '0.0', 89, 1),
+(86, 0, 'other one', 'Other One', 'Autre', 'Ander[a]', 'アザーワン', '其他', 6, '14.2', '14.0', '0.0', 89, 1),
+(87, 0, 'stellar amphiptere', 'Stellar Amphiptere', 'Amphiptère Stellaire', 'Stellar-Amphitere', 'ステラ・アンフィプテレ', '星宇安菲瑟龙', 6, '10.6', '30.2', '0.0', 89, 2),
+(88, 0, 'stellar brobinyak', 'Stellar Brobinyak', 'Brobinyak Stellaire', 'Stellar-Brobinyak', 'ステラ・ブロビニャク', '星宇布罗宾雅克', 6, '15.1', '28.8', '0.0', 89, 2);
+
+--
+-- Triggers `mobs_ew`
+--
+DROP TRIGGER IF EXISTS `mob_ew_del`;
+DELIMITER $$
+CREATE TRIGGER `mob_ew_del` AFTER DELETE ON `mobs_ew` FOR EACH ROW BEGIN
+	CALL update_etag('distances_ew');
+	CALL update_etag('mobs_ew');
+END
+$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_ew_ins`;
+DELIMITER $$
+CREATE TRIGGER `mob_ew_ins` AFTER INSERT ON `mobs_ew` FOR EACH ROW BEGIN
+	CALL update_etag('distances_ew');
+	CALL update_etag('mobs_ew');
+END
+$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_ew_upd`;
+DELIMITER $$
+CREATE TRIGGER `mob_ew_upd` AFTER UPDATE ON `mobs_ew` FOR EACH ROW BEGIN
+	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.id_zone <> OLD.id_zone THEN
+		CALL update_etag('distances_ew');
+    END IF;
+	CALL update_etag('mobs_ew');
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `mobs_hw`
 --
 
-CREATE TABLE `mobs_hw` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
-  `id_zone` tinyint(4) NOT NULL,
+DROP TABLE IF EXISTS `mobs_hw`;
+CREATE TABLE IF NOT EXISTS `mobs_hw` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
   `x` decimal(3,1) UNSIGNED NOT NULL,
   `y` decimal(3,1) UNSIGNED NOT NULL,
-  `lvl` tinyint(3) DEFAULT NULL,
-  `slain` tinyint(2) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `lvl` tinyint DEFAULT NULL,
+  `slain` tinyint DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `PK_ID` (`id`) USING BTREE,
+  KEY `FK_ZONE` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `mobs_hw`
 --
 
 INSERT INTO `mobs_hw` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `lvl`, `slain`) VALUES
-(1, 3481, 'Archaeornis', 'Archaeornis', 'Archéornis', 'Archaeornis', 'アルケオーニス', '古鸟', 1, 17.0, 12.0, 51, 3),
-(2, 3472, 'Bergthurs', 'Bergthurs', 'Bergthurs', 'Berg-Jötunn', 'ベルグスルス', '山巨魔', 1, 32.0, 24.0, 50, 2),
-(3, 3471, 'Deepeye', 'Deepeye', 'Oculus', 'Glotzauge', 'ディープアイ', '深瞳', 1, 30.0, 26.0, 50, 3),
-(4, 3476, 'Frost Grenade', 'Frost Grenade', 'Grenado Du Gel', 'Frost-Granate', 'フロストグレネード', '寒霜榴弹怪', 1, 28.0, 13.0, 50, 2),
-(5, 3480, 'Gelato', 'Gelato', 'Gelato', 'Gelato', 'ジェラート', '明胶怪', 1, 10.0, 17.0, 51, 2),
-(6, 3484, 'Ice Commander', 'Ice Commander', 'Commandant Gelé', 'Eiskommandant', 'アイスコマンダー', '寒冰指挥官', 1, 10.0, 12.0, 51, 3),
-(7, 3475, 'Icetrap', 'Icetrap', 'Piège-glace', 'Eisfalle', 'アイストラップ', '寒冰陷阱草', 1, 23.0, 15.0, 50, 3),
-(8, 3487, 'Inland Tursus', 'Inland Tursus', 'Tursus Des Terres', 'Binnen-Tursus', 'インランド・トゥルスス', '内陆图苏斯水龙蜥', 1, 29.0, 7.0, 56, 2),
-(9, 3483, 'Lone Yeti', 'Lone Yeti', 'Yéti Solitaire', 'Einsamer Yeti', 'ローン・イエティ', '孤独大脚雪人', 1, 21.0, 31.0, 51, 2),
-(10, 3485, 'Polar Bear', 'Polar Bear', 'Ours Polaire', 'Eisbär', 'ポーラーベアー', '极地熊', 1, 23.0, 21.0, 51, 3),
-(11, 3482, 'Rheum', 'Rheum', 'Chassie', 'Schlafsand', 'ルーム', '汁液怪', 1, 14.0, 19.0, 51, 3),
-(12, 3473, 'Silver Wolf', 'Silver Wolf', 'Loup Argenté', 'Silberwolf', 'シルバーウルフ', '银狼', 1, 23.0, 25.0, 50, 3),
-(13, 3490, 'Slate Yeti', 'Slate Yeti', 'Yéti Du Grésil', 'Schiefer-Yeti', 'スレート・イエティ', '大脚板岩雪人', 1, 25.0, 32.0, 56, NULL),
-(14, 3478, 'Slush Zoblyn', 'Slush Zoblyn', 'Zoblyn De Névasse', 'Schlamm-Zobalos', 'スラッシュゾブラン', '融雪矿怪虫', 1, 25.0, 12.0, 50, NULL),
-(15, 3470, 'Steinbock', 'Steinbock', 'Steinbock', 'Schneebock', 'スタインボック', '小羚羊', 1, 30.0, 32.0, 50, 3),
-(16, 3474, 'Upland Mylodon', 'Upland Mylodon', 'Mylodon Des Plateaux', 'Hochland-Mylodon', 'アップランド・ミロドン', '山地磨齿兽', 1, 26.0, 20.0, 50, 3),
-(17, 3493, 'Vindthurs', 'Vindthurs', 'Vindthurs', 'Vindthur', 'ヴィンドスルス', '风巨魔', 1, 9.0, 9.0, 56, NULL),
-(18, 3479, 'Wooly Yak', 'Wooly Yak', 'Yak Laineux', 'Woll-Yak', 'ウーリーヤク', '多毛牦牛', 1, 16.0, 18.0, 51, 2),
-(19, 3524, 'Anzu', 'Anzu', 'Anzu', 'Anzu', 'アンズー', '安祖', 2, 21.0, 7.0, 59, 2),
-(20, 3498, 'Cloudworm', 'Cloudworm', 'Ver Des Nuages', 'Wolkenwurm', 'クラウドウォーム', '云层巨虫', 2, 29.0, 35.0, 50, 1),
-(21, 3496, 'Conodont', 'Conodont', 'Conodonte', 'Conodont', 'コノドント', '雷牙', 2, 28.0, 35.0, 50, 1),
-(22, 3505, 'Dhalmel', 'Dhalmel', 'Dhalmel', 'Dhalmel', 'ダルメル', '长颈驼', 2, 16.0, 30.0, 56, 3),
-(23, 3511, 'Endymion', 'Endymion', 'Endymion', 'Endymion', 'エンディミオン', '恩底弥翁', 2, 14.0, 10.6, 57, 2),
-(24, 3494, 'Gaelicat', 'Gaelicat', 'Gaélichat', 'Geira-Katze', 'ゲイラキャット', '风筝猫', 2, 11.0, 33.0, 50, 3),
-(25, 3495, 'Gastornis', 'Gastornis', 'Gastornis', 'Gastornis', 'ガストルニス', '冠恐鸟', 2, 11.0, 33.0, 50, 2),
-(26, 3512, 'Groundskeeper', 'Groundskeeper', 'Terragardien', 'Erdwächter', 'グランズキーパー', '坐镇巨像', 2, 17.0, 17.0, 57, 3),
-(27, 3506, 'Korrigan', 'Korrigan', 'Korrigan', 'Korrigane', 'コリガン', '柯瑞甘', 2, 20.0, 30.0, 56, 3),
-(28, 3501, 'Lan\'laii Gundu', 'Lan\'laii Gundu', 'Lan\'laii Des Gundu', 'Lan\'laii Gundo', 'ランライ・グンド', '衮杜兰腊义', 2, 36.0, 21.0, 51, 1),
-(29, 3515, 'Lan\'laii Vundu', 'Lan\'laii Vundu', 'Lan\'laii Des Vundu', 'Lan\'laii Vundo', 'ランライ・ブンド', '温杜兰腊义', 2, 28.0, 10.0, 57, NULL),
-(30, 3502, 'Nat\'laii Gundu', 'Nat\'laii Gundu', 'Nat\'laii Des Gundu', 'Nat\'laii Gundo', 'ナツライ・グンド', '衮杜那腊义', 2, 36.0, 20.0, 51, 1),
-(31, 3516, 'Nat\'laii Vundu', 'Nat\'laii Vundu', 'Nat\'laii Des Vundu', 'Nat\'laii Vundo', 'ナツライ・ブンド', '温杜那腊义', 2, 28.0, 10.0, 57, NULL),
-(32, 3497, 'Obdella', 'Obdella', 'Obdella', 'Obdella', 'オブデラ', '棘蛭', 2, 24.0, 34.0, 50, 2),
-(33, 3499, 'Paissa', 'Paissa', 'Païssa', 'Paissa', 'パイッサ', '猴面雀', 2, 20.0, 35.0, 50, 3),
-(34, 3500, 'Sanuwa', 'Sanuwa', 'Sanuwa', 'Sanuwa', 'サヌワ', '腾云蛇', 2, 36.0, 21.0, 51, 1),
-(35, 3514, 'Sanuwa Vundu', 'Sanuwa Vundu', 'Sanuwa Des Vundu', 'Vundo-Sanuwa', 'サヌワ・ブンド', '腾云蛇温杜', 2, 30.0, 14.0, 57, NULL),
-(36, 3525, 'Toco Toco', 'Toco Toco', 'Toco Toco', 'Tokotoko', 'トコトコ', '巨嘴鸟', 2, 21.0, 7.0, 59, 3),
-(37, 3523, 'Tsanahale', 'Tsanahale', 'Tsanahale', 'Tsanahal', 'ツィナハレ', '奇纳哈尔鸟妖', 2, 15.4, 7.3, 59, 2),
-(38, 3503, 'Vuk\'laii Gundu', 'Vuk\'laii Gundu', 'Vuk\'laii Des Gundu', 'Vuk\'laii Gundo', 'ヴクライ・グンド', '衮杜乌腊义', 2, 36.0, 25.0, 51, 1),
-(39, 3509, 'Window Wamoura', 'Window Wamoura', 'Wamoura De La Fenêtre Bleue', 'Himmelblau-Wamoura', 'ウィンドウ・ワモーラ', '天窗瓦魔蛾', 2, 9.0, 16.0, 57, 1),
-(40, 3510, 'Window Wamouracampa', 'Window Wamouracampa', 'Wamouracampa De La Fenêtre Bleue', 'Himmelblau-Wamouracampa', 'ウィンドウ・ワモーラカンパ', '天窗瓦魔蛾幼虫', 2, 6.0, 19.0, 57, 2),
-(41, 3504, 'Wisent', 'Wisent', 'Wisent', 'Wisent', 'ウィセント', '文森野牛', 2, 20.0, 38.0, 56, 2),
-(42, 3565, 'Bandersnatch', 'Bandersnatch', 'Bandersnatch', 'Bandersnatch', 'バンダースナッチ', '斑攫兽', 3, 34.0, 14.0, 52, 3),
-(43, 3587, 'Bone Aevis', 'Bone Aevis', 'Ostéoneibis', 'Knochen-Avis', 'ボーンエイビス', '白骨龙鸟', 3, 11.0, 39.0, 57, NULL),
-(44, 3566, 'Brown Bear', 'Brown Bear', 'Ours Brun', 'Braunbär', 'ブラウンベアー', '棕熊', 3, 30.0, 11.0, 52, 2),
-(45, 3570, 'Clearwater Nanka', 'Clearwater Nanka', 'Nanka D\'eau Douce', 'Fluss-Nanka', 'リバー・ナンカ', '清水南加', 3, 28.0, 22.0, 52, NULL),
-(46, 3569, 'Clearwater Ninki Nanka', 'Clearwater Ninki Nanka', 'Ninki Nanka D\'eau Douce', 'Fluss-Ninki Nanka', 'リバー・ニンキナンカ', '清水宁基南加', 3, 28.0, 22.0, 52, 2),
-(47, 3572, 'Dragonfly Watcher', 'Dragonfly Watcher', 'Draguêpe Veilleur', 'Späher-Drachycera', 'ドラゴンフライ・ウォッチャー', '守望蜻蜓飞蜥', 3, 25.0, 33.0, 52, 2),
-(48, 3567, 'Dravanian Aevis', 'Dravanian Aevis', 'Eibis Dravanien', 'Dravanischer Avis', 'ドラヴァニアン・エイビス', '龙堡龙鸟', 3, 25.0, 23.0, 52, 2),
-(49, 3576, 'Dravanian Wyvern', 'Dravanian Wyvern', 'Wyverne Dravanienne', 'Dravanischer Wyvern', 'ドラヴァニアン・ワイバーン', '龙堡双足飞龙', 3, 17.0, 36.0, 53, 3),
-(50, 3563, 'Feather Flea', 'Feather Flea', 'Puce à Plumes', 'Fiederfloh', 'フェザーフリー', '羽毛跳蚤', 3, 35.0, 24.0, 52, 3),
-(51, 3578, 'Forelands Hippocerf', 'Forelands Hippocerf', 'Hippocerf De L\'avant-pays', 'Vorland-Hippocerf', 'フォーランド・ヒッポセルフ', '参天骏雕', 3, 21.0, 23.0, 53, 3),
-(52, 3579, 'Gallimimus', 'Gallimimus', 'Gallimimus', 'Gallimimus', 'ガッリミムス', '似鸡龙', 3, 18.0, 15.0, 53, 3),
-(53, 3573, 'Gnath Firedrone', 'Gnath Firedrone', 'Gnathe Myrmifeu', 'Gnath-Feuerdrohne', 'グナース・ファイアドローン', '骨颌火兵', 3, 27.0, 36.0, 52, NULL),
-(54, 3588, 'Golden Bandersnatch', 'Golden Bandersnatch', 'Bandersnatch Doré', 'Goldener Bandersnatch', 'ゴールデン・バンダースナッチ', '金斑攫兽', 3, 26.0, 7.0, 57, NULL),
-(55, 3571, 'Loaghtan', 'Loaghtan', 'Loaghtan', 'Loaghtan', 'ロフタン', '洛夫坦山羊', 3, 26.0, 30.0, 52, 3),
-(56, 3568, 'Melia', 'Melia', 'Mélia', 'Meliade', 'メリアエ', '枯树精', 3, 24.0, 23.0, 52, 2),
-(57, 3577, 'Miacid', 'Miacid', 'Miacis', 'Miacis', 'ミアキス', '细齿兽', 3, 19.0, 27.0, 53, 3),
-(58, 3555, 'Syricta', 'Syricta', 'Syricta', 'Syricta', 'シリクタ', '希里科塔', 3, 13.0, 18.0, 53, 2),
-(59, 3586, 'Thunder Dragon', 'Thunder Dragon', 'Dragon De Foudre', 'Blitzdrache', 'サンダードラゴン', '雷龙', 3, 31.0, 8.0, 57, 1),
-(60, 3581, 'Vinegaroon', 'Vinegaroon', 'Vinaigrier', 'Geißelskorpion', 'ビネガロン', '醋蝎龙', 3, 13.0, 14.0, 53, 2),
-(62, 3564, 'Wild Chocobo', 'Wild Chocobo', 'Chocobo Sauvage', 'Wild-Chocobo', 'ワイルドチョコボ', '野生陆行鸟', 3, 35.0, 21.0, 52, 3),
-(63, 3619, 'Amphiptere', 'Amphiptere', 'Amphiptère', 'Amphitere', 'アンフィプテレ', '安菲瑟龙', 4, 17.0, 31.0, 54, 2),
-(64, 3620, 'Archaeosaur', 'Archaeosaur', 'Archéosaure', 'Archaeosaurus', 'アルケオダイノス', '古恐龙', 4, 24.0, 26.0, 54, NULL),
-(65, 3625, 'Bladed Vinegaroon', 'Bladed Vinegaroon', 'Vinaigrier à Lames', 'Klingen-Geißelskorpion', 'ブレード・ビネガロン', '利刃醋蝎龙', 4, 14.0, 22.0, 55, 2),
-(66, 3630, 'Blood Dragon', 'Blood Dragon', 'Dragon De Sang', 'Blutdrache', 'ブラッドドラゴン', '血龙', 4, 28.3, 11.2, 56, 1),
-(67, 3631, 'Cloud Aevis', 'Cloud Aevis', 'Nubeibis', 'Wolken-Avis', 'クラウドエイビス', '白云龙鸟', 4, 9.0, 36.0, 56, 1),
-(68, 3629, 'Diresaur', 'Diresaur', 'Allosaure', 'Werdrache', 'ウェアドラゴン', '变种龙', 4, 7.0, 19.0, 56, 3),
-(69, 3623, 'Dragonet', 'Dragonet', 'Dragonnet', 'Drachenjunges', 'ドラゴネット', '幼龙', 4, 17.0, 12.0, 55, 3),
-(70, 3626, 'Elder Syricta', 'Elder Syricta', 'Syricta Antique', 'Höherer Syricta', 'エルダーシリクタ', '古老希里科塔', 4, 34.0, 22.0, 55, 2),
-(71, 3628, 'Elder Wyvern', 'Elder Wyvern', 'Wyverne Ancienne', 'Höherer Wyvern', 'エルダーワイバーン', '古老双足飞龙', 4, 25.0, 30.0, 55, NULL),
-(72, 3668, 'Gnarled Melia', 'Gnarled Melia', 'Mélia Noueuse', 'Knorrige Meliade', 'ナールド・メリアエ', '扭曲枯树精', 4, 10.0, 20.0, 55, NULL),
-(73, 3614, 'Hropken', 'Hropken', 'Hropken', 'Hropken', 'ロプケン', '洛浦肯', 4, 36.0, 28.0, 54, 2),
-(74, 3621, 'Limestone Golem', 'Limestone Golem', 'Golem De Calcaire', 'Kalkstein-Golem', 'ライムゴーレム', '石灰巨像', 4, 9.0, 12.0, 55, 2),
-(75, 3618, 'Lower Skylord', 'Lower Skylord', 'Maître Aérien Mineur', 'Niederer Drache', 'レッサードラゴン', '小龙', 4, 20.0, 28.0, 54, 2),
-(76, 3627, 'Mists Biast', 'Mists Biast', 'Biast Des Brumes', 'Nebel-Smei', 'ミスト・ビアスト', '浓雾雷蛟', 4, 34.0, 32.0, 55, 2),
-(77, 3622, 'Mists Drake', 'Mists Drake', 'Dragon Des Brumes', 'Nebel-Drakon', 'ミスト・ドレイク', '浓雾火蛟', 4, 10.0, 18.0, 55, 3),
-(78, 3617, 'Moss Dragon', 'Moss Dragon', 'Dragon Moussu', 'Moosdrache', 'モスドラゴン', '苔龙', 4, 23.0, 20.0, 54, 2),
-(79, 3613, 'Sankchinni', 'Sankchinni', 'Sankchinni', 'Sankchinni', 'サンクチンニ', '山克芹尼', 4, 27.0, 31.0, 54, 3),
-(80, 3615, 'Tulihand', 'Tulihand', 'Tulihänd', 'Tulihand', 'トゥリヘンド', '火尾飞蜥', 4, 33.0, 16.0, 54, 2),
-(81, 3624, 'Vouivre', 'Vouivre', 'Vouivre', 'Vivel', 'ヴィーヴル', '薇薇尔飞龙', 4, 21.0, 20.0, 55, 2),
-(82, 3612, 'Bifericeras', 'Bifericeras', 'Biféricéras', 'Bifericeras', 'ビフェリケラス', '对菊石', 5, 25.0, 27.0, 59, 3),
-(83, 3609, 'Cockatrice', 'Cockatrice', 'Cocatrix', 'Cockatrice', 'コカトリス', '魔蛇鸟', 5, 18.0, 36.0, 59, 3),
-(84, 3603, 'Crawler', 'Crawler', 'Chenille', 'Kriecher', 'クロウラー', '毛爬虫', 5, 12.0, 16.0, 58, 3),
-(85, 3594, 'Damselfly', 'Damselfly', 'Demoiselle', 'Kleinlibelle', 'ダムゼルフライ', '灯芯蜻蛉', 5, 24.5, 19.9, 58, 2),
-(86, 3598, 'Goblin Brandisher', 'Goblin Brandisher', 'Brandisseur Gobelin', 'Goblin-Schleuderer', 'ゴブリン・ブランディッシャー', '哥布林挥刀者', 5, 29.0, 21.0, 58, 1),
-(87, 3600, 'Goblin Sharpshooter', 'Goblin Sharpshooter', 'Tireur Gobelin', 'Goblin-Scharfschütze', 'ゴブリン・シャープシューター', '哥布林狙击手', 5, 30.0, 21.0, 58, 2),
-(88, 3599, 'Goblin Tinkerer', 'Goblin Tinkerer', 'Rétameur Gobelin', 'Goblin-Bastler', 'ゴブリン・ティンカラー', '哥布林修补匠', 5, 29.0, 22.0, 58, 2),
-(89, 3605, 'Great Morbol', 'Great Morbol', 'Grand Morbol', 'Groß-Morbol', 'モルボルグレート', '大魔界花', 5, 10.0, 21.0, 58, 1),
-(90, 3610, 'Okeanis', 'Okeanis', 'Océanide', 'Okeanis', 'オーケアニス', '俄刻阿尼斯', 5, 9.0, 30.0, 59, 2),
-(91, 3604, 'Orn Kite', 'Orn Kite', 'Colibri D\'Orn', 'Orn-Kolibri', 'オーン・コリブリ', '奥恩飞鸢', 5, 11.0, 28.0, 58, 3),
-(92, 3607, 'Poroggo', 'Poroggo', 'Poroggo', 'Poroggo', 'ポロッゴ', '智蛙', 5, 11.0, 33.0, 59, 2),
-(93, 3595, 'Ratel', 'Ratel', 'Ratel', 'Ratel', 'ラーテル', '蜜獾', 5, 28.0, 25.0, 58, 2),
-(94, 3611, 'Sun Leech', 'Sun Leech', 'Sangsue Solaire', 'Sonnen-Egel', 'サンリーチ', '太阳水蛭', 5, 9.0, 32.0, 59, 2),
-(95, 3593, 'Tarantula Hawk', 'Tarantula Hawk', 'Guêpe Pepsis', 'Tarantulafalke', 'タランチュラホーク', '蛛蜂', 5, 26.8, 16.3, 58, 3),
-(96, 3545, '6th Legion Vanguard', '6th Legion Vanguard', 'Avant-garde De La 6e Légion', 'Frontbrecher der VI. Legion', 'VIレギオン・ヴァンガード', '第六军团魔导先锋', 6, 35.0, 24.0, 59, NULL),
-(97, 3552, 'Adamantite Claw', 'Adamantite Claw', 'Griffe D\'adamantium Magitek', 'Magitek-Adamantiumklaue', '魔導アダマンクロー', '魔导精金爪', 6, 31.0, 30.0, 59, NULL),
-(98, 3540, 'Allagan Chimera', 'Allagan Chimera', 'Chimère Allagoise', 'Allagische Chimära', 'アラガン・キマイラ', '亚拉戈奇美拉', 6, 31.0, 5.0, 59, 1),
-(99, 3534, 'Clockwork Engineer', 'Clockwork Engineer', 'Ingénieur Mécanique', 'Uhrwerk-Techniker', 'アラガンワーク・エンジニア', '亚拉戈发条工程师', 6, 15.0, 12.0, 59, 1),
-(100, 3535, 'Clockwork Paladin', 'Clockwork Paladin', 'Paladin Mécanique', 'Uhrwerk-Paladin', 'アラガンワーク・パラディン', '亚拉戈发条圣骑士', 6, 15.0, 12.0, 59, 1),
-(101, 3542, 'Corpse Flower', 'Corpse Flower', 'Fleur-dépouille', 'Titanenwurz', 'コープスフラワー', '尸生花', 6, 33.0, 10.0, 59, 2),
-(102, 3541, 'Empuse', 'Empuse', 'Empousa', 'Empusa', 'エンプーサ', '疫虫', 6, 30.0, 15.0, 59, 2),
-(103, 3537, 'Enforcement Droid', 'Enforcement Droid', 'Droïde D\'exécution', 'Vollzugsdroide', 'エンフォースドロイド', '执法机甲', 6, 13.0, 17.7, 59, 3),
-(104, 3539, 'Lamia Cybrid', 'Lamia Cybrid', 'Lamia Cybride', 'Lamia-Zybrid', 'ラミア・サイブリッド', '胞质杂交拉米亚', 6, 27.0, 11.0, 59, 1),
-(105, 3580, 'Lesser Hydra', 'Lesser Hydra', 'Hydre Mineure', 'Kleine Hydra', 'レッサーハイドラ', '小海德拉', 6, 13.0, 33.0, 59, 2),
-(106, 3559, 'Meracydian Amphiptere', 'Meracydian Amphiptere', 'Amphiptère Méracydien', 'Meracydische Amphitere', 'メラシディアン・アンフィプテレ', '美拉西迪亚安菲瑟龙', 6, 18.0, 31.0, 59, NULL),
-(107, 3557, 'Meracydian Brobinyak', 'Meracydian Brobinyak', 'Brobinyak Méracydien', 'Meracydischer Brobinyak', 'メラシディアン・ブロビニャク', '美拉西迪亚布罗宾雅克', 6, 7.0, 31.0, 59, 1),
-(108, 3560, 'Meracydian Dragon', 'Meracydian Dragon', 'Dragon Méracydien', 'Meracydischer Drache', 'メラシディアン・ドラゴン', '美拉西迪亚巨龙', 6, 8.0, 27.0, 59, NULL),
-(109, 3556, 'Meracydian Vouivre', 'Meracydian Vouivre', 'Vouivre Méracydienne', 'Meracydische Vivel', 'メラシディアン・ヴィーヴル', '美拉西迪亚薇薇尔飞龙', 6, 9.0, 37.0, 59, 1),
-(110, 3543, 'Proto-naga', 'Proto-naga', 'Proto-naga', 'Proto-Naga', 'プロト・ナーガ', '原型那迦', 6, 35.0, 8.0, 59, 2),
-(111, 3544, 'Reptoid', 'Reptoid', 'Reptoïde', 'Reptoid', 'レプトイド', '爬虫半人马', 6, 33.0, 12.0, 59, 2),
-(112, 3532, 'Snapper-rook', 'Snapper-rook', 'Drone-drille', 'Schnappturm', 'ルークスナッパー', '响声堡', 6, 12.0, 13.0, 59, 2),
-(113, 3489, 'Grand Archaeornis', 'Grand Archaeornis', 'Grand Archéornis', 'Großer Archaeornis', 'グランド・アルケオーニス', '大古鸟', 1, 35.0, 18.0, 56, NULL),
-(114, 3616, 'Wadjet', 'Wadjet', 'Ouadjet', 'Wadjet', 'ウアジェット', '神蜥蜴瓦吉特', 4, 28.0, 19.0, 54, 2),
-(115, 3608, 'Opken', 'Opken', 'Opken', 'Opken', 'オプケン', '欧浦肯', 5, 13.0, 33.0, 59, 3),
-(120, 3533, 'Owlbear', 'Owlbear', 'Hibours', 'Strigidae', 'オウルベア', '枭熊', 6, 13.0, 12.0, 59, 3),
-(122, 3477, 'Coldwind Bateleur', 'Coldwind Bateleur', 'Bateleur De Ventfroid', 'Kaltwind-Gaukler', 'コールドウィンド・バテラー', '寒风短尾雕', 1, 30.0, 13.0, 50, NULL),
-(124, 3513, 'Vundu Totem', 'Vundu Totem', 'Totem Des Vundu', 'Vundo-Totem', 'ブンド・トーテム', '温杜图腾', 2, 17.0, 17.0, 57, 1),
-(125, 3582, 'Tyrannosaur', 'Tyrannosaur', 'Tyrannosaure', 'Tyrannosaurus', 'ティラノサウルス', '暴龙', 3, 13.0, 18.0, 53, 2),
-(127, 3596, 'Wildebeest', 'Wildebeest', 'Gnou', 'Gnu', 'ワイルドビースト', '牛羚', 5, 33.0, 19.0, 58, 3),
-(128, 3554, 'Meracydian Falak', 'Meracydian Falak', 'Falak Méracydien', 'Meracydischer Falak', 'メラシディアン・ファラク', '美拉西迪亚法拉克', 6, 15.0, 28.0, 59, 1),
-(129, 3602, 'Espertype Magitek Vangob G-III', 'Espertype Magitek Vangob G-III', 'Gobavant-garde Magitek G-III Écrabouilleuse', 'Magitek-Gobbrecher III-E', 'III号ゴブリガードE型', '3号哥布林装甲E型', 5, 31.0, 19.0, 58, NULL),
-(130, 3597, 'Narbrooi', 'Narbrooi', 'Narbrooi', 'Narbrooi', 'ナルブルーイ', '纳布芮依', 5, 35.0, 21.0, 58, 3),
-(131, 3606, 'Sun Bear', 'Sun Bear', 'Bruan', 'Sonnenbär', 'サンベアー', '太阳熊', 5, 8.0, 28.0, 58, NULL),
-(132, 3574, 'Gnath Steeldrone', 'Gnath Steeldrone', 'Gnathe Myrmacier', 'Gnath-Stahldrohne', 'グナース・スチールドローン', '骨颌钢兵', 3, 27.0, 36.0, 52, NULL),
-(133, 3575, 'Gnath Cultivator', 'Gnath Cultivator', 'Gnathe Cultivateur', 'Gnath-Kultivator', 'グナース・カルティベーター', '骨颌播种员', 3, 27.0, 36.0, 52, NULL),
-(134, 3583, 'Gnath Haildrone', 'Gnath Haildrone', 'Gnathe Myrmigrêle', 'Gnath-Hageldrohne', 'グナース・ヘイルドローン', '骨颌冰兵', 3, 27.0, 36.0, 53, NULL),
-(135, 3584, 'Gnath Irondrone', 'Gnath Irondrone', 'Gnathe Myrmifer', 'Gnath-Eisendrohne', 'グナース・アイアンドローン', '骨颌铁兵', 3, 27.0, 36.0, 53, NULL),
-(136, 3585, 'Gnath Forager', 'Gnath Forager', 'Gnathe Glaneur', 'Gnath-Furier', 'グナース・フォリジャー', '骨颌觅食员', 3, 27.0, 36.0, 53, NULL),
-(137, 3589, 'Dragonfly Tracer', 'Dragonfly Tracer', 'Draguêpe Fureteur', 'Sucher-Drachycera', 'ドラゴンフライ・トレーサー', '追踪蜻蜓飞蜥', 3, 31.0, 8.0, 57, NULL),
-(138, 3536, 'Clockwork Harvestman', 'Clockwork Harvestman', 'Faucheux Mécanique', 'Uhrwerk-Ernter', 'アラガンワーク・ハーベストマン', '亚拉戈发条收割者', 6, 13.0, 8.0, 59, 3),
-(139, 3551, 'Clockwork Bit', 'Clockwork Bit', 'Foret Mécanique', 'Uhrwerk-Drohne', 'アラガンワーク・ビット', '亚拉戈发条浮游炮', 6, 6.0, 15.0, 59, NULL),
-(140, 3561, 'Warspite', 'Warspite', 'Cuirassé Warspite', 'Kriegsgroll', 'ウォースパイト', '战怨', 6, 25.0, 22.0, 60, NULL),
-(141, 3562, 'Sphinx', 'Sphinx', 'Sphinx', 'Sphinx', 'スフィンクス', '斯芬克斯', 6, 25.0, 22.0, 60, NULL),
-(142, 3549, '6th Legion Secutor', '6th Legion Secutor', 'Secutor De La 6e Légion', 'Secutor der VI. Legion', 'VIレギオン・セクトール', '第六军团剑斗士', 6, 38.0, 24.0, 59, NULL),
-(143, 3546, '6th Legion Hoplomachus', '6th Legion Hoplomachus', 'Hoplomachus De La 6e Légion', 'Hoplomachus der VI. Legion', 'VIレギオン・ホプロマクス', '第六军团拳斗士', 6, 38.0, 24.0, 59, NULL),
-(144, 3547, '6th Legion Laquearius', '6th Legion Laquearius', 'Laquearius De La 6e Légion', 'Laquearius der VI. Legion', 'VIレギオン・ラクエリウス', '第六军团绳斗士', 6, 38.0, 24.0, 59, NULL),
-(145, 4399, '6th Legion Bit', '6th Legion Bit', 'Drone De La 6e Légion', 'Drohne der VI. Legion', 'VIレギオン・ビット', '第六军团浮游炮', 6, 33.0, 26.0, 59, NULL),
-(146, 3553, 'Mark III Magitek Colossus', 'Mark III Magitek Colossus', 'Colosse Magitek III', 'Magitek-Stahlriese', '魔導コロッサスIII', '魔导巨兵三型', 6, 24.0, 30.0, 59, NULL),
-(147, 3550, '6th Legion Signifer', '6th Legion Signifer', 'Signifer De La 6e Légion', 'Signifer der VI. Legion', 'VIレギオン・シグニフェル', '第六军团旗手', 6, 33.0, 37.0, 59, NULL),
-(148, 3548, '6th Legion Eques', '6th Legion Eques', 'Eques De La 6e Légion', 'Eques der VI. Legion', 'VIレギオン・エクエス', '第六军团骑士', 6, 33.0, 37.0, 59, NULL),
-(149, 3492, 'Ice Zoblyn', 'Ice Zoblyn', 'Zoblyn De Glace', 'Eis-Zobalos', 'アイスゾブラン', '寒冰矿怪虫', 1, 29.0, 36.0, 56, NULL),
-(150, 3491, 'Sorbet', 'Sorbet', 'Sorbet', 'Sorbet', 'ソルベ', '冰糕怪', 1, 22.0, 28.0, 56, NULL),
-(151, 3538, 'Lamia Thelytoke', 'Lamia Thelytoke', 'Lamia Thélitoque', 'Lamia-Thelytokie', 'ラミア・テリトーク', '单性繁殖拉米亚', 6, 27.0, 11.0, 59, 1),
-(152, 3558, 'Meracydian Dragonet', 'Meracydian Dragonet', 'Dragonnet Méracydien', 'Meracydisches Drachenjunges', 'メラシディアン・ドラゴネット', '美拉西迪亚幼龙', 6, 7.0, 35.0, 59, 1),
-(153, 3601, 'Goblin Glider', 'Goblin Glider', 'Voltigeur Gobelin', 'Goblin-Gleiter', 'ゴブリン・グライダー', '哥布林滑翔兵', 5, 32.0, 23.0, 58, 2),
-(154, 3592, 'Loth Cultivator', 'Loth Cultivator', 'Cultivateur Du Loth', 'Loth-Kultivator', 'ロス・カルティベーター', '骨颌违心播种员', 3, 26.0, 36.0, 57, 1),
-(156, 3590, 'Loth Firedrone', 'Loth Firedrone', 'Myrmifeu Du Loth', 'Loth-Feuerdrohne', 'ロス・ファイアドローン', '骨颌违心火兵', 3, 26.0, 36.0, 57, 1),
-(155, 3591, 'Loth Steeldrone', 'Loth Steeldrone', 'Myrmacier Du Loth', 'Loth-Stahldrohne', 'ロス・スチールドローン', '骨颌违心钢兵', 3, 26.0, 36.0, 57, 1),
-(157, 3486, 'Ice Dragon', 'Ice Dragon', 'Dragon De Glace', 'Frostdrache', 'フリーズドラゴン', '冰龙', 1, 14.0, 23.7, 56, NULL),
-(158, 3488, 'Sleet Trap', 'Sleet Trap', 'Piège-grésil', 'Graupelfalle', 'スリートトラップ', '雨雪陷阱草', 1, 36.0, 7.0, 56, NULL),
-(159, 3520, '6th Legion Bestiarius', '6th Legion Bestiarius', 'Bestiarius De La 6e Légion', 'Bestiarius der VI. Legion', 'VIレギオン・ベスティアリウス', '第六军团矛斗士', 2, 23.0, 23.0, 57, NULL),
-(160, 3522, '6th Legion Imaginifer', '6th Legion Imaginifer', 'Imaginifer De La 6e Légion', 'Imaginifer der VI. Legion', 'VIレギオン・イマギニファー', '第六军团咒法士', 2, 23.0, 23.0, 57, NULL),
-(161, 3519, '6th Legion Myrmillo', '6th Legion Myrmillo', 'Myrmillo De La 6e Légion', 'Myrmillo der VI. Legion', 'VIレギオン・ミュルミッロ', '第六军团鱼斗士', 2, 23.0, 23.0, 57, NULL),
-(162, 3518, '6th Legion Triarius', '6th Legion Triarius', 'Triarius De 6e Légion', 'Triarius der VI. Legion', 'VIレギオン・トリアリウス', '第六军团角斗士', 2, 23.0, 23.0, 57, NULL),
-(163, 3521, '6th Legion Veles', '6th Legion Veles', 'Veles De La 6e Légion', 'Veles der VI. Legion', 'VIレギオン・ヴェリス', '第六军团前卫', 2, 23.0, 23.0, 57, NULL),
-(164, 3508, 'Abalathian Kite', 'Abalathian Kite', 'Milan D\'Abalathia', 'Abalathischer Milan', 'アバラシア・カイト', '阿拉巴提亚飞鸢', 2, 18.0, 29.0, 57, NULL),
-(165, 3526, 'Griffin', 'Griffin', 'Griffon', 'Griffon', 'グリフィン', '狮鹫', 2, 37.0, 15.0, 59, NULL),
-(166, 3527, 'Lan\'loii Vundu', 'Lan\'loii Vundu', 'Lan\'loii Des Vundu', 'Lan\'loii Vundo', 'ランロイ・ブンド', '温杜兰洛义', 2, 37.0, 15.0, 59, NULL),
-(167, 3530, 'Mockingbird Totem', 'Mockingbird Totem', 'Totem De Moqueur', 'Spottdrossel-Totem', 'モッキンバード・トーテム', '仿声鸟图腾', 2, 37.0, 15.0, 59, NULL),
-(168, 3528, 'Nat\'loii Vundu', 'Nat\'loii Vundu', 'Nat\'loii Des Vundu', 'Nat\'loii Vundo', 'ナツロイ・ブンド', '温杜那洛义', 2, 37.0, 15.0, 59, NULL),
-(169, 3531, 'O\'sanuwa Vundu', 'O\'sanuwa Vundu', 'O\'sanuwa Des Vundu', 'Vundo-O\'sanuwa', 'オサヌワ・ブモラ', '温杜欧腾云蛇', 2, 37.0, 15.0, 59, NULL),
-(170, 3517, 'Vuk\'laii Vundu', 'Vuk\'laii Vundu', 'Vuk\'laii Des Vundu', 'Vuk\'laii Vundo', 'ヴクライ・ブンド', '温杜乌腊义', 2, 23.0, 23.0, 57, NULL),
-(171, 3529, 'Vuk\'loii Vundu', 'Vuk\'loii Vundu', 'Vuk\'loii Des Vundu', 'Vuk\'loii Vundo', 'ヴクロイ・ブンド', '温杜乌洛义', 2, 37.0, 15.0, 59, NULL),
-(172, 3507, 'Wily Paissa', 'Wily Paissa', 'Païssa Rusé', 'Gerissener Paissa', 'ワイリー・パイッサ', '狡猾猴面雀', 2, 18.0, 29.0, 56, NULL);
+(1, 3481, 'Archaeornis', 'Archaeornis', 'Archéornis', 'Archaeornis', 'アルケオーニス', '古鸟', 1, '17.0', '12.0', 51, 3),
+(2, 3472, 'Bergthurs', 'Bergthurs', 'Bergthurs', 'Berg-Jötunn', 'ベルグスルス', '山巨魔', 1, '32.0', '24.0', 50, 2),
+(3, 3471, 'Deepeye', 'Deepeye', 'Oculus', 'Glotzauge', 'ディープアイ', '深瞳', 1, '30.0', '26.0', 50, 3),
+(4, 3476, 'Frost Grenade', 'Frost Grenade', 'Grenado Du Gel', 'Frost-Granate', 'フロストグレネード', '寒霜榴弹怪', 1, '28.0', '13.0', 50, 2),
+(5, 3480, 'Gelato', 'Gelato', 'Gelato', 'Gelato', 'ジェラート', '明胶怪', 1, '10.0', '17.0', 51, 2),
+(6, 3484, 'Ice Commander', 'Ice Commander', 'Commandant Gelé', 'Eiskommandant', 'アイスコマンダー', '寒冰指挥官', 1, '10.0', '12.0', 51, 3),
+(7, 3475, 'Icetrap', 'Icetrap', 'Piège-glace', 'Eisfalle', 'アイストラップ', '寒冰陷阱草', 1, '23.0', '15.0', 50, 3),
+(8, 3487, 'Inland Tursus', 'Inland Tursus', 'Tursus Des Terres', 'Binnen-Tursus', 'インランド・トゥルスス', '内陆图苏斯水龙蜥', 1, '29.0', '7.0', 56, 2),
+(9, 3483, 'Lone Yeti', 'Lone Yeti', 'Yéti Solitaire', 'Einsamer Yeti', 'ローン・イエティ', '孤独大脚雪人', 1, '21.0', '31.0', 51, 2),
+(10, 3485, 'Polar Bear', 'Polar Bear', 'Ours Polaire', 'Eisbär', 'ポーラーベアー', '极地熊', 1, '23.0', '21.0', 51, 3),
+(11, 3482, 'Rheum', 'Rheum', 'Chassie', 'Schlafsand', 'ルーム', '汁液怪', 1, '14.0', '19.0', 51, 3),
+(12, 3473, 'Silver Wolf', 'Silver Wolf', 'Loup Argenté', 'Silberwolf', 'シルバーウルフ', '银狼', 1, '23.0', '25.0', 50, 3),
+(13, 3490, 'Slate Yeti', 'Slate Yeti', 'Yéti Du Grésil', 'Schiefer-Yeti', 'スレート・イエティ', '大脚板岩雪人', 1, '25.0', '32.0', 56, NULL),
+(14, 3478, 'Slush Zoblyn', 'Slush Zoblyn', 'Zoblyn De Névasse', 'Schlamm-Zobalos', 'スラッシュゾブラン', '融雪矿怪虫', 1, '25.0', '12.0', 50, NULL),
+(15, 3470, 'Steinbock', 'Steinbock', 'Steinbock', 'Schneebock', 'スタインボック', '小羚羊', 1, '30.0', '32.0', 50, 3),
+(16, 3474, 'Upland Mylodon', 'Upland Mylodon', 'Mylodon Des Plateaux', 'Hochland-Mylodon', 'アップランド・ミロドン', '山地磨齿兽', 1, '26.0', '20.0', 50, 3),
+(17, 3493, 'Vindthurs', 'Vindthurs', 'Vindthurs', 'Vindthur', 'ヴィンドスルス', '风巨魔', 1, '9.0', '9.0', 56, NULL),
+(18, 3479, 'Wooly Yak', 'Wooly Yak', 'Yak Laineux', 'Woll-Yak', 'ウーリーヤク', '多毛牦牛', 1, '16.0', '18.0', 51, 2),
+(19, 3524, 'Anzu', 'Anzu', 'Anzu', 'Anzu', 'アンズー', '安祖', 2, '21.0', '7.0', 59, 2),
+(20, 3498, 'Cloudworm', 'Cloudworm', 'Ver Des Nuages', 'Wolkenwurm', 'クラウドウォーム', '云层巨虫', 2, '29.0', '35.0', 50, 1),
+(21, 3496, 'Conodont', 'Conodont', 'Conodonte', 'Conodont', 'コノドント', '雷牙', 2, '28.0', '35.0', 50, 1),
+(22, 3505, 'Dhalmel', 'Dhalmel', 'Dhalmel', 'Dhalmel', 'ダルメル', '长颈驼', 2, '16.0', '30.0', 56, 3),
+(23, 3511, 'Endymion', 'Endymion', 'Endymion', 'Endymion', 'エンディミオン', '恩底弥翁', 2, '14.0', '10.6', 57, 2),
+(24, 3494, 'Gaelicat', 'Gaelicat', 'Gaélichat', 'Geira-Katze', 'ゲイラキャット', '风筝猫', 2, '11.0', '33.0', 50, 3),
+(25, 3495, 'Gastornis', 'Gastornis', 'Gastornis', 'Gastornis', 'ガストルニス', '冠恐鸟', 2, '11.0', '33.0', 50, 2),
+(26, 3512, 'Groundskeeper', 'Groundskeeper', 'Terragardien', 'Erdwächter', 'グランズキーパー', '坐镇巨像', 2, '17.0', '17.0', 57, 3),
+(27, 3506, 'Korrigan', 'Korrigan', 'Korrigan', 'Korrigane', 'コリガン', '柯瑞甘', 2, '20.0', '30.0', 56, 3),
+(28, 3501, 'Lan\'laii Gundu', 'Lan\'laii Gundu', 'Lan\'laii Des Gundu', 'Lan\'laii Gundo', 'ランライ・グンド', '衮杜兰腊义', 2, '36.0', '21.0', 51, 1),
+(29, 3515, 'Lan\'laii Vundu', 'Lan\'laii Vundu', 'Lan\'laii Des Vundu', 'Lan\'laii Vundo', 'ランライ・ブンド', '温杜兰腊义', 2, '28.0', '10.0', 57, NULL),
+(30, 3502, 'Nat\'laii Gundu', 'Nat\'laii Gundu', 'Nat\'laii Des Gundu', 'Nat\'laii Gundo', 'ナツライ・グンド', '衮杜那腊义', 2, '36.0', '20.0', 51, 1),
+(31, 3516, 'Nat\'laii Vundu', 'Nat\'laii Vundu', 'Nat\'laii Des Vundu', 'Nat\'laii Vundo', 'ナツライ・ブンド', '温杜那腊义', 2, '28.0', '10.0', 57, NULL),
+(32, 3497, 'Obdella', 'Obdella', 'Obdella', 'Obdella', 'オブデラ', '棘蛭', 2, '24.0', '34.0', 50, 2),
+(33, 3499, 'Paissa', 'Paissa', 'Païssa', 'Paissa', 'パイッサ', '猴面雀', 2, '20.0', '35.0', 50, 3),
+(34, 3500, 'Sanuwa', 'Sanuwa', 'Sanuwa', 'Sanuwa', 'サヌワ', '腾云蛇', 2, '36.0', '21.0', 51, 1),
+(35, 3514, 'Sanuwa Vundu', 'Sanuwa Vundu', 'Sanuwa Des Vundu', 'Vundo-Sanuwa', 'サヌワ・ブンド', '腾云蛇温杜', 2, '30.0', '14.0', 57, NULL),
+(36, 3525, 'Toco Toco', 'Toco Toco', 'Toco Toco', 'Tokotoko', 'トコトコ', '巨嘴鸟', 2, '21.0', '7.0', 59, 3),
+(37, 3523, 'Tsanahale', 'Tsanahale', 'Tsanahale', 'Tsanahal', 'ツィナハレ', '奇纳哈尔鸟妖', 2, '15.4', '7.3', 59, 2),
+(38, 3503, 'Vuk\'laii Gundu', 'Vuk\'laii Gundu', 'Vuk\'laii Des Gundu', 'Vuk\'laii Gundo', 'ヴクライ・グンド', '衮杜乌腊义', 2, '36.0', '25.0', 51, 1),
+(39, 3509, 'Window Wamoura', 'Window Wamoura', 'Wamoura De La Fenêtre Bleue', 'Himmelblau-Wamoura', 'ウィンドウ・ワモーラ', '天窗瓦魔蛾', 2, '9.0', '16.0', 57, 1),
+(40, 3510, 'Window Wamouracampa', 'Window Wamouracampa', 'Wamouracampa De La Fenêtre Bleue', 'Himmelblau-Wamouracampa', 'ウィンドウ・ワモーラカンパ', '天窗瓦魔蛾幼虫', 2, '6.0', '19.0', 57, 2),
+(41, 3504, 'Wisent', 'Wisent', 'Wisent', 'Wisent', 'ウィセント', '文森野牛', 2, '20.0', '38.0', 56, 2),
+(42, 3565, 'Bandersnatch', 'Bandersnatch', 'Bandersnatch', 'Bandersnatch', 'バンダースナッチ', '斑攫兽', 3, '34.0', '14.0', 52, 3),
+(43, 3587, 'Bone Aevis', 'Bone Aevis', 'Ostéoneibis', 'Knochen-Avis', 'ボーンエイビス', '白骨龙鸟', 3, '11.0', '39.0', 57, NULL),
+(44, 3566, 'Brown Bear', 'Brown Bear', 'Ours Brun', 'Braunbär', 'ブラウンベアー', '棕熊', 3, '30.0', '11.0', 52, 2),
+(45, 3570, 'Clearwater Nanka', 'Clearwater Nanka', 'Nanka D\'eau Douce', 'Fluss-Nanka', 'リバー・ナンカ', '清水南加', 3, '28.0', '22.0', 52, NULL),
+(46, 3569, 'Clearwater Ninki Nanka', 'Clearwater Ninki Nanka', 'Ninki Nanka D\'eau Douce', 'Fluss-Ninki Nanka', 'リバー・ニンキナンカ', '清水宁基南加', 3, '28.0', '22.0', 52, 2),
+(47, 3572, 'Dragonfly Watcher', 'Dragonfly Watcher', 'Draguêpe Veilleur', 'Späher-Drachycera', 'ドラゴンフライ・ウォッチャー', '守望蜻蜓飞蜥', 3, '25.0', '33.0', 52, 2),
+(48, 3567, 'Dravanian Aevis', 'Dravanian Aevis', 'Eibis Dravanien', 'Dravanischer Avis', 'ドラヴァニアン・エイビス', '龙堡龙鸟', 3, '25.0', '23.0', 52, 2),
+(49, 3576, 'Dravanian Wyvern', 'Dravanian Wyvern', 'Wyverne Dravanienne', 'Dravanischer Wyvern', 'ドラヴァニアン・ワイバーン', '龙堡双足飞龙', 3, '17.0', '36.0', 53, 3),
+(50, 3563, 'Feather Flea', 'Feather Flea', 'Puce à Plumes', 'Fiederfloh', 'フェザーフリー', '羽毛跳蚤', 3, '35.0', '24.0', 52, 3),
+(51, 3578, 'Forelands Hippocerf', 'Forelands Hippocerf', 'Hippocerf De L\'avant-pays', 'Vorland-Hippocerf', 'フォーランド・ヒッポセルフ', '参天骏雕', 3, '21.0', '23.0', 53, 3),
+(52, 3579, 'Gallimimus', 'Gallimimus', 'Gallimimus', 'Gallimimus', 'ガッリミムス', '似鸡龙', 3, '18.0', '15.0', 53, 3),
+(53, 3573, 'Gnath Firedrone', 'Gnath Firedrone', 'Gnathe Myrmifeu', 'Gnath-Feuerdrohne', 'グナース・ファイアドローン', '骨颌火兵', 3, '27.0', '36.0', 52, NULL),
+(54, 3588, 'Golden Bandersnatch', 'Golden Bandersnatch', 'Bandersnatch Doré', 'Goldener Bandersnatch', 'ゴールデン・バンダースナッチ', '金斑攫兽', 3, '26.0', '7.0', 57, NULL),
+(55, 3571, 'Loaghtan', 'Loaghtan', 'Loaghtan', 'Loaghtan', 'ロフタン', '洛夫坦山羊', 3, '26.0', '30.0', 52, 3),
+(56, 3568, 'Melia', 'Melia', 'Mélia', 'Meliade', 'メリアエ', '枯树精', 3, '24.0', '23.0', 52, 2),
+(57, 3577, 'Miacid', 'Miacid', 'Miacis', 'Miacis', 'ミアキス', '细齿兽', 3, '19.0', '27.0', 53, 3),
+(58, 3555, 'Syricta', 'Syricta', 'Syricta', 'Syricta', 'シリクタ', '希里科塔', 3, '13.0', '18.0', 53, 2),
+(59, 3586, 'Thunder Dragon', 'Thunder Dragon', 'Dragon De Foudre', 'Blitzdrache', 'サンダードラゴン', '雷龙', 3, '31.0', '8.0', 57, 1),
+(60, 3581, 'Vinegaroon', 'Vinegaroon', 'Vinaigrier', 'Geißelskorpion', 'ビネガロン', '醋蝎龙', 3, '13.0', '14.0', 53, 2),
+(62, 3564, 'Wild Chocobo', 'Wild Chocobo', 'Chocobo Sauvage', 'Wild-Chocobo', 'ワイルドチョコボ', '野生陆行鸟', 3, '35.0', '21.0', 52, 3),
+(63, 3619, 'Amphiptere', 'Amphiptere', 'Amphiptère', 'Amphitere', 'アンフィプテレ', '安菲瑟龙', 4, '17.0', '31.0', 54, 2),
+(64, 3620, 'Archaeosaur', 'Archaeosaur', 'Archéosaure', 'Archaeosaurus', 'アルケオダイノス', '古恐龙', 4, '24.0', '26.0', 54, NULL),
+(65, 3625, 'Bladed Vinegaroon', 'Bladed Vinegaroon', 'Vinaigrier à Lames', 'Klingen-Geißelskorpion', 'ブレード・ビネガロン', '利刃醋蝎龙', 4, '14.0', '22.0', 55, 2),
+(66, 3630, 'Blood Dragon', 'Blood Dragon', 'Dragon De Sang', 'Blutdrache', 'ブラッドドラゴン', '血龙', 4, '28.3', '11.2', 56, 1),
+(67, 3631, 'Cloud Aevis', 'Cloud Aevis', 'Nubeibis', 'Wolken-Avis', 'クラウドエイビス', '白云龙鸟', 4, '9.0', '36.0', 56, 1),
+(68, 3629, 'Diresaur', 'Diresaur', 'Allosaure', 'Werdrache', 'ウェアドラゴン', '变种龙', 4, '7.0', '19.0', 56, 3),
+(69, 3623, 'Dragonet', 'Dragonet', 'Dragonnet', 'Drachenjunges', 'ドラゴネット', '幼龙', 4, '17.0', '12.0', 55, 3),
+(70, 3626, 'Elder Syricta', 'Elder Syricta', 'Syricta Antique', 'Höherer Syricta', 'エルダーシリクタ', '古老希里科塔', 4, '34.0', '22.0', 55, 2),
+(71, 3628, 'Elder Wyvern', 'Elder Wyvern', 'Wyverne Ancienne', 'Höherer Wyvern', 'エルダーワイバーン', '古老双足飞龙', 4, '25.0', '30.0', 55, NULL),
+(72, 3668, 'Gnarled Melia', 'Gnarled Melia', 'Mélia Noueuse', 'Knorrige Meliade', 'ナールド・メリアエ', '扭曲枯树精', 4, '10.0', '20.0', 55, NULL),
+(73, 3614, 'Hropken', 'Hropken', 'Hropken', 'Hropken', 'ロプケン', '洛浦肯', 4, '36.0', '28.0', 54, 2),
+(74, 3621, 'Limestone Golem', 'Limestone Golem', 'Golem De Calcaire', 'Kalkstein-Golem', 'ライムゴーレム', '石灰巨像', 4, '9.0', '12.0', 55, 2),
+(75, 3618, 'Lower Skylord', 'Lower Skylord', 'Maître Aérien Mineur', 'Niederer Drache', 'レッサードラゴン', '小龙', 4, '20.0', '28.0', 54, 2),
+(76, 3627, 'Mists Biast', 'Mists Biast', 'Biast Des Brumes', 'Nebel-Smei', 'ミスト・ビアスト', '浓雾雷蛟', 4, '34.0', '32.0', 55, 2),
+(77, 3622, 'Mists Drake', 'Mists Drake', 'Dragon Des Brumes', 'Nebel-Drakon', 'ミスト・ドレイク', '浓雾火蛟', 4, '10.0', '18.0', 55, 3),
+(78, 3617, 'Moss Dragon', 'Moss Dragon', 'Dragon Moussu', 'Moosdrache', 'モスドラゴン', '苔龙', 4, '23.0', '20.0', 54, 2),
+(79, 3613, 'Sankchinni', 'Sankchinni', 'Sankchinni', 'Sankchinni', 'サンクチンニ', '山克芹尼', 4, '27.0', '31.0', 54, 3),
+(80, 3615, 'Tulihand', 'Tulihand', 'Tulihänd', 'Tulihand', 'トゥリヘンド', '火尾飞蜥', 4, '33.0', '16.0', 54, 2),
+(81, 3624, 'Vouivre', 'Vouivre', 'Vouivre', 'Vivel', 'ヴィーヴル', '薇薇尔飞龙', 4, '21.0', '20.0', 55, 2),
+(82, 3612, 'Bifericeras', 'Bifericeras', 'Biféricéras', 'Bifericeras', 'ビフェリケラス', '对菊石', 5, '25.0', '27.0', 59, 3),
+(83, 3609, 'Cockatrice', 'Cockatrice', 'Cocatrix', 'Cockatrice', 'コカトリス', '魔蛇鸟', 5, '18.0', '36.0', 59, 3),
+(84, 3603, 'Crawler', 'Crawler', 'Chenille', 'Kriecher', 'クロウラー', '毛爬虫', 5, '12.0', '16.0', 58, 3),
+(85, 3594, 'Damselfly', 'Damselfly', 'Demoiselle', 'Kleinlibelle', 'ダムゼルフライ', '灯芯蜻蛉', 5, '24.5', '19.9', 58, 2),
+(86, 3598, 'Goblin Brandisher', 'Goblin Brandisher', 'Brandisseur Gobelin', 'Goblin-Schleuderer', 'ゴブリン・ブランディッシャー', '哥布林挥刀者', 5, '29.0', '21.0', 58, 1),
+(87, 3600, 'Goblin Sharpshooter', 'Goblin Sharpshooter', 'Tireur Gobelin', 'Goblin-Scharfschütze', 'ゴブリン・シャープシューター', '哥布林狙击手', 5, '30.0', '21.0', 58, 2),
+(88, 3599, 'Goblin Tinkerer', 'Goblin Tinkerer', 'Rétameur Gobelin', 'Goblin-Bastler', 'ゴブリン・ティンカラー', '哥布林修补匠', 5, '29.0', '22.0', 58, 2),
+(89, 3605, 'Great Morbol', 'Great Morbol', 'Grand Morbol', 'Groß-Morbol', 'モルボルグレート', '大魔界花', 5, '10.0', '21.0', 58, 1),
+(90, 3610, 'Okeanis', 'Okeanis', 'Océanide', 'Okeanis', 'オーケアニス', '俄刻阿尼斯', 5, '9.0', '30.0', 59, 2),
+(91, 3604, 'Orn Kite', 'Orn Kite', 'Colibri D\'Orn', 'Orn-Kolibri', 'オーン・コリブリ', '奥恩飞鸢', 5, '11.0', '28.0', 58, 3),
+(92, 3607, 'Poroggo', 'Poroggo', 'Poroggo', 'Poroggo', 'ポロッゴ', '智蛙', 5, '11.0', '33.0', 59, 2),
+(93, 3595, 'Ratel', 'Ratel', 'Ratel', 'Ratel', 'ラーテル', '蜜獾', 5, '28.0', '25.0', 58, 2),
+(94, 3611, 'Sun Leech', 'Sun Leech', 'Sangsue Solaire', 'Sonnen-Egel', 'サンリーチ', '太阳水蛭', 5, '9.0', '32.0', 59, 2),
+(95, 3593, 'Tarantula Hawk', 'Tarantula Hawk', 'Guêpe Pepsis', 'Tarantulafalke', 'タランチュラホーク', '蛛蜂', 5, '26.8', '16.3', 58, 3),
+(96, 3545, '6th Legion Vanguard', '6th Legion Vanguard', 'Avant-garde De La 6e Légion', 'Frontbrecher der VI. Legion', 'VIレギオン・ヴァンガード', '第六军团魔导先锋', 6, '35.0', '24.0', 59, NULL),
+(97, 3552, 'Adamantite Claw', 'Adamantite Claw', 'Griffe D\'adamantium Magitek', 'Magitek-Adamantiumklaue', '魔導アダマンクロー', '魔导精金爪', 6, '31.0', '30.0', 59, NULL),
+(98, 3540, 'Allagan Chimera', 'Allagan Chimera', 'Chimère Allagoise', 'Allagische Chimära', 'アラガン・キマイラ', '亚拉戈奇美拉', 6, '31.0', '5.0', 59, 1),
+(99, 3534, 'Clockwork Engineer', 'Clockwork Engineer', 'Ingénieur Mécanique', 'Uhrwerk-Techniker', 'アラガンワーク・エンジニア', '亚拉戈发条工程师', 6, '15.0', '12.0', 59, 1),
+(100, 3535, 'Clockwork Paladin', 'Clockwork Paladin', 'Paladin Mécanique', 'Uhrwerk-Paladin', 'アラガンワーク・パラディン', '亚拉戈发条圣骑士', 6, '15.0', '12.0', 59, 1),
+(101, 3542, 'Corpse Flower', 'Corpse Flower', 'Fleur-dépouille', 'Titanenwurz', 'コープスフラワー', '尸生花', 6, '33.0', '10.0', 59, 2),
+(102, 3541, 'Empuse', 'Empuse', 'Empousa', 'Empusa', 'エンプーサ', '疫虫', 6, '30.0', '15.0', 59, 2),
+(103, 3537, 'Enforcement Droid', 'Enforcement Droid', 'Droïde D\'exécution', 'Vollzugsdroide', 'エンフォースドロイド', '执法机甲', 6, '13.0', '17.7', 59, 3),
+(104, 3539, 'Lamia Cybrid', 'Lamia Cybrid', 'Lamia Cybride', 'Lamia-Zybrid', 'ラミア・サイブリッド', '胞质杂交拉米亚', 6, '27.0', '11.0', 59, 1),
+(105, 3580, 'Lesser Hydra', 'Lesser Hydra', 'Hydre Mineure', 'Kleine Hydra', 'レッサーハイドラ', '小海德拉', 6, '13.0', '33.0', 59, 2),
+(106, 3559, 'Meracydian Amphiptere', 'Meracydian Amphiptere', 'Amphiptère Méracydien', 'Meracydische Amphitere', 'メラシディアン・アンフィプテレ', '美拉西迪亚安菲瑟龙', 6, '18.0', '31.0', 59, NULL),
+(107, 3557, 'Meracydian Brobinyak', 'Meracydian Brobinyak', 'Brobinyak Méracydien', 'Meracydischer Brobinyak', 'メラシディアン・ブロビニャク', '美拉西迪亚布罗宾雅克', 6, '7.0', '31.0', 59, 1),
+(108, 3560, 'Meracydian Dragon', 'Meracydian Dragon', 'Dragon Méracydien', 'Meracydischer Drache', 'メラシディアン・ドラゴン', '美拉西迪亚巨龙', 6, '8.0', '27.0', 59, NULL),
+(109, 3556, 'Meracydian Vouivre', 'Meracydian Vouivre', 'Vouivre Méracydienne', 'Meracydische Vivel', 'メラシディアン・ヴィーヴル', '美拉西迪亚薇薇尔飞龙', 6, '9.0', '37.0', 59, 1),
+(110, 3543, 'Proto-naga', 'Proto-naga', 'Proto-naga', 'Proto-Naga', 'プロト・ナーガ', '原型那迦', 6, '35.0', '8.0', 59, 2),
+(111, 3544, 'Reptoid', 'Reptoid', 'Reptoïde', 'Reptoid', 'レプトイド', '爬虫半人马', 6, '33.0', '12.0', 59, 2),
+(112, 3532, 'Snapper-rook', 'Snapper-rook', 'Drone-drille', 'Schnappturm', 'ルークスナッパー', '响声堡', 6, '12.0', '13.0', 59, 2),
+(113, 3489, 'Grand Archaeornis', 'Grand Archaeornis', 'Grand Archéornis', 'Großer Archaeornis', 'グランド・アルケオーニス', '大古鸟', 1, '35.0', '18.0', 56, NULL),
+(114, 3616, 'Wadjet', 'Wadjet', 'Ouadjet', 'Wadjet', 'ウアジェット', '神蜥蜴瓦吉特', 4, '28.0', '19.0', 54, 2),
+(115, 3608, 'Opken', 'Opken', 'Opken', 'Opken', 'オプケン', '欧浦肯', 5, '13.0', '33.0', 59, 3),
+(120, 3533, 'Owlbear', 'Owlbear', 'Hibours', 'Strigidae', 'オウルベア', '枭熊', 6, '13.0', '12.0', 59, 3),
+(122, 3477, 'Coldwind Bateleur', 'Coldwind Bateleur', 'Bateleur De Ventfroid', 'Kaltwind-Gaukler', 'コールドウィンド・バテラー', '寒风短尾雕', 1, '30.0', '13.0', 50, NULL),
+(124, 3513, 'Vundu Totem', 'Vundu Totem', 'Totem Des Vundu', 'Vundo-Totem', 'ブンド・トーテム', '温杜图腾', 2, '17.0', '17.0', 57, 1),
+(125, 3582, 'Tyrannosaur', 'Tyrannosaur', 'Tyrannosaure', 'Tyrannosaurus', 'ティラノサウルス', '暴龙', 3, '13.0', '18.0', 53, 2),
+(127, 3596, 'Wildebeest', 'Wildebeest', 'Gnou', 'Gnu', 'ワイルドビースト', '牛羚', 5, '33.0', '19.0', 58, 3),
+(128, 3554, 'Meracydian Falak', 'Meracydian Falak', 'Falak Méracydien', 'Meracydischer Falak', 'メラシディアン・ファラク', '美拉西迪亚法拉克', 6, '15.0', '28.0', 59, 1),
+(129, 3602, 'Espertype Magitek Vangob G-III', 'Espertype Magitek Vangob G-III', 'Gobavant-garde Magitek G-III Écrabouilleuse', 'Magitek-Gobbrecher III-E', 'III号ゴブリガードE型', '3号哥布林装甲E型', 5, '31.0', '19.0', 58, NULL),
+(130, 3597, 'Narbrooi', 'Narbrooi', 'Narbrooi', 'Narbrooi', 'ナルブルーイ', '纳布芮依', 5, '35.0', '21.0', 58, 3),
+(131, 3606, 'Sun Bear', 'Sun Bear', 'Bruan', 'Sonnenbär', 'サンベアー', '太阳熊', 5, '8.0', '28.0', 58, NULL),
+(132, 3574, 'Gnath Steeldrone', 'Gnath Steeldrone', 'Gnathe Myrmacier', 'Gnath-Stahldrohne', 'グナース・スチールドローン', '骨颌钢兵', 3, '27.0', '36.0', 52, NULL),
+(133, 3575, 'Gnath Cultivator', 'Gnath Cultivator', 'Gnathe Cultivateur', 'Gnath-Kultivator', 'グナース・カルティベーター', '骨颌播种员', 3, '27.0', '36.0', 52, NULL),
+(134, 3583, 'Gnath Haildrone', 'Gnath Haildrone', 'Gnathe Myrmigrêle', 'Gnath-Hageldrohne', 'グナース・ヘイルドローン', '骨颌冰兵', 3, '27.0', '36.0', 53, NULL),
+(135, 3584, 'Gnath Irondrone', 'Gnath Irondrone', 'Gnathe Myrmifer', 'Gnath-Eisendrohne', 'グナース・アイアンドローン', '骨颌铁兵', 3, '27.0', '36.0', 53, NULL),
+(136, 3585, 'Gnath Forager', 'Gnath Forager', 'Gnathe Glaneur', 'Gnath-Furier', 'グナース・フォリジャー', '骨颌觅食员', 3, '27.0', '36.0', 53, NULL),
+(137, 3589, 'Dragonfly Tracer', 'Dragonfly Tracer', 'Draguêpe Fureteur', 'Sucher-Drachycera', 'ドラゴンフライ・トレーサー', '追踪蜻蜓飞蜥', 3, '31.0', '8.0', 57, NULL),
+(138, 3536, 'Clockwork Harvestman', 'Clockwork Harvestman', 'Faucheux Mécanique', 'Uhrwerk-Ernter', 'アラガンワーク・ハーベストマン', '亚拉戈发条收割者', 6, '13.0', '8.0', 59, 3),
+(139, 3551, 'Clockwork Bit', 'Clockwork Bit', 'Foret Mécanique', 'Uhrwerk-Drohne', 'アラガンワーク・ビット', '亚拉戈发条浮游炮', 6, '6.0', '15.0', 59, NULL),
+(140, 3561, 'Warspite', 'Warspite', 'Cuirassé Warspite', 'Kriegsgroll', 'ウォースパイト', '战怨', 6, '25.0', '22.0', 60, NULL),
+(141, 3562, 'Sphinx', 'Sphinx', 'Sphinx', 'Sphinx', 'スフィンクス', '斯芬克斯', 6, '25.0', '22.0', 60, NULL),
+(142, 3549, '6th Legion Secutor', '6th Legion Secutor', 'Secutor De La 6e Légion', 'Secutor der VI. Legion', 'VIレギオン・セクトール', '第六军团剑斗士', 6, '38.0', '24.0', 59, NULL),
+(143, 3546, '6th Legion Hoplomachus', '6th Legion Hoplomachus', 'Hoplomachus De La 6e Légion', 'Hoplomachus der VI. Legion', 'VIレギオン・ホプロマクス', '第六军团拳斗士', 6, '38.0', '24.0', 59, NULL),
+(144, 3547, '6th Legion Laquearius', '6th Legion Laquearius', 'Laquearius De La 6e Légion', 'Laquearius der VI. Legion', 'VIレギオン・ラクエリウス', '第六军团绳斗士', 6, '38.0', '24.0', 59, NULL),
+(145, 4399, '6th Legion Bit', '6th Legion Bit', 'Drone De La 6e Légion', 'Drohne der VI. Legion', 'VIレギオン・ビット', '第六军团浮游炮', 6, '33.0', '26.0', 59, NULL),
+(146, 3553, 'Mark III Magitek Colossus', 'Mark III Magitek Colossus', 'Colosse Magitek III', 'Magitek-Stahlriese', '魔導コロッサスIII', '魔导巨兵三型', 6, '24.0', '30.0', 59, NULL),
+(147, 3550, '6th Legion Signifer', '6th Legion Signifer', 'Signifer De La 6e Légion', 'Signifer der VI. Legion', 'VIレギオン・シグニフェル', '第六军团旗手', 6, '33.0', '37.0', 59, NULL),
+(148, 3548, '6th Legion Eques', '6th Legion Eques', 'Eques De La 6e Légion', 'Eques der VI. Legion', 'VIレギオン・エクエス', '第六军团骑士', 6, '33.0', '37.0', 59, NULL),
+(149, 3492, 'Ice Zoblyn', 'Ice Zoblyn', 'Zoblyn De Glace', 'Eis-Zobalos', 'アイスゾブラン', '寒冰矿怪虫', 1, '29.0', '36.0', 56, NULL),
+(150, 3491, 'Sorbet', 'Sorbet', 'Sorbet', 'Sorbet', 'ソルベ', '冰糕怪', 1, '22.0', '28.0', 56, NULL),
+(151, 3538, 'Lamia Thelytoke', 'Lamia Thelytoke', 'Lamia Thélitoque', 'Lamia-Thelytokie', 'ラミア・テリトーク', '单性繁殖拉米亚', 6, '27.0', '11.0', 59, 1),
+(152, 3558, 'Meracydian Dragonet', 'Meracydian Dragonet', 'Dragonnet Méracydien', 'Meracydisches Drachenjunges', 'メラシディアン・ドラゴネット', '美拉西迪亚幼龙', 6, '7.0', '35.0', 59, 1),
+(153, 3601, 'Goblin Glider', 'Goblin Glider', 'Voltigeur Gobelin', 'Goblin-Gleiter', 'ゴブリン・グライダー', '哥布林滑翔兵', 5, '32.0', '23.0', 58, 2),
+(154, 3592, 'Loth Cultivator', 'Loth Cultivator', 'Cultivateur Du Loth', 'Loth-Kultivator', 'ロス・カルティベーター', '骨颌违心播种员', 3, '26.0', '36.0', 57, 1),
+(156, 3590, 'Loth Firedrone', 'Loth Firedrone', 'Myrmifeu Du Loth', 'Loth-Feuerdrohne', 'ロス・ファイアドローン', '骨颌违心火兵', 3, '26.0', '36.0', 57, 1),
+(155, 3591, 'Loth Steeldrone', 'Loth Steeldrone', 'Myrmacier Du Loth', 'Loth-Stahldrohne', 'ロス・スチールドローン', '骨颌违心钢兵', 3, '26.0', '36.0', 57, 1),
+(157, 3486, 'Ice Dragon', 'Ice Dragon', 'Dragon De Glace', 'Frostdrache', 'フリーズドラゴン', '冰龙', 1, '14.0', '23.7', 56, NULL),
+(158, 3488, 'Sleet Trap', 'Sleet Trap', 'Piège-grésil', 'Graupelfalle', 'スリートトラップ', '雨雪陷阱草', 1, '36.0', '7.0', 56, NULL),
+(159, 3520, '6th Legion Bestiarius', '6th Legion Bestiarius', 'Bestiarius De La 6e Légion', 'Bestiarius der VI. Legion', 'VIレギオン・ベスティアリウス', '第六军团矛斗士', 2, '23.0', '23.0', 57, NULL),
+(160, 3522, '6th Legion Imaginifer', '6th Legion Imaginifer', 'Imaginifer De La 6e Légion', 'Imaginifer der VI. Legion', 'VIレギオン・イマギニファー', '第六军团咒法士', 2, '23.0', '23.0', 57, NULL),
+(161, 3519, '6th Legion Myrmillo', '6th Legion Myrmillo', 'Myrmillo De La 6e Légion', 'Myrmillo der VI. Legion', 'VIレギオン・ミュルミッロ', '第六军团鱼斗士', 2, '23.0', '23.0', 57, NULL),
+(162, 3518, '6th Legion Triarius', '6th Legion Triarius', 'Triarius De 6e Légion', 'Triarius der VI. Legion', 'VIレギオン・トリアリウス', '第六军团角斗士', 2, '23.0', '23.0', 57, NULL),
+(163, 3521, '6th Legion Veles', '6th Legion Veles', 'Veles De La 6e Légion', 'Veles der VI. Legion', 'VIレギオン・ヴェリス', '第六军团前卫', 2, '23.0', '23.0', 57, NULL),
+(164, 3508, 'Abalathian Kite', 'Abalathian Kite', 'Milan D\'Abalathia', 'Abalathischer Milan', 'アバラシア・カイト', '阿拉巴提亚飞鸢', 2, '18.0', '29.0', 57, NULL),
+(165, 3526, 'Griffin', 'Griffin', 'Griffon', 'Griffon', 'グリフィン', '狮鹫', 2, '37.0', '15.0', 59, NULL),
+(166, 3527, 'Lan\'loii Vundu', 'Lan\'loii Vundu', 'Lan\'loii Des Vundu', 'Lan\'loii Vundo', 'ランロイ・ブンド', '温杜兰洛义', 2, '37.0', '15.0', 59, NULL),
+(167, 3530, 'Mockingbird Totem', 'Mockingbird Totem', 'Totem De Moqueur', 'Spottdrossel-Totem', 'モッキンバード・トーテム', '仿声鸟图腾', 2, '37.0', '15.0', 59, NULL),
+(168, 3528, 'Nat\'loii Vundu', 'Nat\'loii Vundu', 'Nat\'loii Des Vundu', 'Nat\'loii Vundo', 'ナツロイ・ブンド', '温杜那洛义', 2, '37.0', '15.0', 59, NULL),
+(169, 3531, 'O\'sanuwa Vundu', 'O\'sanuwa Vundu', 'O\'sanuwa Des Vundu', 'Vundo-O\'sanuwa', 'オサヌワ・ブモラ', '温杜欧腾云蛇', 2, '37.0', '15.0', 59, NULL),
+(170, 3517, 'Vuk\'laii Vundu', 'Vuk\'laii Vundu', 'Vuk\'laii Des Vundu', 'Vuk\'laii Vundo', 'ヴクライ・ブンド', '温杜乌腊义', 2, '23.0', '23.0', 57, NULL),
+(171, 3529, 'Vuk\'loii Vundu', 'Vuk\'loii Vundu', 'Vuk\'loii Des Vundu', 'Vuk\'loii Vundo', 'ヴクロイ・ブンド', '温杜乌洛义', 2, '37.0', '15.0', 59, NULL),
+(172, 3507, 'Wily Paissa', 'Wily Paissa', 'Païssa Rusé', 'Gerissener Paissa', 'ワイリー・パイッサ', '狡猾猴面雀', 2, '18.0', '29.0', 56, NULL);
 
 --
 -- Triggers `mobs_hw`
 --
+DROP TRIGGER IF EXISTS `mob_hw_del`;
 DELIMITER $$
 CREATE TRIGGER `mob_hw_del` AFTER DELETE ON `mobs_hw` FOR EACH ROW BEGIN
 	CALL update_etag('distances_hw');
@@ -2539,6 +2811,7 @@ CREATE TRIGGER `mob_hw_del` AFTER DELETE ON `mobs_hw` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_hw_ins`;
 DELIMITER $$
 CREATE TRIGGER `mob_hw_ins` AFTER INSERT ON `mobs_hw` FOR EACH ROW BEGIN
 	CALL update_etag('distances_hw');
@@ -2546,6 +2819,7 @@ CREATE TRIGGER `mob_hw_ins` AFTER INSERT ON `mobs_hw` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_hw_upd`;
 DELIMITER $$
 CREATE TRIGGER `mob_hw_upd` AFTER UPDATE ON `mobs_hw` FOR EACH ROW BEGIN
 	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.id_zone <> OLD.id_zone THEN
@@ -2562,149 +2836,155 @@ DELIMITER ;
 -- Table structure for table `mobs_sb`
 --
 
-CREATE TABLE `mobs_sb` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
-  `id_zone` tinyint(4) NOT NULL,
+DROP TABLE IF EXISTS `mobs_sb`;
+CREATE TABLE IF NOT EXISTS `mobs_sb` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
   `x` decimal(3,1) UNSIGNED NOT NULL,
   `y` decimal(3,1) UNSIGNED NOT NULL,
-  `lvl` tinyint(3) DEFAULT NULL,
-  `slain` tinyint(2) UNSIGNED DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `lvl` tinyint DEFAULT NULL,
+  `slain` tinyint UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `id` (`id`) USING BTREE,
+  KEY `PK_ID` (`id`) USING BTREE,
+  KEY `FK_ZONE` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=119 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `mobs_sb`
 --
 
 INSERT INTO `mobs_sb` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `lvl`, `slain`) VALUES
-(1, 5682, 'Burrow Antlion', 'Burrow Antlion', 'Fourmilion Creuseur', 'Erdloch-Ameisenlöwe', 'ブロウ・アントリオン', '地洞蚁狮', 1, 16.0, 24.0, 61, NULL),
-(2, 5685, 'Diakka', 'Diakka', 'Diakka', 'Diakka', 'ディアッカ', '狄亚卡', 1, 10.0, 27.0, 61, 2),
-(3, 5673, 'Dust Dhara', 'Dust Dhara', 'Dhara De Poussière', 'Staub-Dhara', 'ダスト・ダラ', '尘驼罗', 1, 27.0, 13.0, 60, NULL),
-(4, 5674, 'Foper', 'Foper', 'Fopar', 'Foper', 'フォーパー', '弗帕', 1, 22.8, 16.5, 60, 3),
-(5, 5692, 'Gagana', 'Gagana', 'Gagana', 'Gagana', 'ガガナ', '迦迦纳怪鸟', 1, 28.0, 17.0, 67, NULL),
-(6, 5697, 'Gazelle', 'Gazelle', 'Gazelle', 'Gazelle', 'ガゼル', '瞪羚', 1, 25.0, 30.0, 67, 2),
-(7, 5676, 'Gazelle Hawk', 'Gazelle Hawk', 'Frelon Gazelle', 'Gazellenfalke', 'ガゼルホーク', '羚鹰蜂', 1, 11.0, 12.0, 60, 2),
-(8, 5679, 'Gelid Bhoot', 'Gelid Bhoot', 'Bhut Glacial', 'Eisig[a] Bhut', 'ジェリド・ブフート', '极寒浮灵', 1, 25.0, 15.0, 60, 1),
-(9, 5686, 'Goosefish', 'Goosefish', 'Saillot', 'Seeteufel', 'グース', '魔鮟鱇', 1, 9.0, 30.0, 61, 3),
-(10, 5696, 'Highland Dhara', 'Highland Dhara', 'Dhara Des Hauteurs', 'Hochland-Dhara', 'ハイランド・ダラ', '高地驼罗', 1, 29.5, 29.1, 67, NULL),
-(11, 5671, 'Leshy', 'Leshy', 'Liéchi', 'Leschij', 'レーシー', '莱西', 1, 11.0, 14.0, 60, 3),
-(12, 5672, 'Lesser Gagana', 'Lesser Gagana', 'Gagana Mineur', 'Klein[a] Gagana', 'レッサー・ガガナ', '小迦迦纳怪鸟', 1, 20.0, 10.0, 60, NULL),
-(13, 5687, 'Mossling', 'Mossling', 'Moussemousse', 'Moosling', 'モスモス', '苔小妖', 1, 11.0, 23.0, 61, 2),
-(14, 5683, 'Mountain Grizzly', 'Mountain Grizzly', 'Grizzli De Montagne', 'Berggrizzly', 'マウンテン・グリズリー', '山地灰熊', 1, 11.0, 17.0, 61, 1),
-(15, 5691, 'Qalyana Brahmin', 'Qalyana Brahmin', 'Qalyana Brahmin', 'Qalyana-Brahmin', 'カリヤナ・ブラフミン', '伽黎亚婆罗门', 1, 34.0, 21.0, 67, 1),
-(16, 5689, 'Qalyana Kshatriya', 'Qalyana Kshatriya', 'Qalyana Kshatriya', 'Qalyana-Kshatriya', 'カリヤナ・クシャトリア', '伽黎亚刹帝利', 1, 34.0, 21.0, 67, 2),
-(17, 5690, 'Qalyana Shudra', 'Qalyana Shudra', 'Qalyana Shudra', 'Qalyana-Shudra', 'カリヤナ・シュードラ', '伽黎亚首陀罗', 1, 34.0, 21.0, 67, 2),
-(18, 5688, 'Sacred Marid', 'Sacred Marid', 'Marid Sacré', 'Heilig[a] Maride', 'セイクレッド・マーリド', '圣山魔象', 1, 34.0, 21.0, 67, 1),
-(19, 5675, 'Sapria', 'Sapria', 'Sapria', 'Sapria', 'サプリア', '寄生花', 1, 10.0, 15.0, 60, 1),
-(20, 5684, 'Skimmer', 'Skimmer', 'Cordulie', 'Schröpfer', 'スキマー', '蚂螂', 1, 11.0, 23.0, 61, NULL),
-(21, 5677, 'Spinner', 'Spinner', 'Fileuse', 'Spinner', 'スピナー', '纺蛛', 1, 21.0, 8.0, 60, 3),
-(22, 5693, 'Teleoceras', 'Teleoceras', 'Teleoceras', 'Teleoceras', 'テレオケラス', '远角犀', 1, 29.0, 25.0, 67, 2),
-(23, 5681, 'Tracer Antlion', 'Tracer Antlion', 'Fourmilion Fureteur', 'Jagd-Ameisenlöwe', 'トレーサー・アントリオン', '追踪蚁狮', 1, 15.2, 23.0, 61, NULL),
-(24, 5694, 'Tracker Antlion', 'Tracker Antlion', 'Fourmilion Traqueur', 'Fährtensucher-Ameisenlöwe', 'トラッカー・アントリオン', '跟踪蚁狮', 1, 29.9, 27.9, 67, NULL),
-(25, 5695, 'Trench Antlion', 'Trench Antlion', 'Fourmilion Des Fossés', 'Graben-Ameisenlöwe', 'トレンチ・アントリオン', '地沟蚁狮', 1, 30.0, 28.0, 67, NULL),
-(26, 5678, 'Velodyna Pugil', 'Velodyna Pugil', 'Pugil De La Velodyna', 'Velodyna-Pugil', 'ベロジナ・プギル', '威罗迪纳陆鱼', 1, 28.0, 16.0, 60, 2),
-(27, 5680, 'Velodyna Sarcosuchus', 'Velodyna Sarcosuchus', 'Sarcosuchus De La Velodyna', 'Velodyna-Sarcosuchus', 'ベロジナ・サルコスクス', '威罗迪纳帝王鳄', 1, 18.0, 11.0, 60, 3),
-(28, 5701, 'Bloodglider', 'Bloodglider', 'Lunigère Sanguine', 'Blutgleiter', 'ブラッドグライダー', '血飞蛾', 2, 13.0, 13.0, 60, 2),
-(29, 5700, 'Chapuli', 'Chapuli', 'Chapuli', 'Chapuli', 'チャプリ', '洽普利蚱蜢', 2, 7.0, 13.0, 60, NULL),
-(30, 5705, 'Crag Claw', 'Crag Claw', 'Griffe De Grès', 'Felsenklaue', 'クラッグクロウ', '峭壁巨钳虾', 2, 26.6, 7.8, 61, 2),
-(31, 5698, 'Dust Anila', 'Dust Anila', 'Anila De Poussière', 'Staub-Anila', 'ダスト・アニラ', '尘阿尼罗', 2, 21.0, 10.0, 60, NULL),
-(32, 5702, 'Fluturini', 'Fluturini', 'Fluturini', 'Fluturini', 'フルトゥリーニ', '浮蝶', 2, 15.0, 8.0, 60, 2),
-(33, 5703, 'Gyr Abanian Hornbill', 'Gyr Abanian Hornbill', 'Bucorve Gyrabanien', 'Abanischer Hornrabe', 'ギラバニアン・ホーンビル', '基拉巴尼亚亚犀鸟', 2, 10.0, 7.0, 60, 2),
-(34, 5713, 'Highland Eruca', 'Highland Eruca', 'Eruca Des Hauteurs', 'Hochland-Eruca', 'ハイランド・エルカ', '高地毛虫', 2, 26.0, 36.0, 68, 1),
-(35, 5710, 'Highwing Chapuli', 'Highwing Chapuli', 'Chapuli Ailes-hautes', 'Hochschwingen-Chapuli', 'ハイウィング・チャプリ', '高翅蚱蜢', 2, 18.0, 35.0, 68, NULL),
-(36, 5712, 'Jhammel', 'Jhammel', 'Jhammel', 'Jhammel', 'ジャムメル', '长颈骆', 2, 25.0, 30.0, 68, 1),
-(37, 5714, 'Kongamato', 'Kongamato', 'Kongamato', 'Kongamato', 'コンガマトー', '恐甲蚂蜓', 2, 14.0, 26.0, 68, 2),
-(38, 5707, 'Marble Urolith', 'Marble Urolith', 'Urolithe De Marbre', 'Marmor-Urolith', 'マーブル・ウロリス', '大理石乌洛里石', 2, 35.0, 9.0, 61, 1),
-(39, 5709, 'Muud Suud', 'Muud Suud', 'Moudsoud', 'Muhtsu', 'ムードスード', '姆德斯德', 2, 15.0, 31.0, 68, NULL),
-(40, 5715, 'Pantera', 'Pantera', 'Pantera', 'Pantera', 'パンテーラ', '斑豹', 2, 13.0, 29.0, 68, 2),
-(41, 5706, 'Qiqirn Meatcutter', 'Qiqirn Meatcutter', 'Qiqirn Tranche-viande', 'Qiqirn-Fleischschneider', 'キキルン・ミートカッター', '卢恩人切肉者', 2, 25.0, 20.0, 61, NULL),
-(42, 5699, 'Qiqirn Meateater', 'Qiqirn Meateater', 'Qiqirn Croque-viande', 'Qiqirn-Fleischfresser', 'キキルン・ミートイーター', '卢恩人食肉者', 2, 15.0, 14.0, 60, NULL),
-(43, 5704, 'Ruud Suud', 'Ruud Suud', 'Roudsoud', 'Ruhtsu', 'ルードスード', '鲁德斯德', 2, 31.0, 9.0, 61, NULL),
-(44, 5708, 'Scarab Beetle', 'Scarab Beetle', 'Scaraléoptère Gyrabanien', 'Abanischer Käfer', 'ギラバニアン・スカラベ', '基拉巴尼亚圣甲虫', 2, 25.0, 13.0, 61, 2),
-(45, 5711, 'True Griffin', 'True Griffin', 'Vrai Griffon', 'Urgreif', 'トゥルーグリフィン', '真狮鹫', 2, 23.0, 25.0, 68, 1),
-(46, 5747, 'Apa', 'Apa', 'Apa', 'Apa', 'アーパス', '阿帕斯', 3, 18.0, 34.0, 63, NULL),
-(47, 5737, 'Bombfish', 'Bombfish', 'Poisson-bombo', 'Igelbomber', 'ハリセンボム', '刺球爆弹怪', 3, 32.0, 35.0, 62, 2),
-(48, 5736, 'Coralshell', 'Coralshell', 'Coquorail', 'Korallenschale', 'サンゴセオイ', '珊瑚壳', 3, 33.0, 6.0, 62, 2),
-(49, 5740, 'Flying Shark', 'Flying Shark', 'Requin Volant', 'Fliegender Hai', 'トビザメ', '飞鲨', 3, 26.0, 31.0, 62, 2),
-(50, 5742, 'Gasame', 'Gasame', 'Gasame', 'Gasame', 'ガサメ', '拥剑蟹', 3, 26.0, 36.0, 62, 2),
-(51, 5734, 'Gyuki', 'Gyuki', 'Gyuki', 'Gyuki', 'ギュウキ', '牛鬼', 3, 20.0, 10.0, 62, 1),
-(52, 5741, 'Hellborn Anala', 'Hellborn Anala', 'Anala Infernal', 'Infernalisch[a] Anala', 'ゴクノ・アナラ', '地狱阿那罗', 3, 27.0, 35.0, 62, NULL),
-(53, 5749, 'Island Gedan', 'Island Gedan', 'Gedan Des îles', 'Insel-Gedan', 'ガーダン', '獦狚', 3, 11.0, 8.0, 63, NULL),
-(54, 5751, 'Naked Yumemi', 'Naked Yumemi', 'Yumemi Nu', 'Nackt-Yumemi', 'カラナシ・ユメミ', '无壳观梦螺', 3, 25.0, 26.0, 63, 1),
-(55, 5743, 'Red Bukan', 'Red Bukan', 'Bukan Rouge', 'Rot[a] Bukan', 'ベニコウラ・ブカン', '红甲武官', 3, 7.0, 26.0, 63, 2),
-(56, 5745, 'Red Honkan', 'Red Honkan', 'Honkan Rouge', 'Rot[a] Jonkan', 'ベニコウラ・ホンカン', '红甲正官', 3, 7.0, 26.0, 63, 2),
-(57, 5744, 'Red Hyoe', 'Red Hyoe', 'Hyoe Rouge', 'Rot[a] Hyoe', 'ベニコウラ・ヒョウエ', '红甲兵卫', 3, 7.0, 26.0, 63, 2),
-(58, 5748, 'Ruby Hornbill', 'Ruby Hornbill', 'Bucorve De Rubis', 'Rubin-Hornrabe', 'ベニツノ', '红角犀鸟', 3, 33.0, 19.0, 63, NULL),
-(59, 5738, 'Sea Serpent', 'Sea Serpent', 'Serpent De Mer', 'Seeschlange', 'オオウミヘビ', '大海蛇', 3, 30.0, 8.0, 62, 2),
-(60, 5739, 'Shiranui', 'Shiranui', 'Shiranui', 'Shiranui', 'シラヌイ', '不知火', 3, 25.0, 6.0, 62, 2),
-(61, 5746, 'Striped Ray', 'Striped Ray', 'Raie Rayée', 'Gestreifter Rochen', 'シマエイ', '斑鳐', 3, 7.0, 26.0, 63, 2),
-(62, 5733, 'Tatsunoko', 'Tatsunoko', 'Tatsunoko', 'Tatsunoko', 'タツノコ', '龙之子', 3, 28.0, 31.0, 62, 2),
-(63, 5735, 'Unkiu', 'Unkiu', 'Unkiu', 'Unkiu', 'ウンキウ', '甲鲎', 3, 34.0, 16.0, 62, 3),
-(64, 5750, 'Yumemi', 'Yumemi', 'Yumemi', 'Yumemi', 'ユメミガイ', '观梦螺', 3, 25.0, 26.0, 63, 1),
-(65, 5761, 'Bi Fang', 'Bi Fang', 'Bibao', 'Bibao', 'ヒッポウ', '毕方', 4, 17.8, 30.5, 64, 2),
-(66, 5758, 'Doman Weasel', 'Doman Weasel', 'Furet Domien', 'Doma-Wiesel', 'ドマイタチ', '多玛鼬', 4, 33.0, 29.0, 64, NULL),
-(67, 5769, 'Ebisu Catfish', 'Ebisu Catfish', 'Namazu Ebisu', 'Ebisu Namazuo', 'エビス・ナマズオ', '惠比寿鲶鱼精', 4, 27.0, 8.0, 67, 3),
-(68, 5766, 'Gensui Apa', 'Gensui Apa', 'Apa Du Gensui', 'Gensui-Apa', 'ゲンスイ・アーパス', '玄水阿帕斯', 4, 21.0, 34.0, 64, NULL),
-(69, 5767, 'Gensui Dhara', 'Gensui Dhara', 'Dhara Du Gensui', 'Gensui-Dhara', 'ゲンスイ・ダラ', '玄水驼罗', 4, 38.0, 21.0, 64, NULL),
-(70, 5756, 'Koja', 'Koja', 'Koja', 'Koja', 'コジャ', '高加颅', 4, 16.0, 27.0, 64, NULL),
-(71, 5752, 'Lupin Bladehand', 'Lupin Bladehand', 'Lupin Bretteur', 'Wolfsleute-Schwertkämpfer', '人狼族の太刀使い', '狼人族刀手', 4, 24.0, 29.0, 64, 1),
-(72, 5754, 'Lupin Bowhand', 'Lupin Bowhand', 'Lupin Archer', 'Wolfsleute-Bogenschütze', '人狼族の弓使い', '狼人族弓手', 4, 24.0, 29.0, 64, 1),
-(73, 5753, 'Lupin Spearhand', 'Lupin Spearhand', 'Lupin Lancier', 'Wolfsleute-Pikenier', '人狼族の槍使い', '狼人族枪手', 4, 23.0, 29.0, 64, 1),
-(74, 5770, 'Magatsu', 'Magatsu', 'Koja Magatsu', 'Magatsu Koja', 'マガツ・コジャ', '祸津高加颅', 4, 17.0, 13.0, 67, NULL),
-(75, 5768, 'Magatsu Kiyofusa', 'Magatsu Kiyofusa', 'Kiyofusa Magatsu', 'Magatsu Kiyofusa', 'マガツ・キヨフサ', '祸津清房', 4, 16.0, 12.0, 67, 3),
-(76, 5763, 'Minobi', 'Minobi', 'Minobi', 'Minobi', 'ミノビ', '蓑火', 4, 32.0, 20.0, 64, 3),
-(77, 5772, 'Rainbow Tiger', 'Rainbow Tiger', 'Tigre De La Vallée', 'Regenbogen-Tiger', 'シチサイトラ', '七彩虎', 4, 28.0, 12.0, 67, NULL),
-(78, 5757, 'Rhino Beetle', 'Rhino Beetle', 'Rhinoscarabée', 'Nashornkäfer', 'サイカブト', '犀甲虫', 4, 32.0, 22.0, 64, 3),
-(79, 5759, 'River Hornbill', 'River Hornbill', 'Bucorve De Rivière', 'Fluss-Hornrabe', 'ムニ・ベニツノ', '无二红角犀鸟', 4, 29.0, 25.0, 64, NULL),
-(80, 5765, 'Taoquan', 'Taoquan', 'Taoquan', 'Taoquan', 'タオチュアン', '蜪犬', 4, 30.0, 35.0, 64, 2),
-(81, 5755, 'Tenaga', 'Tenaga', 'Tenaga', 'Tenaga', 'テナガ', '长手精', 4, 28.0, 32.0, 64, 2),
-(82, 5764, 'Vanara', 'Vanara', 'Vanara', 'Vanara', 'ヴァナラ', '婆那罗', 4, 25.0, 29.0, 64, 2),
-(83, 5762, 'Water Serpent', 'Water Serpent', 'Serpent D\'eau', 'Wasserschlange', 'ミズヘビ', '水蛇', 4, 25.0, 28.0, 64, 2),
-(84, 5771, 'Whitewing Hornbill', 'Whitewing Hornbill', 'Bucorve Ailes-blanches', 'Weißschwingen-Hornrabe', 'サキジロ・ベニツノ', '白翼红角犀鸟', 4, 21.0, 13.0, 67, NULL),
-(85, 5760, 'Yanxian Tiger', 'Yanxian Tiger', 'Tigre Yanxien', 'Yanxia-Tiger', 'ヤンサトラ', '延夏虎', 4, 36.0, 17.0, 64, NULL),
-(86, 5785, 'Baras', 'Baras', 'Baras', 'Baras', 'ベルス', '伯尔斯虎', 5, 16.0, 19.0, 66, 3),
-(87, 5787, 'Buzzfly', 'Buzzfly', 'Vombrellule', 'Brummfliege', 'バズフライ', '噪蜻蜓', 5, 21.0, 29.0, 66, NULL),
-(88, 5788, 'Chaochu', 'Chaochu', 'Chaotyugh', 'Chaochu', 'カオチュー', '庞口花', 5, 20.0, 26.0, 66, 2),
-(89, 5786, 'Gulo Gulo', 'Gulo Gulo', 'Gulo Gulo', 'Gulo Gulo', 'グログロ', '狼獾', 5, 16.0, 26.0, 66, NULL),
-(90, 5777, 'Halgai', 'Halgai', 'Halgai', 'Halgai', 'ハルガイ', '刺草球', 5, 21.0, 19.0, 65, 3),
-(91, 5778, 'Khun Chuluu', 'Khun Chuluu', 'Khun Chuluu', 'Khun Chuluu', 'フン・チョロー', '石人浑朝鲁', 5, 17.0, 11.0, 65, 3),
-(92, 5781, 'Mammoth', 'Mammoth', 'Mammouth', 'Mammut', 'マンモス', '长毛象', 5, 28.0, 18.0, 65, 2),
-(93, 5783, 'Manzasiri', 'Manzasiri', 'Manzasiri', 'Manzasiri', 'マンザシリ', '曼殊师里', 5, 12.0, 30.0, 66, 3),
-(94, 5775, 'Matamata', 'Matamata', 'Matamata', 'Matamata', 'マタマタ', '玛塔蛇颈龟', 5, 27.0, 15.0, 65, 2),
-(95, 5782, 'Matanga', 'Matanga', 'Matanga', 'Matanga', 'マタンガ', '象魔', 5, 10.0, 21.0, 66, 2),
-(96, 5779, 'Muu Shuwuu', 'Muu Shuwuu', 'Muu Shuwuu', 'Muu Shuwuu', 'モー・ショボー', '邪鸟木绍布', 5, 29.0, 11.0, 65, 2),
-(97, 5780, 'Purbol', 'Purbol', 'Purbol', 'Purbol', 'プルボル', '紫魔花', 5, 34.0, 21.0, 65, 3),
-(98, 5784, 'Steppe Anala', 'Steppe Anala', 'Anala De La Steppe', 'Steppen-Anala', 'ステップ・アナラ', '草原阿那罗', 5, 15.0, 32.0, 66, NULL),
-(99, 5776, 'Steppe Dhole', 'Steppe Dhole', 'Dhole De La Steppe', 'Steppen-Dhole', 'ステップドール', '草原朵尔', 5, 28.0, 29.0, 65, 3),
-(100, 5773, 'Steppe Dzo', 'Steppe Dzo', 'Hainag', 'Steppen-Dzo', 'ケナガウシ', '犏牛', 5, 30.0, 31.0, 65, 3),
-(101, 5774, 'Steppe Gedan', 'Steppe Gedan', 'Gedan De La Steppe', 'Steppen-Gedan', 'ステップ・ガーダン', '草原獦狚', 5, 31.0, 25.0, 65, NULL),
-(102, 5723, 'Abaddon', 'Abaddon', 'Abaddon', 'Abaddon', 'アバドン', '狱蟾蜍', 6, 25.0, 33.0, 69, 3),
-(103, 5725, 'Abalathian Minotaur', 'Abalathian Minotaur', 'Minotaure D\'Abalathia', 'Abalathischer Minotaurus', 'アバラシアン・ミノタウロス', '阿拉巴提亚弥诺陶洛斯', 6, 28.0, 11.0, 69, 2),
-(104, 5720, 'Chelone', 'Chelone', 'Chélone', 'Chelone', 'ケローネ', '海石龟', 6, 26.0, 14.0, 69, 2),
-(105, 5727, 'Creeping Edila', 'Creeping Edila', 'Edila Rampante', 'Kriechend[a] Edila', 'クリーピング・エディラ', '爬行埃迪拉', 6, 30.0, 27.0, 69, 3),
-(106, 5729, 'Dark Clay Beast', 'Dark Clay Beast', 'Bête D\'argile Des Montagnes', 'Berg-Lehmbestie', 'マウンテン・クレイビースト', '高山泥岩巨兽', 6, 5.0, 26.0, 69, 2),
-(107, 5732, 'Guard Bhoot', 'Guard Bhoot', 'Bhut Gardien', 'Wächter-Bhut', 'ガード・ブフート', '浮灵守卫', 6, 24.0, 9.0, 69, 3),
-(108, 5716, 'Kaluk', 'Kaluk', 'Kaluk', 'Kaluk', 'カルク', '卡栌克', 6, 12.0, 20.0, 69, 3),
-(109, 5724, 'Loch Leech', 'Loch Leech', 'Sangsue Des Lacs', 'Seldsee-Egel', 'ロッホ・リーチ', '湖区水蛭', 6, 16.0, 15.0, 69, 2),
-(110, 5730, 'Loch Nanka', 'Loch Nanka', 'Nanka Des Lacs', 'Seldsee-Nanka', 'ロッホ・ナンカ', '湖区南加', 6, 16.0, 20.0, 69, 1),
-(111, 5717, 'Phoebad', 'Phoebad', 'Phoebad', 'Phoebad', 'フォーバッド', '弗巴德', 6, 23.0, 21.0, 69, 3),
-(112, 5731, 'Salt Anila', 'Salt Anila', 'Anila De Sel', 'Salz-Anila', 'ソルト・アニラ', '盐湖阿尼罗', 6, 5.0, 15.0, 69, NULL),
-(113, 5718, 'Salt Dhara', 'Salt Dhara', 'Dhara De Sel', 'Salz-Dhara', 'ソルト・ダラ', '盐湖驼罗', 6, 10.0, 25.0, 69, NULL),
-(114, 5722, 'Salt Dhruva', 'Salt Dhruva', 'Dhruva De Sel', 'Salz-Dhruva', 'ドルヴァ', '陀鲁婆', 6, 29.0, 23.0, 69, 3),
-(115, 5721, 'Soblyn', 'Soblyn', 'Soblyn', 'Sobalos', 'ソブラン', '盐爬虫', 6, 13.0, 23.0, 69, 2),
-(116, 5728, 'Specter', 'Specter', 'Spector', 'Schemen', 'スペクター', '妖影', 6, 18.0, 8.0, 69, 3),
-(117, 5726, 'Vepar', 'Vepar', 'Vepar', 'Vepar', 'ヴェパル', '魔陆鱼', 6, 24.0, 30.0, 69, 2),
-(118, 5719, 'Yabby', 'Yabby', 'Thalassina', 'Yabby', 'タラシナ', '虾蛄', 6, 19.0, 25.0, 69, 1);
+(1, 5682, 'Burrow Antlion', 'Burrow Antlion', 'Fourmilion Creuseur', 'Erdloch-Ameisenlöwe', 'ブロウ・アントリオン', '地洞蚁狮', 1, '16.0', '24.0', 61, NULL),
+(2, 5685, 'Diakka', 'Diakka', 'Diakka', 'Diakka', 'ディアッカ', '狄亚卡', 1, '10.0', '27.0', 61, 2),
+(3, 5673, 'Dust Dhara', 'Dust Dhara', 'Dhara De Poussière', 'Staub-Dhara', 'ダスト・ダラ', '尘驼罗', 1, '27.0', '13.0', 60, NULL),
+(4, 5674, 'Foper', 'Foper', 'Fopar', 'Foper', 'フォーパー', '弗帕', 1, '22.8', '16.5', 60, 3),
+(5, 5692, 'Gagana', 'Gagana', 'Gagana', 'Gagana', 'ガガナ', '迦迦纳怪鸟', 1, '28.0', '17.0', 67, NULL),
+(6, 5697, 'Gazelle', 'Gazelle', 'Gazelle', 'Gazelle', 'ガゼル', '瞪羚', 1, '25.0', '30.0', 67, 2),
+(7, 5676, 'Gazelle Hawk', 'Gazelle Hawk', 'Frelon Gazelle', 'Gazellenfalke', 'ガゼルホーク', '羚鹰蜂', 1, '11.0', '12.0', 60, 2),
+(8, 5679, 'Gelid Bhoot', 'Gelid Bhoot', 'Bhut Glacial', 'Eisig[a] Bhut', 'ジェリド・ブフート', '极寒浮灵', 1, '25.0', '15.0', 60, 1),
+(9, 5686, 'Goosefish', 'Goosefish', 'Saillot', 'Seeteufel', 'グース', '魔鮟鱇', 1, '9.0', '30.0', 61, 3),
+(10, 5696, 'Highland Dhara', 'Highland Dhara', 'Dhara Des Hauteurs', 'Hochland-Dhara', 'ハイランド・ダラ', '高地驼罗', 1, '29.5', '29.1', 67, NULL),
+(11, 5671, 'Leshy', 'Leshy', 'Liéchi', 'Leschij', 'レーシー', '莱西', 1, '11.0', '14.0', 60, 3),
+(12, 5672, 'Lesser Gagana', 'Lesser Gagana', 'Gagana Mineur', 'Klein[a] Gagana', 'レッサー・ガガナ', '小迦迦纳怪鸟', 1, '20.0', '10.0', 60, NULL),
+(13, 5687, 'Mossling', 'Mossling', 'Moussemousse', 'Moosling', 'モスモス', '苔小妖', 1, '11.0', '23.0', 61, 2),
+(14, 5683, 'Mountain Grizzly', 'Mountain Grizzly', 'Grizzli De Montagne', 'Berggrizzly', 'マウンテン・グリズリー', '山地灰熊', 1, '11.0', '17.0', 61, 1),
+(15, 5691, 'Qalyana Brahmin', 'Qalyana Brahmin', 'Qalyana Brahmin', 'Qalyana-Brahmin', 'カリヤナ・ブラフミン', '伽黎亚婆罗门', 1, '34.0', '21.0', 67, 1),
+(16, 5689, 'Qalyana Kshatriya', 'Qalyana Kshatriya', 'Qalyana Kshatriya', 'Qalyana-Kshatriya', 'カリヤナ・クシャトリア', '伽黎亚刹帝利', 1, '34.0', '21.0', 67, 2),
+(17, 5690, 'Qalyana Shudra', 'Qalyana Shudra', 'Qalyana Shudra', 'Qalyana-Shudra', 'カリヤナ・シュードラ', '伽黎亚首陀罗', 1, '34.0', '21.0', 67, 2),
+(18, 5688, 'Sacred Marid', 'Sacred Marid', 'Marid Sacré', 'Heilig[a] Maride', 'セイクレッド・マーリド', '圣山魔象', 1, '34.0', '21.0', 67, 1),
+(19, 5675, 'Sapria', 'Sapria', 'Sapria', 'Sapria', 'サプリア', '寄生花', 1, '10.0', '15.0', 60, 1),
+(20, 5684, 'Skimmer', 'Skimmer', 'Cordulie', 'Schröpfer', 'スキマー', '蚂螂', 1, '11.0', '23.0', 61, NULL),
+(21, 5677, 'Spinner', 'Spinner', 'Fileuse', 'Spinner', 'スピナー', '纺蛛', 1, '21.0', '8.0', 60, 3),
+(22, 5693, 'Teleoceras', 'Teleoceras', 'Teleoceras', 'Teleoceras', 'テレオケラス', '远角犀', 1, '29.0', '25.0', 67, 2),
+(23, 5681, 'Tracer Antlion', 'Tracer Antlion', 'Fourmilion Fureteur', 'Jagd-Ameisenlöwe', 'トレーサー・アントリオン', '追踪蚁狮', 1, '15.2', '23.0', 61, NULL),
+(24, 5694, 'Tracker Antlion', 'Tracker Antlion', 'Fourmilion Traqueur', 'Fährtensucher-Ameisenlöwe', 'トラッカー・アントリオン', '跟踪蚁狮', 1, '29.9', '27.9', 67, NULL),
+(25, 5695, 'Trench Antlion', 'Trench Antlion', 'Fourmilion Des Fossés', 'Graben-Ameisenlöwe', 'トレンチ・アントリオン', '地沟蚁狮', 1, '30.0', '28.0', 67, NULL),
+(26, 5678, 'Velodyna Pugil', 'Velodyna Pugil', 'Pugil De La Velodyna', 'Velodyna-Pugil', 'ベロジナ・プギル', '威罗迪纳陆鱼', 1, '28.0', '16.0', 60, 2),
+(27, 5680, 'Velodyna Sarcosuchus', 'Velodyna Sarcosuchus', 'Sarcosuchus De La Velodyna', 'Velodyna-Sarcosuchus', 'ベロジナ・サルコスクス', '威罗迪纳帝王鳄', 1, '18.0', '11.0', 60, 3),
+(28, 5701, 'Bloodglider', 'Bloodglider', 'Lunigère Sanguine', 'Blutgleiter', 'ブラッドグライダー', '血飞蛾', 2, '13.0', '13.0', 60, 2),
+(29, 5700, 'Chapuli', 'Chapuli', 'Chapuli', 'Chapuli', 'チャプリ', '洽普利蚱蜢', 2, '7.0', '13.0', 60, NULL),
+(30, 5705, 'Crag Claw', 'Crag Claw', 'Griffe De Grès', 'Felsenklaue', 'クラッグクロウ', '峭壁巨钳虾', 2, '26.6', '7.8', 61, 2),
+(31, 5698, 'Dust Anila', 'Dust Anila', 'Anila De Poussière', 'Staub-Anila', 'ダスト・アニラ', '尘阿尼罗', 2, '21.0', '10.0', 60, NULL),
+(32, 5702, 'Fluturini', 'Fluturini', 'Fluturini', 'Fluturini', 'フルトゥリーニ', '浮蝶', 2, '15.0', '8.0', 60, 2),
+(33, 5703, 'Gyr Abanian Hornbill', 'Gyr Abanian Hornbill', 'Bucorve Gyrabanien', 'Abanischer Hornrabe', 'ギラバニアン・ホーンビル', '基拉巴尼亚亚犀鸟', 2, '10.0', '7.0', 60, 2),
+(34, 5713, 'Highland Eruca', 'Highland Eruca', 'Eruca Des Hauteurs', 'Hochland-Eruca', 'ハイランド・エルカ', '高地毛虫', 2, '26.0', '36.0', 68, 1),
+(35, 5710, 'Highwing Chapuli', 'Highwing Chapuli', 'Chapuli Ailes-hautes', 'Hochschwingen-Chapuli', 'ハイウィング・チャプリ', '高翅蚱蜢', 2, '18.0', '35.0', 68, NULL),
+(36, 5712, 'Jhammel', 'Jhammel', 'Jhammel', 'Jhammel', 'ジャムメル', '长颈骆', 2, '25.0', '30.0', 68, 1),
+(37, 5714, 'Kongamato', 'Kongamato', 'Kongamato', 'Kongamato', 'コンガマトー', '恐甲蚂蜓', 2, '14.0', '26.0', 68, 2),
+(38, 5707, 'Marble Urolith', 'Marble Urolith', 'Urolithe De Marbre', 'Marmor-Urolith', 'マーブル・ウロリス', '大理石乌洛里石', 2, '35.0', '9.0', 61, 1),
+(39, 5709, 'Muud Suud', 'Muud Suud', 'Moudsoud', 'Muhtsu', 'ムードスード', '姆德斯德', 2, '15.0', '31.0', 68, NULL),
+(40, 5715, 'Pantera', 'Pantera', 'Pantera', 'Pantera', 'パンテーラ', '斑豹', 2, '13.0', '29.0', 68, 2),
+(41, 5706, 'Qiqirn Meatcutter', 'Qiqirn Meatcutter', 'Qiqirn Tranche-viande', 'Qiqirn-Fleischschneider', 'キキルン・ミートカッター', '卢恩人切肉者', 2, '25.0', '20.0', 61, NULL),
+(42, 5699, 'Qiqirn Meateater', 'Qiqirn Meateater', 'Qiqirn Croque-viande', 'Qiqirn-Fleischfresser', 'キキルン・ミートイーター', '卢恩人食肉者', 2, '15.0', '14.0', 60, NULL),
+(43, 5704, 'Ruud Suud', 'Ruud Suud', 'Roudsoud', 'Ruhtsu', 'ルードスード', '鲁德斯德', 2, '31.0', '9.0', 61, NULL),
+(44, 5708, 'Scarab Beetle', 'Scarab Beetle', 'Scaraléoptère Gyrabanien', 'Abanischer Käfer', 'ギラバニアン・スカラベ', '基拉巴尼亚圣甲虫', 2, '25.0', '13.0', 61, 2),
+(45, 5711, 'True Griffin', 'True Griffin', 'Vrai Griffon', 'Urgreif', 'トゥルーグリフィン', '真狮鹫', 2, '23.0', '25.0', 68, 1),
+(46, 5747, 'Apa', 'Apa', 'Apa', 'Apa', 'アーパス', '阿帕斯', 3, '18.0', '34.0', 63, NULL),
+(47, 5737, 'Bombfish', 'Bombfish', 'Poisson-bombo', 'Igelbomber', 'ハリセンボム', '刺球爆弹怪', 3, '32.0', '35.0', 62, 2),
+(48, 5736, 'Coralshell', 'Coralshell', 'Coquorail', 'Korallenschale', 'サンゴセオイ', '珊瑚壳', 3, '33.0', '6.0', 62, 2),
+(49, 5740, 'Flying Shark', 'Flying Shark', 'Requin Volant', 'Fliegender Hai', 'トビザメ', '飞鲨', 3, '26.0', '31.0', 62, 2),
+(50, 5742, 'Gasame', 'Gasame', 'Gasame', 'Gasame', 'ガサメ', '拥剑蟹', 3, '26.0', '36.0', 62, 2),
+(51, 5734, 'Gyuki', 'Gyuki', 'Gyuki', 'Gyuki', 'ギュウキ', '牛鬼', 3, '20.0', '10.0', 62, 1),
+(52, 5741, 'Hellborn Anala', 'Hellborn Anala', 'Anala Infernal', 'Infernalisch[a] Anala', 'ゴクノ・アナラ', '地狱阿那罗', 3, '27.0', '35.0', 62, NULL),
+(53, 5749, 'Island Gedan', 'Island Gedan', 'Gedan Des îles', 'Insel-Gedan', 'ガーダン', '獦狚', 3, '11.0', '8.0', 63, NULL),
+(54, 5751, 'Naked Yumemi', 'Naked Yumemi', 'Yumemi Nu', 'Nackt-Yumemi', 'カラナシ・ユメミ', '无壳观梦螺', 3, '25.0', '26.0', 63, 1),
+(55, 5743, 'Red Bukan', 'Red Bukan', 'Bukan Rouge', 'Rot[a] Bukan', 'ベニコウラ・ブカン', '红甲武官', 3, '7.0', '26.0', 63, 2),
+(56, 5745, 'Red Honkan', 'Red Honkan', 'Honkan Rouge', 'Rot[a] Jonkan', 'ベニコウラ・ホンカン', '红甲正官', 3, '7.0', '26.0', 63, 2),
+(57, 5744, 'Red Hyoe', 'Red Hyoe', 'Hyoe Rouge', 'Rot[a] Hyoe', 'ベニコウラ・ヒョウエ', '红甲兵卫', 3, '7.0', '26.0', 63, 2),
+(58, 5748, 'Ruby Hornbill', 'Ruby Hornbill', 'Bucorve De Rubis', 'Rubin-Hornrabe', 'ベニツノ', '红角犀鸟', 3, '33.0', '19.0', 63, NULL),
+(59, 5738, 'Sea Serpent', 'Sea Serpent', 'Serpent De Mer', 'Seeschlange', 'オオウミヘビ', '大海蛇', 3, '30.0', '8.0', 62, 2),
+(60, 5739, 'Shiranui', 'Shiranui', 'Shiranui', 'Shiranui', 'シラヌイ', '不知火', 3, '25.0', '6.0', 62, 2),
+(61, 5746, 'Striped Ray', 'Striped Ray', 'Raie Rayée', 'Gestreifter Rochen', 'シマエイ', '斑鳐', 3, '7.0', '26.0', 63, 2),
+(62, 5733, 'Tatsunoko', 'Tatsunoko', 'Tatsunoko', 'Tatsunoko', 'タツノコ', '龙之子', 3, '28.0', '31.0', 62, 2),
+(63, 5735, 'Unkiu', 'Unkiu', 'Unkiu', 'Unkiu', 'ウンキウ', '甲鲎', 3, '34.0', '16.0', 62, 3),
+(64, 5750, 'Yumemi', 'Yumemi', 'Yumemi', 'Yumemi', 'ユメミガイ', '观梦螺', 3, '25.0', '26.0', 63, 1),
+(65, 5761, 'Bi Fang', 'Bi Fang', 'Bibao', 'Bibao', 'ヒッポウ', '毕方', 4, '17.8', '30.5', 64, 2),
+(66, 5758, 'Doman Weasel', 'Doman Weasel', 'Furet Domien', 'Doma-Wiesel', 'ドマイタチ', '多玛鼬', 4, '33.0', '29.0', 64, NULL),
+(67, 5769, 'Ebisu Catfish', 'Ebisu Catfish', 'Namazu Ebisu', 'Ebisu Namazuo', 'エビス・ナマズオ', '惠比寿鲶鱼精', 4, '27.0', '8.0', 67, 3),
+(68, 5766, 'Gensui Apa', 'Gensui Apa', 'Apa Du Gensui', 'Gensui-Apa', 'ゲンスイ・アーパス', '玄水阿帕斯', 4, '21.0', '34.0', 64, NULL),
+(69, 5767, 'Gensui Dhara', 'Gensui Dhara', 'Dhara Du Gensui', 'Gensui-Dhara', 'ゲンスイ・ダラ', '玄水驼罗', 4, '38.0', '21.0', 64, NULL),
+(70, 5756, 'Koja', 'Koja', 'Koja', 'Koja', 'コジャ', '高加颅', 4, '16.0', '27.0', 64, NULL),
+(71, 5752, 'Lupin Bladehand', 'Lupin Bladehand', 'Lupin Bretteur', 'Wolfsleute-Schwertkämpfer', '人狼族の太刀使い', '狼人族刀手', 4, '24.0', '29.0', 64, 1),
+(72, 5754, 'Lupin Bowhand', 'Lupin Bowhand', 'Lupin Archer', 'Wolfsleute-Bogenschütze', '人狼族の弓使い', '狼人族弓手', 4, '24.0', '29.0', 64, 1),
+(73, 5753, 'Lupin Spearhand', 'Lupin Spearhand', 'Lupin Lancier', 'Wolfsleute-Pikenier', '人狼族の槍使い', '狼人族枪手', 4, '23.0', '29.0', 64, 1),
+(74, 5770, 'Magatsu', 'Magatsu', 'Koja Magatsu', 'Magatsu Koja', 'マガツ・コジャ', '祸津高加颅', 4, '17.0', '13.0', 67, NULL),
+(75, 5768, 'Magatsu Kiyofusa', 'Magatsu Kiyofusa', 'Kiyofusa Magatsu', 'Magatsu Kiyofusa', 'マガツ・キヨフサ', '祸津清房', 4, '16.0', '12.0', 67, 3),
+(76, 5763, 'Minobi', 'Minobi', 'Minobi', 'Minobi', 'ミノビ', '蓑火', 4, '32.0', '20.0', 64, 3),
+(77, 5772, 'Rainbow Tiger', 'Rainbow Tiger', 'Tigre De La Vallée', 'Regenbogen-Tiger', 'シチサイトラ', '七彩虎', 4, '28.0', '12.0', 67, NULL),
+(78, 5757, 'Rhino Beetle', 'Rhino Beetle', 'Rhinoscarabée', 'Nashornkäfer', 'サイカブト', '犀甲虫', 4, '32.0', '22.0', 64, 3),
+(79, 5759, 'River Hornbill', 'River Hornbill', 'Bucorve De Rivière', 'Fluss-Hornrabe', 'ムニ・ベニツノ', '无二红角犀鸟', 4, '29.0', '25.0', 64, NULL),
+(80, 5765, 'Taoquan', 'Taoquan', 'Taoquan', 'Taoquan', 'タオチュアン', '蜪犬', 4, '30.0', '35.0', 64, 2),
+(81, 5755, 'Tenaga', 'Tenaga', 'Tenaga', 'Tenaga', 'テナガ', '长手精', 4, '28.0', '32.0', 64, 2),
+(82, 5764, 'Vanara', 'Vanara', 'Vanara', 'Vanara', 'ヴァナラ', '婆那罗', 4, '25.0', '29.0', 64, 2),
+(83, 5762, 'Water Serpent', 'Water Serpent', 'Serpent D\'eau', 'Wasserschlange', 'ミズヘビ', '水蛇', 4, '25.0', '28.0', 64, 2),
+(84, 5771, 'Whitewing Hornbill', 'Whitewing Hornbill', 'Bucorve Ailes-blanches', 'Weißschwingen-Hornrabe', 'サキジロ・ベニツノ', '白翼红角犀鸟', 4, '21.0', '13.0', 67, NULL),
+(85, 5760, 'Yanxian Tiger', 'Yanxian Tiger', 'Tigre Yanxien', 'Yanxia-Tiger', 'ヤンサトラ', '延夏虎', 4, '36.0', '17.0', 64, NULL),
+(86, 5785, 'Baras', 'Baras', 'Baras', 'Baras', 'ベルス', '伯尔斯虎', 5, '16.0', '19.0', 66, 3),
+(87, 5787, 'Buzzfly', 'Buzzfly', 'Vombrellule', 'Brummfliege', 'バズフライ', '噪蜻蜓', 5, '21.0', '29.0', 66, NULL),
+(88, 5788, 'Chaochu', 'Chaochu', 'Chaotyugh', 'Chaochu', 'カオチュー', '庞口花', 5, '20.0', '26.0', 66, 2),
+(89, 5786, 'Gulo Gulo', 'Gulo Gulo', 'Gulo Gulo', 'Gulo Gulo', 'グログロ', '狼獾', 5, '16.0', '26.0', 66, NULL),
+(90, 5777, 'Halgai', 'Halgai', 'Halgai', 'Halgai', 'ハルガイ', '刺草球', 5, '21.0', '19.0', 65, 3),
+(91, 5778, 'Khun Chuluu', 'Khun Chuluu', 'Khun Chuluu', 'Khun Chuluu', 'フン・チョロー', '石人浑朝鲁', 5, '17.0', '11.0', 65, 3),
+(92, 5781, 'Mammoth', 'Mammoth', 'Mammouth', 'Mammut', 'マンモス', '长毛象', 5, '28.0', '18.0', 65, 2),
+(93, 5783, 'Manzasiri', 'Manzasiri', 'Manzasiri', 'Manzasiri', 'マンザシリ', '曼殊师里', 5, '12.0', '30.0', 66, 3),
+(94, 5775, 'Matamata', 'Matamata', 'Matamata', 'Matamata', 'マタマタ', '玛塔蛇颈龟', 5, '27.0', '15.0', 65, 2),
+(95, 5782, 'Matanga', 'Matanga', 'Matanga', 'Matanga', 'マタンガ', '象魔', 5, '10.0', '21.0', 66, 2),
+(96, 5779, 'Muu Shuwuu', 'Muu Shuwuu', 'Muu Shuwuu', 'Muu Shuwuu', 'モー・ショボー', '邪鸟木绍布', 5, '29.0', '11.0', 65, 2),
+(97, 5780, 'Purbol', 'Purbol', 'Purbol', 'Purbol', 'プルボル', '紫魔花', 5, '34.0', '21.0', 65, 3),
+(98, 5784, 'Steppe Anala', 'Steppe Anala', 'Anala De La Steppe', 'Steppen-Anala', 'ステップ・アナラ', '草原阿那罗', 5, '15.0', '32.0', 66, NULL),
+(99, 5776, 'Steppe Dhole', 'Steppe Dhole', 'Dhole De La Steppe', 'Steppen-Dhole', 'ステップドール', '草原朵尔', 5, '28.0', '29.0', 65, 3),
+(100, 5773, 'Steppe Dzo', 'Steppe Dzo', 'Hainag', 'Steppen-Dzo', 'ケナガウシ', '犏牛', 5, '30.0', '31.0', 65, 3),
+(101, 5774, 'Steppe Gedan', 'Steppe Gedan', 'Gedan De La Steppe', 'Steppen-Gedan', 'ステップ・ガーダン', '草原獦狚', 5, '31.0', '25.0', 65, NULL),
+(102, 5723, 'Abaddon', 'Abaddon', 'Abaddon', 'Abaddon', 'アバドン', '狱蟾蜍', 6, '25.0', '33.0', 69, 3),
+(103, 5725, 'Abalathian Minotaur', 'Abalathian Minotaur', 'Minotaure D\'Abalathia', 'Abalathischer Minotaurus', 'アバラシアン・ミノタウロス', '阿拉巴提亚弥诺陶洛斯', 6, '28.0', '11.0', 69, 2),
+(104, 5720, 'Chelone', 'Chelone', 'Chélone', 'Chelone', 'ケローネ', '海石龟', 6, '26.0', '14.0', 69, 2),
+(105, 5727, 'Creeping Edila', 'Creeping Edila', 'Edila Rampante', 'Kriechend[a] Edila', 'クリーピング・エディラ', '爬行埃迪拉', 6, '30.0', '27.0', 69, 3),
+(106, 5729, 'Dark Clay Beast', 'Dark Clay Beast', 'Bête D\'argile Des Montagnes', 'Berg-Lehmbestie', 'マウンテン・クレイビースト', '高山泥岩巨兽', 6, '5.0', '26.0', 69, 2),
+(107, 5732, 'Guard Bhoot', 'Guard Bhoot', 'Bhut Gardien', 'Wächter-Bhut', 'ガード・ブフート', '浮灵守卫', 6, '24.0', '9.0', 69, 3),
+(108, 5716, 'Kaluk', 'Kaluk', 'Kaluk', 'Kaluk', 'カルク', '卡栌克', 6, '12.0', '20.0', 69, 3),
+(109, 5724, 'Loch Leech', 'Loch Leech', 'Sangsue Des Lacs', 'Seldsee-Egel', 'ロッホ・リーチ', '湖区水蛭', 6, '16.0', '15.0', 69, 2),
+(110, 5730, 'Loch Nanka', 'Loch Nanka', 'Nanka Des Lacs', 'Seldsee-Nanka', 'ロッホ・ナンカ', '湖区南加', 6, '16.0', '20.0', 69, 1),
+(111, 5717, 'Phoebad', 'Phoebad', 'Phoebad', 'Phoebad', 'フォーバッド', '弗巴德', 6, '23.0', '21.0', 69, 3),
+(112, 5731, 'Salt Anila', 'Salt Anila', 'Anila De Sel', 'Salz-Anila', 'ソルト・アニラ', '盐湖阿尼罗', 6, '5.0', '15.0', 69, NULL),
+(113, 5718, 'Salt Dhara', 'Salt Dhara', 'Dhara De Sel', 'Salz-Dhara', 'ソルト・ダラ', '盐湖驼罗', 6, '10.0', '25.0', 69, NULL),
+(114, 5722, 'Salt Dhruva', 'Salt Dhruva', 'Dhruva De Sel', 'Salz-Dhruva', 'ドルヴァ', '陀鲁婆', 6, '29.0', '23.0', 69, 3),
+(115, 5721, 'Soblyn', 'Soblyn', 'Soblyn', 'Sobalos', 'ソブラン', '盐爬虫', 6, '13.0', '23.0', 69, 2),
+(116, 5728, 'Specter', 'Specter', 'Spector', 'Schemen', 'スペクター', '妖影', 6, '18.0', '8.0', 69, 3),
+(117, 5726, 'Vepar', 'Vepar', 'Vepar', 'Vepar', 'ヴェパル', '魔陆鱼', 6, '24.0', '30.0', 69, 2),
+(118, 5719, 'Yabby', 'Yabby', 'Thalassina', 'Yabby', 'タラシナ', '虾蛄', 6, '19.0', '25.0', 69, 1);
 
 --
 -- Triggers `mobs_sb`
 --
+DROP TRIGGER IF EXISTS `mob_sb_del`;
 DELIMITER $$
 CREATE TRIGGER `mob_sb_del` AFTER DELETE ON `mobs_sb` FOR EACH ROW BEGIN
 	CALL update_etag('distances_sb');
@@ -2712,6 +2992,7 @@ CREATE TRIGGER `mob_sb_del` AFTER DELETE ON `mobs_sb` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_sb_ins`;
 DELIMITER $$
 CREATE TRIGGER `mob_sb_ins` AFTER INSERT ON `mobs_sb` FOR EACH ROW BEGIN
 	CALL update_etag('distances_sb');
@@ -2719,6 +3000,7 @@ CREATE TRIGGER `mob_sb_ins` AFTER INSERT ON `mobs_sb` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_sb_upd`;
 DELIMITER $$
 CREATE TRIGGER `mob_sb_upd` AFTER UPDATE ON `mobs_sb` FOR EACH ROW BEGIN
 	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.id_zone <> OLD.id_zone THEN
@@ -2735,168 +3017,172 @@ DELIMITER ;
 -- Table structure for table `mobs_shb`
 --
 
-CREATE TABLE `mobs_shb` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
-  `id_zone` tinyint(4) NOT NULL,
+DROP TABLE IF EXISTS `mobs_shb`;
+CREATE TABLE IF NOT EXISTS `mobs_shb` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `id_zone` tinyint NOT NULL,
   `x` decimal(3,1) UNSIGNED DEFAULT NULL,
   `y` decimal(3,1) UNSIGNED DEFAULT NULL,
   `z` decimal(3,1) DEFAULT NULL,
-  `lvl` tinyint(3) DEFAULT NULL,
-  `slain` tinyint(2) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `lvl` tinyint DEFAULT NULL,
+  `slain` tinyint DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `id_zone` (`id_zone`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=137 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `mobs_shb`
 --
 
 INSERT INTO `mobs_shb` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `id_zone`, `x`, `y`, `z`, `lvl`, `slain`) VALUES
-(1, 8507, 'Hoptrap', 'Hoptrap', 'saute-piège', 'Sprungfalle', 'ホップトラップ', '阱蛇麻', 1, 35.6, 24.1, 0.1, 71, 3),
-(2, 8502, 'Violet Triffid', 'Violet Triffid', 'triffide violet', 'violett[a] Triffid', 'ヴァイオレット・トリフィド', '紫罗兰三尖树', 1, 35.3, 25.4, 0.1, 71, NULL),
-(3, 8500, 'Giant Iguana', 'Giant Iguana', 'iguane géant', 'Riesenleguan', 'ジャイアント・イグアナ', '巨型鬣蜥', 1, 27.0, 28.6, 0.0, 71, NULL),
-(4, 8407, 'Wolverine', 'Wolverine', 'wolvérène féroce', 'wild[a] Vielfraß', 'ウルヴァリン', '貂熊', 1, 27.8, 36.8, 0.1, 71, 2),
-(5, 8514, 'Ya-te-veo', 'Ya-te-veo', 'yateveo', 'Yateveo', 'ヤテベオ', '食人花', 1, 32.9, 19.2, 0.1, 71, 3),
-(6, 8499, 'Grey Draco', 'Grey Draco', 'draco gris', 'grau[a] Draco', 'グレイ・ドラコ', '灰蜥龙', 1, 37.1, 16.6, 0.4, 71, NULL),
-(7, 8505, 'White Gremlin', 'White Gremlin', 'gremlin blanc', 'weiß[a] Gremlin', 'ホワイト・グレムリン', '白色格雷姆林', 1, 33.6, 12.3, 0.5, 71, 2),
-(8, 8515, 'Proterosuchus', 'Proterosuchus', 'proterosuchus', 'Proterosuchus', 'プロテロスクス', '古鳄', 1, 28.4, 17.8, 1.1, 71, 1),
-(9, 8516, 'Elven Knight', 'Elven Knight', 'chevalier elfe', 'Elfenritter', 'エルヴンナイト', '菁灵骑士', 1, 26.2, 17.5, 1.5, 71, NULL),
-(10, 8513, 'Irrlicht', 'Irrlicht', 'Irrlicht', 'Irrwisch', 'イルリヒト', '迷光', 1, 25.6, 17.2, 1.5, 71, NULL),
-(11, 8512, 'Coelurosaur', 'Coelurosaur', 'coelurosaure', 'Coelurosaurus', 'コエルロサウルス', '虚骨龙', 1, 22.7, 11.7, 1.0, 71, NULL),
-(12, 8504, 'Wetland Warg', 'Wetland Warg', 'warg des plaines humides', 'Sumpfwarg', 'ウェットランド・ワーグ', '湿地座狼', 1, 22.4, 21.0, 0.0, 71, 2),
-(13, 8506, 'Silkmoth', 'Silkmoth', 'bombyx', 'Seidenmotte', 'シルクモス', '丝蛾', 1, 10.4, 15.5, 0.2, 71, NULL),
-(14, 8786, 'Lake Viper', 'Lake Viper', 'vipère lacustre', 'Seeviper', 'レイクバイパー', '湖畔蝰蛇', 1, 15.6, 22.1, 0.0, 71, 2),
-(15, 8498, 'Chiliad Cama', 'Chiliad Cama', 'chama des mille Lacis', 'Chiliad Cama', 'チリアド・キャマ', '千年卡玛', 1, 17.8, 9.5, 0.9, 71, 2),
-(16, 8439, 'Smilodon', 'Smilodon', 'smilodon affamé', 'ausgehungert[a] Smilodon', 'スミロドン', '斯剑虎', 1, 10.5, 12.3, 0.6, 71, 2),
-(17, 8509, 'Zonure', 'Zonure', 'zonure', 'Zonure', 'ゾヌール', '缠尾蛟', 1, 11.5, 16.9, 0.1, 71, NULL),
-(18, 8501, 'Lake Anemone', 'Lake Anemone', 'anémone lacustre', 'Seeanemone', 'レイク・アネモネ', '湖畔风花', 1, 10.2, 20.3, 0.0, 71, NULL),
-(19, 8518, 'Hobgoblin', 'Hobgoblin', 'hobgobelin', 'Hobgoblin', 'ホブゴブリン', '大哥布林', 2, 34.1, 30.5, 0.0, 70, 3),
-(20, 8523, 'Maultasche', 'Maultasche', 'maultasche', 'Maultasch', 'マウルタッシュ', '饭袋猩猩', 2, 36.0, 29.3, 0.0, 70, 2),
-(21, 8536, 'Whiptail', 'Whiptail', 'fouette-queue', 'Peitschenschwanz', 'ウィップテール', '鞭尾跳蜥', 2, 35.5, 24.7, 0.3, 70, 3),
-(22, 8521, 'Kholusian Iguana', 'Kholusian Iguana', 'iguane de Kholusia', 'Kholusia-Leguan', 'コルシアイグアナ', '珂露西亚鬣蜥', 2, 29.4, 28.8, 0.1, 70, NULL),
-(23, 8539, 'Tragopan', 'Tragopan', 'tragopan', 'Tragopan', 'トラゴパン', '角雉', 2, 26.2, 29.4, 0.1, 70, NULL),
-(24, 8542, 'Germinant', 'Germinant', 'germinateur', 'Germinant', 'ジェルミナンツ', '发芽大口花', 2, 26.9, 32.8, 0.2, 70, 2),
-(25, 8531, 'Toucalibri', 'Toucalibri', 'toucanlibri', 'Tukalibri', 'トゥカリブリ', '巨喙蜂鸟', 2, 15.9, 31.4, 0.1, 70, NULL),
-(26, 8532, 'Wood Eyes', 'Wood Eyes', 'œil des bois', 'Waldwandler', 'ウッドアイズ', '林眼树精', 2, 15.4, 32.5, 0.1, 70, 2),
-(27, 8787, 'Big Claw', 'Big Claw', 'grosse pince', 'Mörderkrabbe', 'ビッグクロウ', '大螯陆蟹', 2, 7.4, 33.1, 0.0, 70, NULL),
-(28, 8534, 'Kholusian Bison', 'Kholusian Bison', 'bison de Kholusia', 'Kholusia-Büffel', 'コルシア・バイソン', '珂露西亚野牛', 2, 10.7, 29.8, 0.2, 70, 2),
-(29, 8537, 'Lowland Hyssop', 'Lowland Hyssop', 'hyssop des basses terres', 'Tiefland-Ysop', 'ロウランド・ヒソプ', '低地海索草', 2, 14.1, 28.2, 0.1, 70, NULL),
-(30, 8525, 'Island Rail', 'Island Rail', 'râle insulaire', 'Inselralle', 'アイランド・レイル', '岛屿秧鸡', 2, 18.1, 28.4, 0.1, 70, 3),
-(31, 8533, 'Island Wolf', 'Island Wolf', 'loup insulaire', 'Inselwolf', 'アイランド・ウルフ', '岛屿黑狼', 2, 28.1, 23.2, 0.3, 70, 3),
-(32, 8529, 'Scree Gnome', 'Scree Gnome', 'gnome des plateaux', 'Schreignom', 'スクリー・ノーム', '碎石诺姆', 2, 8.3, 16.8, 3.6, 78, 1),
-(33, 8526, 'Hobgoblin Guard', 'Hobgoblin Guard', 'garde hobgobelin', 'Hobgoblin-Wache', 'ホブゴブリン・ガード', '大哥布林守卫', 2, 25.2, 8.8, 3.4, 78, NULL),
-(34, 8527, 'Cliffkite', 'Cliffkite', 'milan des falaises', 'Gratgleiter', 'クリフカイト', '壁崖鼹鼠', 2, 17.4, 9.1, 4.3, 78, 2),
-(35, 8528, 'Cliffmole', 'Cliffmole', 'taupe des falaises', 'Klippenmull', 'クリフモール', '壁崖飞鸢', 2, 27.2, 11.6, 3.1, 78, 2),
-(36, 8519, 'Calx', 'Calx', 'calx', 'Calx', 'カルックス', '石灰灵', 2, 18.1, 8.0, 4.4, 78, NULL),
-(37, 8541, 'Gulgnu', 'Gulgnu', 'goulgnou', 'Gulgnu', 'グルグヌー', '格鲁格角马', 2, 19.1, 7.6, 4.4, 78, 3),
-(38, 8245, 'Huldu', 'Huldu', 'huldu du puits', 'Brunnen-Huldu', 'ウェル・フルドゥ', '爆岩怪', 2, 12.7, 11.1, 4.0, 78, 3),
-(39, 8517, 'Ironbeard', 'Ironbeard', 'automate nain', 'Eisenbart', 'ドワーヴン・オートマトン', '矮人自走人偶', 2, 29.8, 16.9, 2.9, 78, 1),
-(40, 8540, 'Saichania', 'Saichania', 'saichania', 'Saichania', 'サイカニア', '美甲兽', 2, 12.5, 13.5, 3.7, 78, NULL),
-(41, 8520, 'Defective Talos', 'Defective Talos', 'talos défectueux', 'fehlerhaft[a] Talos', 'デフェクティブ・タロース', '次品塔罗斯', 2, 13.8, 18.8, 3.3, 78, 2),
-(42, 8535, 'Gulg Knocker', 'Gulg Knocker', 'frappeur du mont Gulg', 'Gulg-Klopfer', 'グルグ・ノッカー', '格鲁格敲石虫', 2, 28.9, 13.8, 3.1, 78, NULL),
-(43, 8522, 'Sulfur Byrgen', 'Sulfur Byrgen', 'byrgen de sulfure', 'Schwefelspross', 'サルファー・ビルゲン', '硫磺坟灵', 2, 34.2, 10.8, 2.8, 78, 1),
-(44, 8543, 'Desert Armadillo', 'Desert Armadillo', 'tatou du désert', 'Wüsten-Gürteltier', 'デザート・アルマジロ', '荒漠犰狳', 3, 32.9, 9.8, 0.6, 70, NULL),
-(45, 8547, 'Gigantender', 'Gigantender', 'gigapampa', 'Riesenkaktor', 'ギガテンダー', '巨人掌', 3, 31.7, 10.9, 0.5, 70, 1),
-(46, 8405, 'Sibilus', 'Sibilus', 'sibilus sablon', 'Sandhaut-Sibilus', 'サンドスキン・シビルス', '蛇蜥蜴', 3, 29.8, 13.3, 0.8, 70, NULL),
-(47, 8551, 'Tolba', 'Tolba', 'tolba', 'Tolba', 'トルバ', '托儿巴龟', 3, 29.7, 20.2, 0.9, 70, NULL),
-(48, 8556, 'Sand Mole', 'Sand Mole', 'taupe des sables', 'Sandmull', 'サンドモール', '沙鼹鼠', 3, 29.7, 20.2, 0.9, 70, 3),
-(49, 8549, 'Amber Iguana', 'Amber Iguana', 'iguane d\'ambre', 'Bernsteinleguan', 'アンバーイグアナ', '琥珀鬣蜥', 3, 13.3, 13.6, 1.1, 76, NULL),
-(50, 8552, 'Ovim Billy', 'Ovim Billy', 'bouquetin ovim', 'Ovim-Bock', 'オヴィム・ビリー', '公力山羊', 3, 14.7, 13.7, 1.2, 76, NULL),
-(51, 8565, 'Phorusrhacos', 'Phorusrhacos', 'phorusrhacos', 'Phorusrhacos', 'フォルスラコス', '恐鹤', 3, 14.7, 13.8, 1.2, 76, 2),
-(52, 8369, 'Gnome', 'Gnome', 'gnome des mines', 'Minengnom', 'ノーム', '诺姆', 3, 20.3, 10.2, 1.6, 76, 2),
-(53, 8566, 'Desert Coyote', 'Desert Coyote', 'coyote', 'Kojote', 'コヨーテ', '郊狼', 3, 20.8, 10.0, 1.6, 76, 1),
-(54, 8561, 'Debitage', 'Debitage', 'débitage', 'Geröllhauser', 'デビタージュ', '废片', 3, 13.7, 17.4, 1.4, 76, 1),
-(55, 8557, 'Thistle Mole', 'Thistle Mole', 'taupépine', 'Dornenmull', 'スパイクモール', '棘刺鼹鼠 ', 3, 11.9, 19.2, 1.4, 76, 2),
-(56, 8790, 'Dryspine Gigantender', 'Dryspine Gigantender', 'gigapampa à épines sèches', 'ausgedörrt[a] Riesenkaktor', 'ドライスパイン・ギガテンダー', '干刺巨人掌', 3, 17.3, 20.7, 1.1, 76, NULL),
-(57, 8545, 'Evil Weapon', 'Evil Weapon', 'arme maligne', 'Bös[a] Waffe', 'イビルウェポン', '恶魔并', 3, 18.3, 21.2, 1.0, 76, 2),
-(58, 8564, 'Harvester', 'Harvester', 'récolteur', 'Ernter', 'ハーベスター', '收割蟹', 3, 17.9, 22.8, 0.9, 76, NULL),
-(59, 8568, 'Megalobat', 'Megalobat', 'chauve-souris mégalo', 'Megalomaus', 'メガロバット', '大型蝙蝠', 3, 13.3, 22.1, 1.3, 76, NULL),
-(60, 8567, 'Molamander', 'Molamander', 'salataupe', 'Molamander', 'モラマンダー', '摩拉曼达', 3, 23.5, 31.6, 0.1, 77, 3),
-(61, 8563, 'Flame Zonure', 'Flame Zonure', 'zonure des flammes', 'lohend[a] Zonure', 'フレイム・ゾヌール', '火焰缠尾蛟', 3, 24.2, 34.5, 0.4, 77, 2),
-(62, 8546, 'Long-tailed Armadillo', 'Long-tailed Armadillo', 'tatou longue-queue', 'Panzerschwanz-Gürteltier', 'ロングテール・アルマジロ', '长尾犰狳', 3, 17.6, 29.9, 0.5, 77, NULL),
-(63, 8544, 'Masterless Talos', 'Masterless Talos', 'talos sans maître', 'herrenlos[a] Talos', 'マスターレス・タロース', '无主塔罗斯', 3, 12.3, 30.6, 0.3, 77, NULL),
-(64, 8151, 'Echevore', 'Echevore', 'échevore de Dohn Mheg', 'Dohn-Echevore', 'エケボア', '石莲猬', 4, 14.8, 34.7, 0.7, 72, 3),
-(65, 8585, 'Rosebear', 'Rosebear', 'ours-rose', 'Rosenbär', 'ローズベアー', '玫瑰熊', 4, 19.9, 32.8, 0.2, 72, 1),
-(66, 8153, 'Undine', 'Undine', 'ondine de Dohn Mheg', 'Dohn-Undine', 'ドォーヌ・ウンディーネ', '温蒂尼', 4, 21.1, 30.7, 0.1, 72, NULL),
-(67, 8589, 'Psammead', 'Psammead', 'psammead', 'Samiad', 'サミアド', '赛米德', 4, 11.3, 36.6, 1.2, 72, NULL),
-(68, 8155, 'Flower Basket', 'Flower Basket', 'panier fleuri', 'Blumenkorb', 'フラワーバスケット', '花束篮筐', 4, 9.5, 31.0, 0.7, 72, 2),
-(69, 8156, 'Etainmoth', 'Etainmoth', 'noctuétain de Dohn Mheg', 'Dohn-Edianmotte', 'エーディンモス', '爱蒂恩蛾', 4, 14.0, 26.5, 0.2, 72, 1),
-(70, 8571, 'Garden Anemone', 'Garden Anemone', 'anémone des jardins', 'Garten-Anemone', 'ガーデン・アネモネ', '庭园风花', 4, 15.1, 25.3, 0.0, 72, NULL),
-(71, 8788, 'Blood Morpho', 'Blood Morpho', 'morpho sang', 'Blut-Morpho', 'ブラッドモルフォ', '血闪蝶', 4, 10.2, 23.1, 0.3, 72, NULL),
-(72, 5891, 'Purple Morpho', 'Purple Morpho', 'morpho violet', 'Purpur-Morpho', 'パープルモルフォ', '紫闪蝶', 4, 10.2, 23.1, 0.3, 72, NULL),
-(73, 8581, 'Hawker', 'Hawker', 'æschne', 'Mosaikjungfer', 'ホーカー', '鹰蜓', 4, 9.7, 20.1, 0.1, 72, 1),
-(74, 8590, 'Killer Bee', 'Killer Bee', 'abeille tueuse', 'Killerbiene', 'キラービー', '杀人蜂', 4, 11.0, 16.6, 0.2, 72, 1),
-(75, 8588, 'Witchweed', 'Witchweed', 'herbe des sorcières', 'Hexenkraut', 'ウィッチウィード', '独脚金', 4, 14.2, 11.5, 0.8, 73, NULL),
-(76, 8152, 'Moss Fungus', 'Moss Fungus', 'mycose moisie de Dohn Mheg', 'Dohn-Moosfungus', 'モスフングス', '苔菇', 4, 19.4, 8.8, 0.5, 73, 2),
-(77, 8582, 'Rainbow Lorikeet', 'Rainbow Lorikeet', 'loriquet arc-en-ciel', 'Regenbogen-Lorikeet', 'レインボー・ロリキート', '彩虹鹦鹉', 4, 24.4, 7.8, 0.7, 73, 1),
-(78, 8586, 'Garden Crocota', 'Garden Crocota', 'crocotta des jardins', 'Garten-Crocuta', 'ガーデン・コロコッタ', '庭园犬狮', 4, 27.2, 6.2, 0.8, 73, 2),
-(79, 8587, 'Werewood', 'Werewood', 'arbre-garou', 'lebend[a] Ebenhöh', 'ウェアウッド', '变种树', 4, 30.1, 4.8, 0.9, 73, 2),
-(80, 8584, 'Rabbit\'s Tail', 'Rabbit\'s Tail', 'queue-de-lièvre', 'Hasenbommel', 'ラビットテール', '兔尾', 4, 32.0, 10.4, 0.9, 73, 1),
-(81, 8583, 'Tot Aevis', 'Tot Aevis', 'toteibis', 'Schillermähnen-Avis', 'トートエイビス', '幼体龙鸟', 4, 31.3, 11.2, 0.8, 73, 1),
-(82, 8577, 'Green Glider', 'Green Glider', 'planeur vert', 'grün[a] Gleiter', 'グリーングライダー', '绿飘龙', 4, 28.9, 12.6, 0.6, 73, 2),
-(83, 8574, 'Garden Porxie', 'Garden Porxie', 'porxie des jardins', 'Garten-Quiexie', 'ガーデン・ポークシー', '庭园仙子猪', 4, 31.0, 14.7, 0.9, 73, 1),
-(84, 8573, 'Nu Mou Potter', 'Nu Mou Potter', 'potier nu mou', 'Bücherwurm[p] der Nu Mou', 'ン・モゥ・ポッター', '恩莫闲人', 4, 31.8, 16.5, 0.9, 73, NULL),
-(85, 8572, 'Nu Mou Fungimancer', 'Nu Mou Fungimancer', 'fongimancien nu mou', 'Fungimant[p] der Nu Mou', 'ン・モゥ・フンギマンサー', '恩莫菌菇术士', 4, 31.3, 16.7, 0.9, 73, NULL),
-(86, 8575, 'Phooka', 'Phooka', 'phooka', 'Phookah', 'プーカ', '普卡精', 4, 20.1, 17.1, 1.0, 73, 1),
-(87, 8457, 'Tomatl', 'Tomatl', 'tomatl tueur', 'Killertomatl', 'キラートマトル', '酸浆果', 5, 10.1, 19.6, 0.1, 74, 2),
-(88, 8609, 'Helm Beetle', 'Helm Beetle', 'coccinelle casquée', 'Helmkäfer', 'ヘルムビートル', '盔甲虫', 5, 15.6, 28.5, 0.0, 74, 2),
-(89, 8600, 'Vampire Vine', 'Vampire Vine', 'vigne vampire', 'Vampirranke', 'ヴァンパイアヴァイン', '吸血藤树', 5, 15.2, 28.4, 0.0, 74, 2),
-(90, 8456, 'Atrociraptor', 'Atrociraptor', 'atrociraptor décharné', 'ausgemergelt[a] Atrociraptor', 'アトロシラプトル', '野蛮盗龙', 5, 12.6, 35.5, -0.1, 74, NULL),
-(91, 8591, 'Djinn', 'Djinn', 'djinn', 'Dschinn', 'ジン', '镇尼', 5, 14.8, 25.1, 0.1, 74, NULL),
-(92, 8615, 'Forest Flamingo', 'Forest Flamingo', 'flamant rose des forêts', 'Waldflamingo', 'フォレスト・フラミンゴ', '丛林红鹳', 5, 17.7, 20.6, 0.1, 74, NULL),
-(93, 8611, 'Wild Swine', 'Wild Swine', 'cochon sauvage', 'rasend[a] Wildschwein', 'ワイルドスワイン', '狂野豚猪', 5, 16.9, 19.7, 0.2, 74, 2),
-(94, 8605, 'Hoarmite', 'Hoarmite', 'foamite', 'Hoarmit', 'ホーマイト', '霜蛛蝎', 5, 12.7, 22.3, 0.1, 74, NULL),
-(95, 8613, 'Vampire Cup', 'Vampire Cup', 'coupe du vampire', 'Vampirkelch', 'ヴァンパイアカップ', '吸血草杯', 5, 9.6, 21.3, -0.1, 74, NULL),
-(96, 8614, 'Woodbat', 'Woodbat', 'chauve-souris des bois', 'Waldfledermaus', 'ウッドバット', '森林蝙蝠', 5, 8.2, 15.9, 0.3, 74, 2),
-(97, 8594, 'Dreamer of the Everlasting Dark', 'Dreamer of the Everlasting Dark', 'endormeur des Ténèbres éternelles', 'Traummagier[p] der Ewigen Dunkelheit', '常闇の夢使い', '永暗梦术师', 5, 6.1, 16.4, 0.3, 74, NULL),
-(98, 8593, 'Doomsayer of the Everlasting Dark', 'Doomsayer of the Everlasting Dark', 'ensorceleur des Ténèbres éternelles', 'Fluchmagier[p] der Ewigen Dunkelheit', '常闇の呪使い', '永暗咒术师', 5, 6.1, 16.4, 0.3, 74, NULL),
-(99, 8595, 'Dart of the Everlasting Dark', 'Dart of the Everlasting Dark', 'maître d\'hast des Ténèbres éternelles', 'Lanzenkämpfer[p] der Ewigen Dunkelheit', '常闇の槍使い', '永暗枪术师', 5, 5.2, 17.0, 0.3, 74, NULL),
-(100, 8459, 'Gizamaluk', 'Gizamaluk', 'jeune gisamark', 'brütend[a] Gizamaluk', 'ギザマルーク', '基札玛路克', 5, 26.6, 29.5, 0.2, 75, 1),
-(101, 8612, 'Caracal', 'Caracal', 'caracal', 'Calacal', 'カラカル', '狞猫', 5, 25.0, 29.2, -0.2, 75, 1),
-(102, 8597, 'Forest Echo', 'Forest Echo', 'écho', 'Wald-Echo', 'エコー', '回声', 5, 25.3, 28.0, -0.1, 75, 2),
-(103, 8287, 'Snapweed', 'Snapweed', 'balsamine artificielle', 'erzeugt[a] Springkraut', 'スナップウィード', '捕捉草', 5, 32.1, 24.2, 0.2, 75, 1),
-(104, 8607, 'Blue Deer Stag', 'Blue Deer Stag', 'daim bleu', 'Blauantilopenbock', 'ブルーディアー・スタッグ', '雄蓝鹿', 5, 32.4, 20.7, 0.1, 75, NULL),
-(105, 8608, 'Blue Deer Doe', 'Blue Deer Doe', 'daine bleue', 'Blauantilopenkuh', 'ブルーディアー・ドゥ', '雌蓝鹿', 5, 32.5, 21.1, 0.2, 75, NULL),
-(106, 8789, 'Cracked Ronkan Vessel', 'Cracked Ronkan Vessel', 'réceptacle ronka fissuré', 'kaputt[a] Ruinenquader', 'クラックド・ロンカヴェッセル', '破裂的隆卡器皿', 5, 28.4, 14.3, -0.1, 75, 1),
-(107, 8598, 'Cracked Ronkan Doll', 'Cracked Ronkan Doll', 'poupée ronka fissurée', 'kaputt[a] Ronka-Totem', 'クラックド・ロンカドール', '破裂的隆卡人偶', 5, 27.6, 13.6, -0.1, 75, 1),
-(108, 8599, 'Cracked Ronkan Thorn', 'Cracked Ronkan Thorn', 'épine ronka fissurée', 'kaputt[a] Ruinenquadroquader', 'クラックド・ロンカソーン', '破裂的隆卡石蒺藜', 5, 27.2, 12.8, -0.2, 75, 1),
-(109, 8610, 'Floor Mandrill', 'Floor Mandrill', 'mandrill métayer', 'Erd-Mandrill', 'フロア・マンドリル', '地山魈', 5, 33.7, 16.4, -0.5, 75, 1),
-(110, 8466, 'Tarichuk', 'Tarichuk', 'tarichuk déplumé', 'gehäutet[a] Tarichuk', 'タリチャック', '塔里丘魔鸟', 5, 25.2, 21.7, 0.2, 75, 1),
-(111, 8601, 'Greatwood Rail', 'Greatwood Rail', 'râle de forêt', 'Waldralle', 'グレートウッドレイル', '大森林秧鸡', 5, 22.6, 7.1, -0.2, 75, NULL),
-(112, 8631, 'Blue Swimmer', 'Blue Swimmer', 'crabe nageur', 'Schwimmkrabbe', 'スイミングクラブ', '泳蟹', 6, 36.7, 7.8, -1.0, 79, 1),
-(113, 8277, 'Clionid', 'Clionid', 'clionide artificielle', 'erzeugt[a] Clionid', 'クリオニッド', '冰海天使', 6, 26.7, 7.3, -1.7, 79, NULL),
-(114, 8630, 'Tempest Swallow', 'Tempest Swallow', 'hirondelle de La Tempête', 'Sturmschwalbe', 'テンペストスワロー', '黑风海燕', 6, 29.2, 16.6, -2.0, 79, 1),
-(115, 8314, 'Dagon', 'Dagon', 'dagon fétide', 'faulig[a] Dagon', 'ダゴン', '大衮', 6, 28.6, 14.0, -1.9, 79, 1),
-(117, 8626, 'Trilobite', 'Trilobite', 'trilobite', 'Trilobit', 'トリロバイト', '三叶虫', 6, 36.0, 14.6, -1.6, 79, 2),
-(118, 8633, 'Mnyiri', 'Mnyiri', 'mnyiri', 'Myniri', 'ムニリ', '触手鮟', 6, 31.3, 7.9, -1.5, 79, NULL),
-(119, 5139, 'Morgawr', 'Morgawr', 'Morgawr', 'Aquapolis-Morgawr', 'モーゴウル', '莫高海怪', 6, 31.1, 21.1, -1.9, 79, 1),
-(120, 8315, 'Nauplius', 'Nauplius', 'nauplius purpurin', 'Purpur-Nauplius', 'プルプラ・ナウプリウス', '无节幼体', 6, 30.8, 15.6, -2.4, 79, NULL),
-(121, 8629, 'Sea Gelatin', 'Sea Gelatin', 'gélatine de mer', 'Meeresgelatine', 'シーゼラチン', '海胶螺', 6, 27.5, 8.4, -1.8, 79, 1),
-(122, 8319, 'Hydrozoan', 'Hydrozoan', 'hydrozoaire furibond', 'erzürnt[a] Hydrozoa', 'ロス・ヒドロゾア', '水螅虫', 6, 19.5, 11.8, -1.6, 79, NULL),
-(123, 8333, 'Mantis Shrimp', 'Mantis Shrimp', 'squille pondeuse', 'laichend[a] Mantis-Garnele', 'スポーニング・マンティスシュリンプ', '螳螂虾', 6, 18.8, 14.5, -2.0, 79, NULL),
-(124, 8329, 'Sea Anemone', 'Sea Anemone', 'anémone des profondeurs', 'Tiefsee-Anemone', 'ディープシーアネモネ', '海风花', 6, 24.5, 17.7, -3.5, 79, NULL),
-(125, 8627, 'Stingray', 'Stingray', 'raie', 'Stachelrochen', 'スティングレイ', '刺魟', 6, 15.5, 17.7, -4.3, 79, NULL),
-(126, 8624, 'Urchinfish', 'Urchinfish', 'hérisson de mer', 'Igelfisch', 'アーチンフィッシュ', '海胆', 6, 9.8, 16.4, -4.3, 79, NULL),
-(127, 8279, 'Danbania', 'Danbania', 'dambanha artificiel', 'erzeugt[a] Danbania', 'ダンバニア', '刺枪鱼', 6, 6.3, 13.5, -4.7, 79, NULL),
-(128, 8621, 'Cubus', 'Cubus', 'oléofuror', 'Kubus', 'カブス', '卡部斯', 6, 21.9, 36.3, -8.2, 79, 1),
-(129, 8555, 'Shorttail Sibilus', 'Shorttail Sibilus', 'sibilus courte-queue', 'Kurzschwanz-Sibilus', 'ショートテイル・シビルス', '短尾蛇蜥蜴', 3, 30.4, 15.9, 0.8, 70, NULL),
-(130, 8558, 'Scissorjaws', 'Scissorjaws', 'mandicisaille', 'Scherenmaul', 'シザージョウ', '铰颌蚁', 3, 31.4, 26.1, 0.7, 70, 1),
-(131, 8548, 'Ngozi', 'Ngozi', 'ngozi', 'Ngozi', 'ンゴツィ', '恩戈齐', 3, 31.8, 25.5, 0.6, 70, NULL),
-(132, 8550, 'Ancient Lizard', 'Ancient Lizard', 'lézard ancestral', 'uralt[a] Eidechse', 'エンシェント・リザード', '古代蜥蜴', 3, 31.9, 27.2, 0.6, 70, 3),
-(133, 8562, 'Ghilman', 'Ghilman', 'ghilman', 'Ghulam', 'グラーム', '古拉姆', 3, 27.2, 30.3, 0.4, 70, 1),
-(134, 8560, 'Sandsucker', 'Sandsucker', 'mange-sable', 'Sandschlucker', 'サンドイーター', '噬沙蠕虫', 3, 27.9, 25.4, 0.7, 70, NULL),
-(135, 8503, 'Gnole', 'Gnole', 'gnole', 'Gnoll', 'ノール', '异豺', 1, 14.2, 16.5, 0.2, 71, 1),
-(136, 8538, 'Highland Hyssop', 'Highland Hyssop', 'hyssop des hautes terres', 'Hochland-Ysop', 'ハイランド・ヒソプ', '高地海索草', 2, 23.9, 10.4, 3.6, 78, 3),
-(116, 8328, 'Amphisbaena', 'Amphisbaena', 'amphisbène perlé', 'alt[a] Amphisbaena', 'アンフィスバエナ', '双向海龙', 6, 36.6, 12.9, -1.5, 79, 1);
+(1, 8507, 'Hoptrap', 'Hoptrap', 'saute-piège', 'Sprungfalle', 'ホップトラップ', '阱蛇麻', 1, '35.6', '24.1', '0.1', 71, 3),
+(2, 8502, 'Violet Triffid', 'Violet Triffid', 'triffide violet', 'violett[a] Triffid', 'ヴァイオレット・トリフィド', '紫罗兰三尖树', 1, '35.3', '25.4', '0.1', 71, NULL),
+(3, 8500, 'Giant Iguana', 'Giant Iguana', 'iguane géant', 'Riesenleguan', 'ジャイアント・イグアナ', '巨型鬣蜥', 1, '27.0', '28.6', '0.0', 71, NULL),
+(4, 8407, 'Wolverine', 'Wolverine', 'wolvérène féroce', 'wild[a] Vielfraß', 'ウルヴァリン', '貂熊', 1, '27.8', '36.8', '0.1', 71, 2),
+(5, 8514, 'Ya-te-veo', 'Ya-te-veo', 'yateveo', 'Yateveo', 'ヤテベオ', '食人花', 1, '32.9', '19.2', '0.1', 71, 3),
+(6, 8499, 'Grey Draco', 'Grey Draco', 'draco gris', 'grau[a] Draco', 'グレイ・ドラコ', '灰蜥龙', 1, '37.1', '16.6', '0.4', 71, NULL),
+(7, 8505, 'White Gremlin', 'White Gremlin', 'gremlin blanc', 'weiß[a] Gremlin', 'ホワイト・グレムリン', '白色格雷姆林', 1, '33.6', '12.3', '0.5', 71, 2),
+(8, 8515, 'Proterosuchus', 'Proterosuchus', 'proterosuchus', 'Proterosuchus', 'プロテロスクス', '古鳄', 1, '28.4', '17.8', '1.1', 71, 1),
+(9, 8516, 'Elven Knight', 'Elven Knight', 'chevalier elfe', 'Elfenritter', 'エルヴンナイト', '菁灵骑士', 1, '26.2', '17.5', '1.5', 71, NULL),
+(10, 8513, 'Irrlicht', 'Irrlicht', 'Irrlicht', 'Irrwisch', 'イルリヒト', '迷光', 1, '25.6', '17.2', '1.5', 71, NULL),
+(11, 8512, 'Coelurosaur', 'Coelurosaur', 'coelurosaure', 'Coelurosaurus', 'コエルロサウルス', '虚骨龙', 1, '22.7', '11.7', '1.0', 71, NULL),
+(12, 8504, 'Wetland Warg', 'Wetland Warg', 'warg des plaines humides', 'Sumpfwarg', 'ウェットランド・ワーグ', '湿地座狼', 1, '22.4', '21.0', '0.0', 71, 2),
+(13, 8506, 'Silkmoth', 'Silkmoth', 'bombyx', 'Seidenmotte', 'シルクモス', '丝蛾', 1, '10.4', '15.5', '0.2', 71, NULL),
+(14, 8786, 'Lake Viper', 'Lake Viper', 'vipère lacustre', 'Seeviper', 'レイクバイパー', '湖畔蝰蛇', 1, '15.6', '22.1', '0.0', 71, 2),
+(15, 8498, 'Chiliad Cama', 'Chiliad Cama', 'chama des mille Lacis', 'Chiliad Cama', 'チリアド・キャマ', '千年卡玛', 1, '17.8', '9.5', '0.9', 71, 2),
+(16, 8439, 'Smilodon', 'Smilodon', 'smilodon affamé', 'ausgehungert[a] Smilodon', 'スミロドン', '斯剑虎', 1, '10.5', '12.3', '0.6', 71, 2),
+(17, 8509, 'Zonure', 'Zonure', 'zonure', 'Zonure', 'ゾヌール', '缠尾蛟', 1, '11.5', '16.9', '0.1', 71, NULL),
+(18, 8501, 'Lake Anemone', 'Lake Anemone', 'anémone lacustre', 'Seeanemone', 'レイク・アネモネ', '湖畔风花', 1, '10.2', '20.3', '0.0', 71, NULL),
+(19, 8518, 'Hobgoblin', 'Hobgoblin', 'hobgobelin', 'Hobgoblin', 'ホブゴブリン', '大哥布林', 2, '34.1', '30.5', '0.0', 70, 3),
+(20, 8523, 'Maultasche', 'Maultasche', 'maultasche', 'Maultasch', 'マウルタッシュ', '饭袋猩猩', 2, '36.0', '29.3', '0.0', 70, 2),
+(21, 8536, 'Whiptail', 'Whiptail', 'fouette-queue', 'Peitschenschwanz', 'ウィップテール', '鞭尾跳蜥', 2, '35.5', '24.7', '0.3', 70, 3),
+(22, 8521, 'Kholusian Iguana', 'Kholusian Iguana', 'iguane de Kholusia', 'Kholusia-Leguan', 'コルシアイグアナ', '珂露西亚鬣蜥', 2, '29.4', '28.8', '0.1', 70, NULL),
+(23, 8539, 'Tragopan', 'Tragopan', 'tragopan', 'Tragopan', 'トラゴパン', '角雉', 2, '26.2', '29.4', '0.1', 70, NULL),
+(24, 8542, 'Germinant', 'Germinant', 'germinateur', 'Germinant', 'ジェルミナンツ', '发芽大口花', 2, '26.9', '32.8', '0.2', 70, 2),
+(25, 8531, 'Toucalibri', 'Toucalibri', 'toucanlibri', 'Tukalibri', 'トゥカリブリ', '巨喙蜂鸟', 2, '15.9', '31.4', '0.1', 70, NULL),
+(26, 8532, 'Wood Eyes', 'Wood Eyes', 'œil des bois', 'Waldwandler', 'ウッドアイズ', '林眼树精', 2, '15.4', '32.5', '0.1', 70, 2),
+(27, 8787, 'Big Claw', 'Big Claw', 'grosse pince', 'Mörderkrabbe', 'ビッグクロウ', '大螯陆蟹', 2, '7.4', '33.1', '0.0', 70, NULL),
+(28, 8534, 'Kholusian Bison', 'Kholusian Bison', 'bison de Kholusia', 'Kholusia-Büffel', 'コルシア・バイソン', '珂露西亚野牛', 2, '10.7', '29.8', '0.2', 70, 2),
+(29, 8537, 'Lowland Hyssop', 'Lowland Hyssop', 'hyssop des basses terres', 'Tiefland-Ysop', 'ロウランド・ヒソプ', '低地海索草', 2, '14.1', '28.2', '0.1', 70, NULL),
+(30, 8525, 'Island Rail', 'Island Rail', 'râle insulaire', 'Inselralle', 'アイランド・レイル', '岛屿秧鸡', 2, '18.1', '28.4', '0.1', 70, 3),
+(31, 8533, 'Island Wolf', 'Island Wolf', 'loup insulaire', 'Inselwolf', 'アイランド・ウルフ', '岛屿黑狼', 2, '28.1', '23.2', '0.3', 70, 3),
+(32, 8529, 'Scree Gnome', 'Scree Gnome', 'gnome des plateaux', 'Schreignom', 'スクリー・ノーム', '碎石诺姆', 2, '8.3', '16.8', '3.6', 78, 1),
+(33, 8526, 'Hobgoblin Guard', 'Hobgoblin Guard', 'garde hobgobelin', 'Hobgoblin-Wache', 'ホブゴブリン・ガード', '大哥布林守卫', 2, '25.2', '8.8', '3.4', 78, NULL),
+(34, 8527, 'Cliffkite', 'Cliffkite', 'milan des falaises', 'Gratgleiter', 'クリフカイト', '壁崖鼹鼠', 2, '17.4', '9.1', '4.3', 78, 2),
+(35, 8528, 'Cliffmole', 'Cliffmole', 'taupe des falaises', 'Klippenmull', 'クリフモール', '壁崖飞鸢', 2, '27.2', '11.6', '3.1', 78, 2),
+(36, 8519, 'Calx', 'Calx', 'calx', 'Calx', 'カルックス', '石灰灵', 2, '18.1', '8.0', '4.4', 78, NULL),
+(37, 8541, 'Gulgnu', 'Gulgnu', 'goulgnou', 'Gulgnu', 'グルグヌー', '格鲁格角马', 2, '19.1', '7.6', '4.4', 78, 3),
+(38, 8245, 'Huldu', 'Huldu', 'huldu du puits', 'Brunnen-Huldu', 'ウェル・フルドゥ', '爆岩怪', 2, '12.7', '11.1', '4.0', 78, 3),
+(39, 8517, 'Ironbeard', 'Ironbeard', 'automate nain', 'Eisenbart', 'ドワーヴン・オートマトン', '矮人自走人偶', 2, '29.8', '16.9', '2.9', 78, 1),
+(40, 8540, 'Saichania', 'Saichania', 'saichania', 'Saichania', 'サイカニア', '美甲兽', 2, '12.5', '13.5', '3.7', 78, NULL),
+(41, 8520, 'Defective Talos', 'Defective Talos', 'talos défectueux', 'fehlerhaft[a] Talos', 'デフェクティブ・タロース', '次品塔罗斯', 2, '13.8', '18.8', '3.3', 78, 2),
+(42, 8535, 'Gulg Knocker', 'Gulg Knocker', 'frappeur du mont Gulg', 'Gulg-Klopfer', 'グルグ・ノッカー', '格鲁格敲石虫', 2, '28.9', '13.8', '3.1', 78, NULL),
+(43, 8522, 'Sulfur Byrgen', 'Sulfur Byrgen', 'byrgen de sulfure', 'Schwefelspross', 'サルファー・ビルゲン', '硫磺坟灵', 2, '34.2', '10.8', '2.8', 78, 1),
+(44, 8543, 'Desert Armadillo', 'Desert Armadillo', 'tatou du désert', 'Wüsten-Gürteltier', 'デザート・アルマジロ', '荒漠犰狳', 3, '32.9', '9.8', '0.6', 70, NULL),
+(45, 8547, 'Gigantender', 'Gigantender', 'gigapampa', 'Riesenkaktor', 'ギガテンダー', '巨人掌', 3, '31.7', '10.9', '0.5', 70, 1),
+(46, 8405, 'Sibilus', 'Sibilus', 'sibilus sablon', 'Sandhaut-Sibilus', 'サンドスキン・シビルス', '蛇蜥蜴', 3, '29.8', '13.3', '0.8', 70, NULL),
+(47, 8551, 'Tolba', 'Tolba', 'tolba', 'Tolba', 'トルバ', '托儿巴龟', 3, '29.7', '20.2', '0.9', 70, NULL),
+(48, 8556, 'Sand Mole', 'Sand Mole', 'taupe des sables', 'Sandmull', 'サンドモール', '沙鼹鼠', 3, '29.7', '20.2', '0.9', 70, 3),
+(49, 8549, 'Amber Iguana', 'Amber Iguana', 'iguane d\'ambre', 'Bernsteinleguan', 'アンバーイグアナ', '琥珀鬣蜥', 3, '13.3', '13.6', '1.1', 76, NULL),
+(50, 8552, 'Ovim Billy', 'Ovim Billy', 'bouquetin ovim', 'Ovim-Bock', 'オヴィム・ビリー', '公力山羊', 3, '14.7', '13.7', '1.2', 76, NULL),
+(51, 8565, 'Phorusrhacos', 'Phorusrhacos', 'phorusrhacos', 'Phorusrhacos', 'フォルスラコス', '恐鹤', 3, '14.7', '13.8', '1.2', 76, 2),
+(52, 8369, 'Gnome', 'Gnome', 'gnome des mines', 'Minengnom', 'ノーム', '诺姆', 3, '20.3', '10.2', '1.6', 76, 2),
+(53, 8566, 'Desert Coyote', 'Desert Coyote', 'coyote', 'Kojote', 'コヨーテ', '郊狼', 3, '20.8', '10.0', '1.6', 76, 1),
+(54, 8561, 'Debitage', 'Debitage', 'débitage', 'Geröllhauser', 'デビタージュ', '废片', 3, '13.7', '17.4', '1.4', 76, 1),
+(55, 8557, 'Thistle Mole', 'Thistle Mole', 'taupépine', 'Dornenmull', 'スパイクモール', '棘刺鼹鼠 ', 3, '11.9', '19.2', '1.4', 76, 2),
+(56, 8790, 'Dryspine Gigantender', 'Dryspine Gigantender', 'gigapampa à épines sèches', 'ausgedörrt[a] Riesenkaktor', 'ドライスパイン・ギガテンダー', '干刺巨人掌', 3, '17.3', '20.7', '1.1', 76, NULL),
+(57, 8545, 'Evil Weapon', 'Evil Weapon', 'arme maligne', 'Bös[a] Waffe', 'イビルウェポン', '恶魔并', 3, '18.3', '21.2', '1.0', 76, 2),
+(58, 8564, 'Harvester', 'Harvester', 'récolteur', 'Ernter', 'ハーベスター', '收割蟹', 3, '17.9', '22.8', '0.9', 76, NULL),
+(59, 8568, 'Megalobat', 'Megalobat', 'chauve-souris mégalo', 'Megalomaus', 'メガロバット', '大型蝙蝠', 3, '13.3', '22.1', '1.3', 76, NULL),
+(60, 8567, 'Molamander', 'Molamander', 'salataupe', 'Molamander', 'モラマンダー', '摩拉曼达', 3, '23.5', '31.6', '0.1', 77, 3),
+(61, 8563, 'Flame Zonure', 'Flame Zonure', 'zonure des flammes', 'lohend[a] Zonure', 'フレイム・ゾヌール', '火焰缠尾蛟', 3, '24.2', '34.5', '0.4', 77, 2),
+(62, 8546, 'Long-tailed Armadillo', 'Long-tailed Armadillo', 'tatou longue-queue', 'Panzerschwanz-Gürteltier', 'ロングテール・アルマジロ', '长尾犰狳', 3, '17.6', '29.9', '0.5', 77, NULL),
+(63, 8544, 'Masterless Talos', 'Masterless Talos', 'talos sans maître', 'herrenlos[a] Talos', 'マスターレス・タロース', '无主塔罗斯', 3, '12.3', '30.6', '0.3', 77, NULL),
+(64, 8151, 'Echevore', 'Echevore', 'échevore de Dohn Mheg', 'Dohn-Echevore', 'エケボア', '石莲猬', 4, '14.8', '34.7', '0.7', 72, 3),
+(65, 8585, 'Rosebear', 'Rosebear', 'ours-rose', 'Rosenbär', 'ローズベアー', '玫瑰熊', 4, '19.9', '32.8', '0.2', 72, 1),
+(66, 8153, 'Undine', 'Undine', 'ondine de Dohn Mheg', 'Dohn-Undine', 'ドォーヌ・ウンディーネ', '温蒂尼', 4, '21.1', '30.7', '0.1', 72, NULL),
+(67, 8589, 'Psammead', 'Psammead', 'psammead', 'Samiad', 'サミアド', '赛米德', 4, '11.3', '36.6', '1.2', 72, NULL),
+(68, 8155, 'Flower Basket', 'Flower Basket', 'panier fleuri', 'Blumenkorb', 'フラワーバスケット', '花束篮筐', 4, '9.5', '31.0', '0.7', 72, 2),
+(69, 8156, 'Etainmoth', 'Etainmoth', 'noctuétain de Dohn Mheg', 'Dohn-Edianmotte', 'エーディンモス', '爱蒂恩蛾', 4, '14.0', '26.5', '0.2', 72, 1),
+(70, 8571, 'Garden Anemone', 'Garden Anemone', 'anémone des jardins', 'Garten-Anemone', 'ガーデン・アネモネ', '庭园风花', 4, '15.1', '25.3', '0.0', 72, NULL),
+(71, 8788, 'Blood Morpho', 'Blood Morpho', 'morpho sang', 'Blut-Morpho', 'ブラッドモルフォ', '血闪蝶', 4, '10.2', '23.1', '0.3', 72, NULL),
+(72, 5891, 'Purple Morpho', 'Purple Morpho', 'morpho violet', 'Purpur-Morpho', 'パープルモルフォ', '紫闪蝶', 4, '10.2', '23.1', '0.3', 72, NULL),
+(73, 8581, 'Hawker', 'Hawker', 'æschne', 'Mosaikjungfer', 'ホーカー', '鹰蜓', 4, '9.7', '20.1', '0.1', 72, 1),
+(74, 8590, 'Killer Bee', 'Killer Bee', 'abeille tueuse', 'Killerbiene', 'キラービー', '杀人蜂', 4, '11.0', '16.6', '0.2', 72, 1),
+(75, 8588, 'Witchweed', 'Witchweed', 'herbe des sorcières', 'Hexenkraut', 'ウィッチウィード', '独脚金', 4, '14.2', '11.5', '0.8', 73, NULL),
+(76, 8152, 'Moss Fungus', 'Moss Fungus', 'mycose moisie de Dohn Mheg', 'Dohn-Moosfungus', 'モスフングス', '苔菇', 4, '19.4', '8.8', '0.5', 73, 2),
+(77, 8582, 'Rainbow Lorikeet', 'Rainbow Lorikeet', 'loriquet arc-en-ciel', 'Regenbogen-Lorikeet', 'レインボー・ロリキート', '彩虹鹦鹉', 4, '24.4', '7.8', '0.7', 73, 1),
+(78, 8586, 'Garden Crocota', 'Garden Crocota', 'crocotta des jardins', 'Garten-Crocuta', 'ガーデン・コロコッタ', '庭园犬狮', 4, '27.2', '6.2', '0.8', 73, 2),
+(79, 8587, 'Werewood', 'Werewood', 'arbre-garou', 'lebend[a] Ebenhöh', 'ウェアウッド', '变种树', 4, '30.1', '4.8', '0.9', 73, 2),
+(80, 8584, 'Rabbit\'s Tail', 'Rabbit\'s Tail', 'queue-de-lièvre', 'Hasenbommel', 'ラビットテール', '兔尾', 4, '32.0', '10.4', '0.9', 73, 1),
+(81, 8583, 'Tot Aevis', 'Tot Aevis', 'toteibis', 'Schillermähnen-Avis', 'トートエイビス', '幼体龙鸟', 4, '31.3', '11.2', '0.8', 73, 1),
+(82, 8577, 'Green Glider', 'Green Glider', 'planeur vert', 'grün[a] Gleiter', 'グリーングライダー', '绿飘龙', 4, '28.9', '12.6', '0.6', 73, 2),
+(83, 8574, 'Garden Porxie', 'Garden Porxie', 'porxie des jardins', 'Garten-Quiexie', 'ガーデン・ポークシー', '庭园仙子猪', 4, '31.0', '14.7', '0.9', 73, 1),
+(84, 8573, 'Nu Mou Potter', 'Nu Mou Potter', 'potier nu mou', 'Bücherwurm[p] der Nu Mou', 'ン・モゥ・ポッター', '恩莫闲人', 4, '31.8', '16.5', '0.9', 73, NULL),
+(85, 8572, 'Nu Mou Fungimancer', 'Nu Mou Fungimancer', 'fongimancien nu mou', 'Fungimant[p] der Nu Mou', 'ン・モゥ・フンギマンサー', '恩莫菌菇术士', 4, '31.3', '16.7', '0.9', 73, NULL),
+(86, 8575, 'Phooka', 'Phooka', 'phooka', 'Phookah', 'プーカ', '普卡精', 4, '20.1', '17.1', '1.0', 73, 1),
+(87, 8457, 'Tomatl', 'Tomatl', 'tomatl tueur', 'Killertomatl', 'キラートマトル', '酸浆果', 5, '10.1', '19.6', '0.1', 74, 2),
+(88, 8609, 'Helm Beetle', 'Helm Beetle', 'coccinelle casquée', 'Helmkäfer', 'ヘルムビートル', '盔甲虫', 5, '15.6', '28.5', '0.0', 74, 2),
+(89, 8600, 'Vampire Vine', 'Vampire Vine', 'vigne vampire', 'Vampirranke', 'ヴァンパイアヴァイン', '吸血藤树', 5, '15.2', '28.4', '0.0', 74, 2),
+(90, 8456, 'Atrociraptor', 'Atrociraptor', 'atrociraptor décharné', 'ausgemergelt[a] Atrociraptor', 'アトロシラプトル', '野蛮盗龙', 5, '12.6', '35.5', '-0.1', 74, NULL),
+(91, 8591, 'Djinn', 'Djinn', 'djinn', 'Dschinn', 'ジン', '镇尼', 5, '14.8', '25.1', '0.1', 74, NULL),
+(92, 8615, 'Forest Flamingo', 'Forest Flamingo', 'flamant rose des forêts', 'Waldflamingo', 'フォレスト・フラミンゴ', '丛林红鹳', 5, '17.7', '20.6', '0.1', 74, NULL),
+(93, 8611, 'Wild Swine', 'Wild Swine', 'cochon sauvage', 'rasend[a] Wildschwein', 'ワイルドスワイン', '狂野豚猪', 5, '16.9', '19.7', '0.2', 74, 2),
+(94, 8605, 'Hoarmite', 'Hoarmite', 'foamite', 'Hoarmit', 'ホーマイト', '霜蛛蝎', 5, '12.7', '22.3', '0.1', 74, NULL),
+(95, 8613, 'Vampire Cup', 'Vampire Cup', 'coupe du vampire', 'Vampirkelch', 'ヴァンパイアカップ', '吸血草杯', 5, '9.6', '21.3', '-0.1', 74, NULL),
+(96, 8614, 'Woodbat', 'Woodbat', 'chauve-souris des bois', 'Waldfledermaus', 'ウッドバット', '森林蝙蝠', 5, '8.2', '15.9', '0.3', 74, 2),
+(97, 8594, 'Dreamer of the Everlasting Dark', 'Dreamer of the Everlasting Dark', 'endormeur des Ténèbres éternelles', 'Traummagier[p] der Ewigen Dunkelheit', '常闇の夢使い', '永暗梦术师', 5, '6.1', '16.4', '0.3', 74, NULL),
+(98, 8593, 'Doomsayer of the Everlasting Dark', 'Doomsayer of the Everlasting Dark', 'ensorceleur des Ténèbres éternelles', 'Fluchmagier[p] der Ewigen Dunkelheit', '常闇の呪使い', '永暗咒术师', 5, '6.1', '16.4', '0.3', 74, NULL),
+(99, 8595, 'Dart of the Everlasting Dark', 'Dart of the Everlasting Dark', 'maître d\'hast des Ténèbres éternelles', 'Lanzenkämpfer[p] der Ewigen Dunkelheit', '常闇の槍使い', '永暗枪术师', 5, '5.2', '17.0', '0.3', 74, NULL),
+(100, 8459, 'Gizamaluk', 'Gizamaluk', 'jeune gisamark', 'brütend[a] Gizamaluk', 'ギザマルーク', '基札玛路克', 5, '26.6', '29.5', '0.2', 75, 1),
+(101, 8612, 'Caracal', 'Caracal', 'caracal', 'Calacal', 'カラカル', '狞猫', 5, '25.0', '29.2', '-0.2', 75, 1),
+(102, 8597, 'Forest Echo', 'Forest Echo', 'écho', 'Wald-Echo', 'エコー', '回声', 5, '25.3', '28.0', '-0.1', 75, 2),
+(103, 8287, 'Snapweed', 'Snapweed', 'balsamine artificielle', 'erzeugt[a] Springkraut', 'スナップウィード', '捕捉草', 5, '32.1', '24.2', '0.2', 75, 1),
+(104, 8607, 'Blue Deer Stag', 'Blue Deer Stag', 'daim bleu', 'Blauantilopenbock', 'ブルーディアー・スタッグ', '雄蓝鹿', 5, '32.4', '20.7', '0.1', 75, NULL),
+(105, 8608, 'Blue Deer Doe', 'Blue Deer Doe', 'daine bleue', 'Blauantilopenkuh', 'ブルーディアー・ドゥ', '雌蓝鹿', 5, '32.5', '21.1', '0.2', 75, NULL),
+(106, 8789, 'Cracked Ronkan Vessel', 'Cracked Ronkan Vessel', 'réceptacle ronka fissuré', 'kaputt[a] Ruinenquader', 'クラックド・ロンカヴェッセル', '破裂的隆卡器皿', 5, '28.4', '14.3', '-0.1', 75, 1),
+(107, 8598, 'Cracked Ronkan Doll', 'Cracked Ronkan Doll', 'poupée ronka fissurée', 'kaputt[a] Ronka-Totem', 'クラックド・ロンカドール', '破裂的隆卡人偶', 5, '27.6', '13.6', '-0.1', 75, 1),
+(108, 8599, 'Cracked Ronkan Thorn', 'Cracked Ronkan Thorn', 'épine ronka fissurée', 'kaputt[a] Ruinenquadroquader', 'クラックド・ロンカソーン', '破裂的隆卡石蒺藜', 5, '27.2', '12.8', '-0.2', 75, 1),
+(109, 8610, 'Floor Mandrill', 'Floor Mandrill', 'mandrill métayer', 'Erd-Mandrill', 'フロア・マンドリル', '地山魈', 5, '33.7', '16.4', '-0.5', 75, 1),
+(110, 8466, 'Tarichuk', 'Tarichuk', 'tarichuk déplumé', 'gehäutet[a] Tarichuk', 'タリチャック', '塔里丘魔鸟', 5, '25.2', '21.7', '0.2', 75, 1),
+(111, 8601, 'Greatwood Rail', 'Greatwood Rail', 'râle de forêt', 'Waldralle', 'グレートウッドレイル', '大森林秧鸡', 5, '22.6', '7.1', '-0.2', 75, NULL),
+(112, 8631, 'Blue Swimmer', 'Blue Swimmer', 'crabe nageur', 'Schwimmkrabbe', 'スイミングクラブ', '泳蟹', 6, '36.7', '7.8', '-1.0', 79, 1),
+(113, 8277, 'Clionid', 'Clionid', 'clionide artificielle', 'erzeugt[a] Clionid', 'クリオニッド', '冰海天使', 6, '26.7', '7.3', '-1.7', 79, NULL),
+(114, 8630, 'Tempest Swallow', 'Tempest Swallow', 'hirondelle de La Tempête', 'Sturmschwalbe', 'テンペストスワロー', '黑风海燕', 6, '29.2', '16.6', '-2.0', 79, 1),
+(115, 8314, 'Dagon', 'Dagon', 'dagon fétide', 'faulig[a] Dagon', 'ダゴン', '大衮', 6, '28.6', '14.0', '-1.9', 79, 1),
+(117, 8626, 'Trilobite', 'Trilobite', 'trilobite', 'Trilobit', 'トリロバイト', '三叶虫', 6, '36.0', '14.6', '-1.6', 79, 2),
+(118, 8633, 'Mnyiri', 'Mnyiri', 'mnyiri', 'Myniri', 'ムニリ', '触手鮟', 6, '31.3', '7.9', '-1.5', 79, NULL),
+(119, 5139, 'Morgawr', 'Morgawr', 'Morgawr', 'Aquapolis-Morgawr', 'モーゴウル', '莫高海怪', 6, '31.1', '21.1', '-1.9', 79, 1),
+(120, 8315, 'Nauplius', 'Nauplius', 'nauplius purpurin', 'Purpur-Nauplius', 'プルプラ・ナウプリウス', '无节幼体', 6, '30.8', '15.6', '-2.4', 79, NULL),
+(121, 8629, 'Sea Gelatin', 'Sea Gelatin', 'gélatine de mer', 'Meeresgelatine', 'シーゼラチン', '海胶螺', 6, '27.5', '8.4', '-1.8', 79, 1),
+(122, 8319, 'Hydrozoan', 'Hydrozoan', 'hydrozoaire furibond', 'erzürnt[a] Hydrozoa', 'ロス・ヒドロゾア', '水螅虫', 6, '19.5', '11.8', '-1.6', 79, NULL),
+(123, 8333, 'Mantis Shrimp', 'Mantis Shrimp', 'squille pondeuse', 'laichend[a] Mantis-Garnele', 'スポーニング・マンティスシュリンプ', '螳螂虾', 6, '18.8', '14.5', '-2.0', 79, NULL),
+(124, 8329, 'Sea Anemone', 'Sea Anemone', 'anémone des profondeurs', 'Tiefsee-Anemone', 'ディープシーアネモネ', '海风花', 6, '24.5', '17.7', '-3.5', 79, NULL),
+(125, 8627, 'Stingray', 'Stingray', 'raie', 'Stachelrochen', 'スティングレイ', '刺魟', 6, '15.5', '17.7', '-4.3', 79, NULL),
+(126, 8624, 'Urchinfish', 'Urchinfish', 'hérisson de mer', 'Igelfisch', 'アーチンフィッシュ', '海胆', 6, '9.8', '16.4', '-4.3', 79, NULL),
+(127, 8279, 'Danbania', 'Danbania', 'dambanha artificiel', 'erzeugt[a] Danbania', 'ダンバニア', '刺枪鱼', 6, '6.3', '13.5', '-4.7', 79, NULL),
+(128, 8621, 'Cubus', 'Cubus', 'oléofuror', 'Kubus', 'カブス', '卡部斯', 6, '21.9', '36.3', '-8.2', 79, 1),
+(129, 8555, 'Shorttail Sibilus', 'Shorttail Sibilus', 'sibilus courte-queue', 'Kurzschwanz-Sibilus', 'ショートテイル・シビルス', '短尾蛇蜥蜴', 3, '30.4', '15.9', '0.8', 70, NULL),
+(130, 8558, 'Scissorjaws', 'Scissorjaws', 'mandicisaille', 'Scherenmaul', 'シザージョウ', '铰颌蚁', 3, '31.4', '26.1', '0.7', 70, 1),
+(131, 8548, 'Ngozi', 'Ngozi', 'ngozi', 'Ngozi', 'ンゴツィ', '恩戈齐', 3, '31.8', '25.5', '0.6', 70, NULL),
+(132, 8550, 'Ancient Lizard', 'Ancient Lizard', 'lézard ancestral', 'uralt[a] Eidechse', 'エンシェント・リザード', '古代蜥蜴', 3, '31.9', '27.2', '0.6', 70, 3),
+(133, 8562, 'Ghilman', 'Ghilman', 'ghilman', 'Ghulam', 'グラーム', '古拉姆', 3, '27.2', '30.3', '0.4', 70, 1),
+(134, 8560, 'Sandsucker', 'Sandsucker', 'mange-sable', 'Sandschlucker', 'サンドイーター', '噬沙蠕虫', 3, '27.9', '25.4', '0.7', 70, NULL),
+(135, 8503, 'Gnole', 'Gnole', 'gnole', 'Gnoll', 'ノール', '异豺', 1, '14.2', '16.5', '0.2', 71, 1),
+(136, 8538, 'Highland Hyssop', 'Highland Hyssop', 'hyssop des hautes terres', 'Hochland-Ysop', 'ハイランド・ヒソプ', '高地海索草', 2, '23.9', '10.4', '3.6', 78, 3),
+(116, 8328, 'Amphisbaena', 'Amphisbaena', 'amphisbène perlé', 'alt[a] Amphisbaena', 'アンフィスバエナ', '双向海龙', 6, '36.6', '12.9', '-1.5', 79, 1);
 
 --
 -- Triggers `mobs_shb`
 --
+DROP TRIGGER IF EXISTS `mob_shb_del`;
 DELIMITER $$
 CREATE TRIGGER `mob_shb_del` AFTER DELETE ON `mobs_shb` FOR EACH ROW BEGIN
 	CALL update_etag('distances_shb');
@@ -2904,6 +3190,7 @@ CREATE TRIGGER `mob_shb_del` AFTER DELETE ON `mobs_shb` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_shb_ins`;
 DELIMITER $$
 CREATE TRIGGER `mob_shb_ins` AFTER INSERT ON `mobs_shb` FOR EACH ROW BEGIN
 	CALL update_etag('distances_shb');
@@ -2911,6 +3198,7 @@ CREATE TRIGGER `mob_shb_ins` AFTER INSERT ON `mobs_shb` FOR EACH ROW BEGIN
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `mob_shb_upd`;
 DELIMITER $$
 CREATE TRIGGER `mob_shb_upd` AFTER UPDATE ON `mobs_shb` FOR EACH ROW BEGIN
 	IF NEW.x <> OLD.x OR NEW.y <> OLD.y OR NEW.id_zone <> OLD.id_zone THEN
@@ -2927,16 +3215,18 @@ DELIMITER ;
 -- Table structure for table `region_arr`
 --
 
-CREATE TABLE `region_arr` (
-  `id` tinyint(4) UNSIGNED NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `region_arr`;
+CREATE TABLE IF NOT EXISTS `region_arr` (
+  `id` tinyint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `region_arr`
@@ -2955,58 +3245,64 @@ INSERT INTO `region_arr` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_
 -- Table structure for table `zones_arr`
 --
 
-CREATE TABLE `zones_arr` (
-  `id` tinyint(4) NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
+DROP TABLE IF EXISTS `zones_arr`;
+CREATE TABLE IF NOT EXISTS `zones_arr` (
+  `id` tinyint NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
   `size_x` decimal(3,1) UNSIGNED NOT NULL DEFAULT '41.9',
   `size_y` decimal(3,1) UNSIGNED NOT NULL DEFAULT '41.9',
-  `id_region` tinyint(4) UNSIGNED NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `id_region` tinyint UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `id_region` (`id_region`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `zones_arr`
 --
 
 INSERT INTO `zones_arr` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `size_x`, `size_y`, `id_region`) VALUES
-(1, 30, 'Middle La Noscea', 'Middle La Noscea', 'Noscea Centrale', 'Zentrales La Noscea', '中央ラノシア', NULL, 41.9, 41.9, 1),
-(2, 31, 'Lower La Noscea', 'Lower La Noscea', 'Basse-Noscea', 'Unteres La Noscea', '低地ラノシア', NULL, 41.9, 41.9, 1),
-(3, 32, 'Eastern La Noscea', 'Eastern La Noscea', 'Noscea Orientale', 'Östliches La Noscea', '東ラノシア', NULL, 41.9, 41.9, 1),
-(4, 33, 'Western La Noscea', 'Western La Noscea', 'Noscea Occidentale', 'Westliches La Noscea', '西ラノシア', NULL, 41.9, 41.9, 1),
-(5, 34, 'Upper La Noscea', 'Upper La Noscea', 'Haute-Noscea', 'Oberes La Noscea', '高地ラノシア', NULL, 41.9, 41.9, 1),
-(6, 350, 'Outer La Noscea', 'Outer La Noscea', 'Noscea Extérieure', 'Äußeres La Noscea', '外地ラノシア', NULL, 41.9, 41.9, 1),
-(7, 54, 'Central Shroud', 'Central Shroud', 'Forêt Centrale', 'Tiefer Wald', '黒衣森：中央森林', NULL, 41.9, 41.9, 2),
-(8, 55, 'East Shroud', 'East Shroud', 'Forêt De L\'est', 'Ostwald', '黒衣森：東部森林', NULL, 41.9, 41.9, 2),
-(9, 56, 'South Shroud', 'South Shroud', 'Forêt Du Sud', 'Südwald', '黒衣森：南部森林', NULL, 41.9, 41.9, 2),
-(10, 57, 'North Shroud', 'North Shroud', 'Forêt Du Nord', 'Nordwald', '黒衣森：北部森林', NULL, 41.9, 41.9, 2),
-(11, 42, 'Western Thanalan', 'Western Thanalan', 'Thanalan Occidental', 'Westliches Thanalan', '西ザナラーン', NULL, 41.9, 41.9, 3),
-(12, 43, 'Central Thanalan', 'Central Thanalan', 'Thanalan Central', 'Zentrales Thanalan', '中央ザナラーン', NULL, 41.9, 41.9, 3),
-(13, 44, 'Eastern Thanalan', 'Eastern Thanalan', 'Thanalan Oriental', 'Östliches Thanalan', '東ザナラーン', NULL, 41.9, 41.9, 3),
-(14, 45, 'Southern Thanalan', 'Southern Thanalan', 'Thanalan Méridional', 'Südliches Thanalan', '南ザナラーン', NULL, 41.9, 41.9, 3),
-(15, 46, 'Northern Thanalan', 'Northern Thanalan', 'Thanalan Septentrional', 'Nördliches Thanalan', '北ザナラーン', NULL, 41.9, 41.9, 3),
-(16, 63, 'Coerthas Central Highlands', 'Coerthas Central Highlands', 'Hautes Terres Du Coerthas Central', 'Zentrales Hochland Von Coerthas', 'クルザス中央高地', NULL, 41.9, 41.9, 4),
-(17, 67, 'Mor Dhona', 'Mor Dhona', 'Mor Dhona', 'Mor Dhona', 'モードゥナ', NULL, 41.9, 41.9, 5);
+(1, 30, 'Middle La Noscea', 'Middle La Noscea', 'Noscea Centrale', 'Zentrales La Noscea', '中央ラノシア', NULL, '41.9', '41.9', 1),
+(2, 31, 'Lower La Noscea', 'Lower La Noscea', 'Basse-Noscea', 'Unteres La Noscea', '低地ラノシア', NULL, '41.9', '41.9', 1),
+(3, 32, 'Eastern La Noscea', 'Eastern La Noscea', 'Noscea Orientale', 'Östliches La Noscea', '東ラノシア', NULL, '41.9', '41.9', 1),
+(4, 33, 'Western La Noscea', 'Western La Noscea', 'Noscea Occidentale', 'Westliches La Noscea', '西ラノシア', NULL, '41.9', '41.9', 1),
+(5, 34, 'Upper La Noscea', 'Upper La Noscea', 'Haute-Noscea', 'Oberes La Noscea', '高地ラノシア', NULL, '41.9', '41.9', 1),
+(6, 350, 'Outer La Noscea', 'Outer La Noscea', 'Noscea Extérieure', 'Äußeres La Noscea', '外地ラノシア', NULL, '41.9', '41.9', 1),
+(7, 54, 'Central Shroud', 'Central Shroud', 'Forêt Centrale', 'Tiefer Wald', '黒衣森：中央森林', NULL, '41.9', '41.9', 2),
+(8, 55, 'East Shroud', 'East Shroud', 'Forêt De L\'est', 'Ostwald', '黒衣森：東部森林', NULL, '41.9', '41.9', 2),
+(9, 56, 'South Shroud', 'South Shroud', 'Forêt Du Sud', 'Südwald', '黒衣森：南部森林', NULL, '41.9', '41.9', 2),
+(10, 57, 'North Shroud', 'North Shroud', 'Forêt Du Nord', 'Nordwald', '黒衣森：北部森林', NULL, '41.9', '41.9', 2),
+(11, 42, 'Western Thanalan', 'Western Thanalan', 'Thanalan Occidental', 'Westliches Thanalan', '西ザナラーン', NULL, '41.9', '41.9', 3),
+(12, 43, 'Central Thanalan', 'Central Thanalan', 'Thanalan Central', 'Zentrales Thanalan', '中央ザナラーン', NULL, '41.9', '41.9', 3),
+(13, 44, 'Eastern Thanalan', 'Eastern Thanalan', 'Thanalan Oriental', 'Östliches Thanalan', '東ザナラーン', NULL, '41.9', '41.9', 3),
+(14, 45, 'Southern Thanalan', 'Southern Thanalan', 'Thanalan Méridional', 'Südliches Thanalan', '南ザナラーン', NULL, '41.9', '41.9', 3),
+(15, 46, 'Northern Thanalan', 'Northern Thanalan', 'Thanalan Septentrional', 'Nördliches Thanalan', '北ザナラーン', NULL, '41.9', '41.9', 3),
+(16, 63, 'Coerthas Central Highlands', 'Coerthas Central Highlands', 'Hautes Terres Du Coerthas Central', 'Zentrales Hochland Von Coerthas', 'クルザス中央高地', NULL, '41.9', '41.9', 4),
+(17, 67, 'Mor Dhona', 'Mor Dhona', 'Mor Dhona', 'Mor Dhona', 'モードゥナ', NULL, '41.9', '41.9', 5);
 
 --
 -- Triggers `zones_arr`
 --
+DROP TRIGGER IF EXISTS `zones_arr_del`;
 DELIMITER $$
 CREATE TRIGGER `zones_arr_del` AFTER DELETE ON `zones_arr` FOR EACH ROW BEGIN
 	CALL update_etag('zones_arr');
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_arr_ins`;
 DELIMITER $$
 CREATE TRIGGER `zones_arr_ins` AFTER INSERT ON `zones_arr` FOR EACH ROW BEGIN
 	CALL update_etag('zones_arr');
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_arr_upd`;
 DELIMITER $$
 CREATE TRIGGER `zones_arr_upd` AFTER UPDATE ON `zones_arr` FOR EACH ROW BEGIN
 	CALL update_etag('zones_arr');
@@ -3017,49 +3313,115 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `zones_ew`
+--
+
+DROP TABLE IF EXISTS `zones_ew`;
+CREATE TABLE IF NOT EXISTS `zones_ew` (
+  `id` tinyint NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `size_x` decimal(3,1) UNSIGNED NOT NULL,
+  `size_y` decimal(3,1) UNSIGNED NOT NULL,
+  UNIQUE KEY `id` (`id`) USING BTREE,
+  KEY `PK_ID` (`id`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
+
+--
+-- Dumping data for table `zones_ew`
+--
+
+INSERT INTO `zones_ew` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `size_x`, `size_y`) VALUES
+(1, 0, 'Labyrinthos', 'Labyrinthos', 'Le Labyrinthos', 'Labyrinthos', 'ラヴィリンソス', '迷津', '40.9', '40.9'),
+(2, 0, 'Thavnair', 'Thavnair', 'Thavnair', 'Thavnair', 'サベネア島', '萨维奈岛', '40.9', '40.9'),
+(3, 0, 'Garlemald', 'Garlemald', 'Garlemald', 'Garlemald', 'ガレマルド', '加雷马', '40.9', '40.9'),
+(4, 0, 'Mare Lamentorum', 'Mare Lamentorum', 'Mare Lamentorum', 'Mare Lamentorum', '嘆きの海', '叹息海', '40.9', '40.9'),
+(5, 0, 'Elpis', 'Elpis', 'Elpis', 'Elpis', 'エルピス', '厄尔庇斯', '40.9', '40.9'),
+(6, 0, 'Ultima Thule', 'Ultima Thule', 'Ultima Thulé', 'Ultima Thule', 'ウルティマ・トゥーレ', '天外天垓', '40.9', '40.9');
+
+--
+-- Triggers `zones_ew`
+--
+DROP TRIGGER IF EXISTS `zones_ew_del`;
+DELIMITER $$
+CREATE TRIGGER `zones_ew_del` AFTER DELETE ON `zones_ew` FOR EACH ROW BEGIN
+	CALL update_etag('zones_ew');
+END
+$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_ew_ins`;
+DELIMITER $$
+CREATE TRIGGER `zones_ew_ins` AFTER INSERT ON `zones_ew` FOR EACH ROW BEGIN
+	CALL update_etag('zones_ew');
+END
+$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_ew_upd`;
+DELIMITER $$
+CREATE TRIGGER `zones_ew_upd` AFTER UPDATE ON `zones_ew` FOR EACH ROW BEGIN
+	CALL update_etag('zones_ew');
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `zones_hw`
 --
 
-CREATE TABLE `zones_hw` (
-  `id` tinyint(4) NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
+DROP TABLE IF EXISTS `zones_hw`;
+CREATE TABLE IF NOT EXISTS `zones_hw` (
+  `id` tinyint NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
   `size_x` decimal(3,1) UNSIGNED NOT NULL,
-  `size_y` decimal(3,1) UNSIGNED NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `size_y` decimal(3,1) UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `id` (`id`) USING BTREE,
+  KEY `PK_ID` (`id`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `zones_hw`
 --
 
 INSERT INTO `zones_hw` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `size_x`, `size_y`) VALUES
-(1, 2200, 'Coerthas Western Highlands', 'Coerthas Western Highlands', 'Hautes Terres Du Coerthas Occidental', 'Westliches Hochland Von Coerthas', 'クルザス西部高地', '库尔札斯西部高地', 44.0, 44.0),
-(2, 2100, 'Sea of Clouds', 'Sea of Clouds', 'L\'Écume Des Cieux D\'Abalathia', 'Abalathisches Wolkenmeer', 'アバラシア雲海', '阿巴拉提亚云海', 44.0, 44.0),
-(3, 2000, 'Dravanian Forelands', 'Dravanian Forelands', 'Avant-pays Dravanien', 'Dravanisches Vorland', '高地ドラヴァニア', '龙堡参天高地', 44.0, 44.0),
-(4, 2002, 'Churning Mists', 'Churning Mists', 'L\'Écume Des Cieux De Dravania', 'Wallende Nebel', 'ドラヴァニア雲海', '翻云雾海', 44.0, 44.0),
-(5, 2001, 'Dravanian Hinterlands', 'Dravanian Hinterlands', 'Arrière-pays Dravanien', 'Dravanisches Hinterland', '低地ドラヴァニア', '龙堡内陆低地', 44.0, 44.0),
-(6, 2101, 'Azys Lla', 'Azys Lla', 'Azys Lla', 'Azys Lla', 'アジス・ラー', '魔大陆阿济兹拉', 44.0, 44.0);
+(1, 2200, 'Coerthas Western Highlands', 'Coerthas Western Highlands', 'Hautes Terres Du Coerthas Occidental', 'Westliches Hochland Von Coerthas', 'クルザス西部高地', '库尔札斯西部高地', '44.0', '44.0'),
+(2, 2100, 'Sea of Clouds', 'Sea of Clouds', 'L\'Écume Des Cieux D\'Abalathia', 'Abalathisches Wolkenmeer', 'アバラシア雲海', '阿巴拉提亚云海', '44.0', '44.0'),
+(3, 2000, 'Dravanian Forelands', 'Dravanian Forelands', 'Avant-pays Dravanien', 'Dravanisches Vorland', '高地ドラヴァニア', '龙堡参天高地', '44.0', '44.0'),
+(4, 2002, 'Churning Mists', 'Churning Mists', 'L\'Écume Des Cieux De Dravania', 'Wallende Nebel', 'ドラヴァニア雲海', '翻云雾海', '44.0', '44.0'),
+(5, 2001, 'Dravanian Hinterlands', 'Dravanian Hinterlands', 'Arrière-pays Dravanien', 'Dravanisches Hinterland', '低地ドラヴァニア', '龙堡内陆低地', '44.0', '44.0'),
+(6, 2101, 'Azys Lla', 'Azys Lla', 'Azys Lla', 'Azys Lla', 'アジス・ラー', '魔大陆阿济兹拉', '44.0', '44.0');
 
 --
 -- Triggers `zones_hw`
 --
+DROP TRIGGER IF EXISTS `zones_hw_del`;
 DELIMITER $$
 CREATE TRIGGER `zones_hw_del` AFTER DELETE ON `zones_hw` FOR EACH ROW BEGIN
 	CALL update_etag('zones_hw');
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_hw_ins`;
 DELIMITER $$
 CREATE TRIGGER `zones_hw_ins` AFTER INSERT ON `zones_hw` FOR EACH ROW BEGIN
 	CALL update_etag('zones_hw');
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_hw_upd`;
 DELIMITER $$
 CREATE TRIGGER `zones_hw_upd` AFTER UPDATE ON `zones_hw` FOR EACH ROW BEGIN
 	CALL update_etag('zones_hw');
@@ -3073,46 +3435,52 @@ DELIMITER ;
 -- Table structure for table `zones_sb`
 --
 
-CREATE TABLE `zones_sb` (
-  `id` tinyint(4) NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
+DROP TABLE IF EXISTS `zones_sb`;
+CREATE TABLE IF NOT EXISTS `zones_sb` (
+  `id` tinyint NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
   `size_x` decimal(3,1) UNSIGNED NOT NULL,
-  `size_y` decimal(3,1) UNSIGNED NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `size_y` decimal(3,1) UNSIGNED NOT NULL,
+  UNIQUE KEY `id` (`id`) USING BTREE,
+  KEY `PK_ID` (`id`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `zones_sb`
 --
 
 INSERT INTO `zones_sb` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `size_x`, `size_y`) VALUES
-(1, 2406, 'The Fringes', 'The Fringes', 'Les Marges', 'Abanisches Grenzland', 'ギラバニア辺境地帯', '基拉巴尼亚边区', 41.9, 41.9),
-(2, 2407, 'The Peaks', 'The Peaks', 'Les Pics', 'Die Zinnen', 'ギラバニア山岳地帯', '基拉巴尼亚山区', 41.9, 41.9),
-(6, 2408, 'The Lochs', 'The Lochs', 'Les Lacs', 'Das Fenn', 'ギラバニア湖畔地帯', '基拉巴尼亚湖区', 41.9, 41.9),
-(3, 2409, 'The Ruby Sea', 'The Ruby Sea', 'Mer de Rubis', 'Rubinsee', '紅玉海', '红玉海', 41.9, 41.9),
-(4, 2410, 'Yanxia', 'Yanxia', 'Yanxia', 'Yanxia', 'ヤンサ', '延夏', 41.9, 41.9),
-(5, 2411, 'The Azim Steppe', 'The Azim Steppe', 'Steppe d\'Azim', 'Azim-Steppe', 'アジムステップ', '太阳神草原', 41.9, 41.9);
+(1, 2406, 'The Fringes', 'The Fringes', 'Les Marges', 'Abanisches Grenzland', 'ギラバニア辺境地帯', '基拉巴尼亚边区', '41.9', '41.9'),
+(2, 2407, 'The Peaks', 'The Peaks', 'Les Pics', 'Die Zinnen', 'ギラバニア山岳地帯', '基拉巴尼亚山区', '41.9', '41.9'),
+(6, 2408, 'The Lochs', 'The Lochs', 'Les Lacs', 'Das Fenn', 'ギラバニア湖畔地帯', '基拉巴尼亚湖区', '41.9', '41.9'),
+(3, 2409, 'The Ruby Sea', 'The Ruby Sea', 'Mer de Rubis', 'Rubinsee', '紅玉海', '红玉海', '41.9', '41.9'),
+(4, 2410, 'Yanxia', 'Yanxia', 'Yanxia', 'Yanxia', 'ヤンサ', '延夏', '41.9', '41.9'),
+(5, 2411, 'The Azim Steppe', 'The Azim Steppe', 'Steppe d\'Azim', 'Azim-Steppe', 'アジムステップ', '太阳神草原', '41.9', '41.9');
 
 --
 -- Triggers `zones_sb`
 --
+DROP TRIGGER IF EXISTS `zones_sb_del`;
 DELIMITER $$
 CREATE TRIGGER `zones_sb_del` AFTER DELETE ON `zones_sb` FOR EACH ROW BEGIN
 	CALL update_etag('zones_sb');
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_sb_ins`;
 DELIMITER $$
 CREATE TRIGGER `zones_sb_ins` AFTER INSERT ON `zones_sb` FOR EACH ROW BEGIN
 	CALL update_etag('zones_sb');
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_sb_upd`;
 DELIMITER $$
 CREATE TRIGGER `zones_sb_upd` AFTER UPDATE ON `zones_sb` FOR EACH ROW BEGIN
 	CALL update_etag('zones_sb');
@@ -3126,251 +3494,57 @@ DELIMITER ;
 -- Table structure for table `zones_shb`
 --
 
-CREATE TABLE `zones_shb` (
-  `id` tinyint(4) NOT NULL,
-  `xivdb_id` int(10) DEFAULT NULL,
-  `name` text,
-  `name_en` text,
-  `name_fr` text,
-  `name_de` text,
-  `name_jp` text,
-  `name_ch` text,
+DROP TABLE IF EXISTS `zones_shb`;
+CREATE TABLE IF NOT EXISTS `zones_shb` (
+  `id` tinyint NOT NULL AUTO_INCREMENT,
+  `xivdb_id` int DEFAULT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_en` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_fr` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_de` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_jp` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  `name_ch` text CHARACTER SET utf8 COLLATE utf8_general_ci,
   `size_x` decimal(3,1) UNSIGNED NOT NULL DEFAULT '41.0',
-  `size_y` decimal(3,1) UNSIGNED NOT NULL DEFAULT '41.0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `size_y` decimal(3,1) UNSIGNED NOT NULL DEFAULT '41.0',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `zones_shb`
 --
 
 INSERT INTO `zones_shb` (`id`, `xivdb_id`, `name`, `name_en`, `name_fr`, `name_de`, `name_jp`, `name_ch`, `size_x`, `size_y`) VALUES
-(1, 2953, 'Lakeland', 'Lakeland', 'Grand-Lac', 'Seenland', 'レイクランド', '雷克兰德', 41.9, 41.9),
-(2, 2954, 'Kholusia', 'Kholusia', 'Kholusia', 'Kholusia', 'コルシア島', '珂露西亚岛', 41.9, 41.9),
-(3, 2955, 'Amh Araeng', 'Amh Araeng', 'Amh Araeng', 'Amh Araeng', 'アム・アレーン', '安穆·艾兰', 41.9, 41.9),
-(4, 2956, 'Il Mheg', 'Il Mheg', 'Il Mheg', 'Il Mheg', 'イル・メグ', '伊尔美格', 41.9, 41.9),
-(5, 2957, 'The Rak\'tika Greatwood', 'The Rak\'tika Greatwood', 'Rak\'tika', 'Der Große Wald Rak\'tika', 'ラケティカ大森林', '拉凯提卡大森林', 41.9, 41.9),
-(6, 2958, 'The Tempest', 'The Tempest', 'La Tempête', 'Tempest', 'テンペスト', '黑风海', 41.9, 41.9);
+(1, 2953, 'Lakeland', 'Lakeland', 'Grand-Lac', 'Seenland', 'レイクランド', '雷克兰德', '41.9', '41.9'),
+(2, 2954, 'Kholusia', 'Kholusia', 'Kholusia', 'Kholusia', 'コルシア島', '珂露西亚岛', '41.9', '41.9'),
+(3, 2955, 'Amh Araeng', 'Amh Araeng', 'Amh Araeng', 'Amh Araeng', 'アム・アレーン', '安穆·艾兰', '41.9', '41.9'),
+(4, 2956, 'Il Mheg', 'Il Mheg', 'Il Mheg', 'Il Mheg', 'イル・メグ', '伊尔美格', '41.9', '41.9'),
+(5, 2957, 'The Rak\'tika Greatwood', 'The Rak\'tika Greatwood', 'Rak\'tika', 'Der Große Wald Rak\'tika', 'ラケティカ大森林', '拉凯提卡大森林', '41.9', '41.9'),
+(6, 2958, 'The Tempest', 'The Tempest', 'La Tempête', 'Tempest', 'テンペスト', '黑风海', '41.9', '41.9');
 
 --
 -- Triggers `zones_shb`
 --
+DROP TRIGGER IF EXISTS `zones_shb_del`;
 DELIMITER $$
 CREATE TRIGGER `zones_shb_del` AFTER DELETE ON `zones_shb` FOR EACH ROW BEGIN
 	CALL update_etag('zones_shb');
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_shb_ins`;
 DELIMITER $$
 CREATE TRIGGER `zones_shb_ins` AFTER INSERT ON `zones_shb` FOR EACH ROW BEGIN
 	CALL update_etag('zones_shb');
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `zones_shb_upd`;
 DELIMITER $$
 CREATE TRIGGER `zones_shb_upd` AFTER UPDATE ON `zones_shb` FOR EACH ROW BEGIN
 	CALL update_etag('zones_shb');
 END
 $$
 DELIMITER ;
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `aetherytes_arr`
---
-ALTER TABLE `aetherytes_arr`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_zone` (`id_zone`);
-
---
--- Indexes for table `aetherytes_hw`
---
-ALTER TABLE `aetherytes_hw`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `PK_ID_AETH` (`id`),
-  ADD KEY `FK_ZONE_AETH` (`id_zone`);
-
---
--- Indexes for table `aetherytes_sb`
---
-ALTER TABLE `aetherytes_sb`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `PK_ID_AETH` (`id`),
-  ADD KEY `FK_ZONE_AETH` (`id_zone`);
-
---
--- Indexes for table `aetherytes_shb`
---
-ALTER TABLE `aetherytes_shb`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_zone` (`id_zone`);
-
---
--- Indexes for table `etags`
---
-ALTER TABLE `etags`
-  ADD PRIMARY KEY (`item`);
-
---
--- Indexes for table `fates_arr`
---
-ALTER TABLE `fates_arr`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `mobs_arr`
---
-ALTER TABLE `mobs_arr`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_zone` (`id_zone`);
-
---
--- Indexes for table `mobs_hw`
---
-ALTER TABLE `mobs_hw`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `PK_ID` (`id`),
-  ADD KEY `FK_ZONE` (`id_zone`);
-
---
--- Indexes for table `mobs_sb`
---
-ALTER TABLE `mobs_sb`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `id` (`id`),
-  ADD KEY `PK_ID` (`id`),
-  ADD KEY `FK_ZONE` (`id_zone`);
-
---
--- Indexes for table `mobs_shb`
---
-ALTER TABLE `mobs_shb`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_zone` (`id_zone`);
-
---
--- Indexes for table `region_arr`
---
-ALTER TABLE `region_arr`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `zones_arr`
---
-ALTER TABLE `zones_arr`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_region` (`id_region`);
-
---
--- Indexes for table `zones_hw`
---
-ALTER TABLE `zones_hw`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `id` (`id`),
-  ADD KEY `PK_ID` (`id`);
-
---
--- Indexes for table `zones_sb`
---
-ALTER TABLE `zones_sb`
-  ADD UNIQUE KEY `id` (`id`),
-  ADD KEY `PK_ID` (`id`);
-
---
--- Indexes for table `zones_shb`
---
-ALTER TABLE `zones_shb`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `aetherytes_arr`
---
-ALTER TABLE `aetherytes_arr`
-  MODIFY `id` tinyint(3) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
-
---
--- AUTO_INCREMENT for table `aetherytes_hw`
---
-ALTER TABLE `aetherytes_hw`
-  MODIFY `id` tinyint(3) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT for table `aetherytes_sb`
---
-ALTER TABLE `aetherytes_sb`
-  MODIFY `id` tinyint(3) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
---
--- AUTO_INCREMENT for table `aetherytes_shb`
---
-ALTER TABLE `aetherytes_shb`
-  MODIFY `id` tinyint(3) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT for table `fates_arr`
---
-ALTER TABLE `fates_arr`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=959;
-
---
--- AUTO_INCREMENT for table `mobs_arr`
---
-ALTER TABLE `mobs_arr`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1003;
-
---
--- AUTO_INCREMENT for table `mobs_hw`
---
-ALTER TABLE `mobs_hw`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
-
---
--- AUTO_INCREMENT for table `mobs_sb`
---
-ALTER TABLE `mobs_sb`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
-
---
--- AUTO_INCREMENT for table `mobs_shb`
---
-ALTER TABLE `mobs_shb`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=137;
-
---
--- AUTO_INCREMENT for table `region_arr`
---
-ALTER TABLE `region_arr`
-  MODIFY `id` tinyint(4) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `zones_arr`
---
-ALTER TABLE `zones_arr`
-  MODIFY `id` tinyint(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
-
---
--- AUTO_INCREMENT for table `zones_hw`
---
-ALTER TABLE `zones_hw`
-  MODIFY `id` tinyint(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `zones_sb`
---
-ALTER TABLE `zones_sb`
-  MODIFY `id` tinyint(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
-
---
--- AUTO_INCREMENT for table `zones_shb`
---
-ALTER TABLE `zones_shb`
-  MODIFY `id` tinyint(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

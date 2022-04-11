@@ -269,7 +269,15 @@ function ini_get_number( $p_name ) {
 }
 
 function cookie_set($name, $value){
-	setcookie($name, $value, time()+60*60*24*365, "/", Config::$domain_cookie);
+	$arr_cookie_options = array (
+		'expires' => time()+60*60*24*365,
+		'path'    => '/',
+		'domain'  => Config::$domain_cookie,
+		'secure'  => true,
+		'httponly' => false,
+		'samesite' => 'Strict'
+	);
+	setcookie($name, $value, $arr_cookie_options);
 }
 
 /**

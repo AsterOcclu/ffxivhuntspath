@@ -33,6 +33,7 @@ class WebLang {
 	public static $MSG_SB = 'Stormblood';
 	public static $MSG_ARR = 'A Realm Reborn';
 	public static $MSG_SHB = 'Shadowbringers';
+	public static $MSG_EW = 'Endwalker';
 	
 	/* Search Page */
 	public static $MSG_SEARCH_BTN = 'Buscar {0} enemigos';
@@ -60,6 +61,7 @@ class WebLang {
 	public static $MSG_HOME_COLLAB_SMOKEY = 'Localización de enemigos en HW';
 	public static $MSG_HOME_COLLAB_MAMORU = 'Traducción del Juego a Chino (Simplificado) en las expansiones SB y HW';
 	public static $MSG_HOME_COLLAB_SUMIRE = 'Traducción del Juego a Chino (Simplificado) en las expansiones SB y HW';
+	public static $MSG_HOME_COLLAB_ASTER = 'Traducción del Juego a Chino (Simplificado) en las expansiones SHB y EW';
 	
 	public static $MSG_HOME_COLLABORATE = '¿Quieres contribuir con esta página traduciendola a tu idioma? ¿Quieres contactar con nosotros para aportar ideas o reportar errores? Puedes contactar con nosotros vía email';
 	public static $MSG_HOME_DONATE = 'Si quieres donar para esta web, puedes hacerlo aquí';
@@ -76,6 +78,10 @@ class WebLang {
 			'Se ha añadido la traducción del Juego a Chino (Simplificado) en las expansiones Heavensward y Stormblood, gracias a '.
 			'<a href="http://na.finalfantasyxiv.com/lodestone/character/14748036/">Mamoru Akizuki (Faerie)</a> y '.
 			'<a href="http://na.finalfantasyxiv.com/lodestone/character/17035001/">Sumire Aster (Faerie)</a>';
+
+	public static $MSG_HOME_UPDATES_8 = 
+			'Added Translation of the Game Client to Simplified Chinese in the Shb and Ew expansions thanks to '.
+			'<a href="https://na.finalfantasyxiv.com/lodestone/character/36279802/">Aster Occlu (Faerie)</a>';
 			
 	public static $MSG_HOME_UPDATES_5 =
 			'Una versión <b>preliminar</b> de las cazas para la expansión ARR ha sido añadida. No es definitiva ya que esta herramienta fue pensada para las expansiones HW y SB, '.

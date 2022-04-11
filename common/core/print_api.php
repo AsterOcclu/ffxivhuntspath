@@ -54,14 +54,14 @@
 			}
 		?>
 		
-		<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+		<!-- <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 		<script>
 		  WebFont.load({
 		    google: {
 		      families: ['Roboto','Droid Sans']
 		    }
 		  });
-		</script>
+		</script> -->
 		<script src="<?php echo Config::$context ?>/js/jquery-2.2.4.min.js"></script>
 		<script src="<?php echo Config::$context ?>/js/jquery-ui.min.js"></script>
 		<script src="<?php echo Config::$context ?>/js/jquery.ui.touch-punch.min.js"></script>
@@ -105,6 +105,7 @@
 							<li class="heavensward"><a href="<?php echo Config::$context ?>/hw/"><img src="<?php echo Config::$context ?>/img/hw.png" height="28px"/></a></li>
 							<li class="stormblood"><a href="<?php echo Config::$context ?>/sb/"><img src="<?php echo Config::$context ?>/img/sb.png" height="28px"/></a></li>
 							<li class="shadowbringers"><a href="<?php echo Config::$context ?>/shb/"><img src="<?php echo Config::$context ?>/img/shb.png" height="28px"/></a></li>
+							<li class="endwalker"><a href="<?php echo Config::$context ?>/ew/"><img src="<?php echo Config::$context ?>/img/ew.png" height="28px"/></a></li>
 					  </ul>
 					</li>
 					<li class="dropdown">
@@ -173,6 +174,7 @@
 					else if($exp === 'sb') echo 'navbar-stormblood';
 					else if($exp === 'arr') echo 'navbar-stormblood';
 					else if($exp === 'shb') echo 'navbar-shadowbringers';
+					else if($exp === 'ew') echo 'navbar-endwalker';
 					else echo 'navbar-ffxiv';
 				?> navbar-fixed-top">
 		  <div class="container">
@@ -646,6 +648,11 @@
 							<img src="<?php echo Config::$context ?>/img/shb.png"/>
 						</a>
 					</div>
+					<div class="expansion-row">
+						<a class="expansion-block endwalker" href="<?php echo Config::$context ?>/ew/">
+							<img src="<?php echo Config::$context ?>/img/ew.png"/>
+						</a>
+					</div>
 				</div>
 			</div>
 			<div class="well">
@@ -663,6 +670,8 @@
 					<dd style="margin-bottom:16px;"><i><?php echo WebLang::$MSG_HOME_COLLAB_MAMORU ?></i></dd>
 					<dt class="text-primary"><a href="http://na.finalfantasyxiv.com/lodestone/character/17035001/">Sumire Aster (Faerie)</a></dt>
 					<dd style="margin-bottom:16px;"><i><?php echo WebLang::$MSG_HOME_COLLAB_SUMIRE ?></i></dd>
+					<dt class="text-primary"><a href="https://na.finalfantasyxiv.com/lodestone/character/36279802/">Aster Occlu (Pandemonium)</a></dt>
+					<dd style="margin-bottom:16px;"><i><?php echo WebLang::$MSG_HOME_COLLAB_ASTER ?></i></dd>
 				</dl>
 				<hr/>
 				<small><?php echo WebLang::$MSG_HOME_COLLABORATE ?>: <script type="text/javascript"><!--
@@ -691,6 +700,7 @@
 			<div id="update7"><?php print_update_raw(WebLang::$MSG_HOME_NEWS_UPDATE, WebLang::$MSG_HOME_UPDATES_7, 'Admin', to_utc_time(2019, 6, 18, 19, 34, 0)); ?></div>
 			<div id="update6"><?php print_update_raw(WebLang::$MSG_HOME_NEWS_UPDATE, WebLang::$MSG_HOME_UPDATES_6, 'Admin', to_utc_time(2017, 10, 9, 10, 39, 0)); ?></div>
 			<div id="update5"><?php print_update_raw(WebLang::$MSG_HOME_NEWS_UPDATE, WebLang::$MSG_HOME_UPDATES_5, 'Admin', to_utc_time(2017, 7, 11, 20, 45, 0)); ?></div>
+			<div id="update8"><?php print_update_raw(WebLang::$MSG_HOME_NEWS_UPDATE, WebLang::$MSG_HOME_UPDATES_8, 'Admin', to_utc_time(2017, 7, 11, 20, 45, 0)); ?></div>
 			<div id="note1"><?php print_note('Regarding ARR Hunts', WebLang::$MSG_NOTE_1, 'Guybrush', to_utc_time(2017, 7, 4, 11, 10, 0)); ?></div>
 			<div id="update4"><?php print_update(WebLang::$MSG_HOME_NEWS_UPDATE, WebLang::$MSG_HOME_UPDATES_4, 'Admin', to_utc_time(2017, 7, 3, 13, 30, 0)); ?></div>
 			<div id="update3"><?php print_update(WebLang::$MSG_HOME_NEWS_UPDATE, WebLang::$MSG_HOME_UPDATES_3, 'Admin', to_utc_time(2017, 7, 1, 15, 32, 0)); ?></div>

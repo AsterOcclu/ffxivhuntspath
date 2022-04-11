@@ -2,10 +2,18 @@
 	require_once('core.php');
 
 	// Redirect to the last Expansion used
-	$index = 'shb';
+	$index = 'ew';
 	if(empty($_COOKIE[Config::$cookie_last_expansion])){
-		$index = 'shb';
-		setcookie(Config::$cookie_last_expansion, $index, time()+60*60*24*365, "/", Config::$domain_cookie);
+		$index = 'ew';
+		$arr_cookie_options = array (
+			'expires' => time()+60*60*24*365,
+			'path'    => '/',
+			'domain'  => Config::$domain_cookie,
+			'secure'  => true,
+			'httponly' => false,
+			'samesite' => 'Strict'
+		);
+		setcookie(Config::$cookie_last_expansion, $index, $arr_cookie_options);
 	} else {
 		$index = $_COOKIE[Config::$cookie_last_expansion];
 		switch ($index) {
@@ -20,12 +28,15 @@
 				break;   
 			case "shb":
 				$index = 'shb';
-				break;   
+				break;
+			case "ew":
+				$index = 'ew';
+				break;  
 			default:
-				$index = 'shb';
+				$index = 'ew';
 				break;
 		}
 	}
 
-	header("Location: http://".Config::$domain."/".$index."/"); /* Redirect browser */
+	header("Location: https://".Config::$domain."/".$index."/"); /* Redirect browser */
 	exit();

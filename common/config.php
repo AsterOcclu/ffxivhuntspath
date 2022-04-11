@@ -5,13 +5,13 @@ class Config {
 	public static $con;
 
 	// Production
-  public static $domain = 'www.ffxivhuntspath.com';
-  public static $domain_cookie = '.ffxivhuntspath.com';
+  public static $domain = 'ffxiv-hunt.venat.xyz';
+  public static $domain_cookie = '.venat.xyz';
   public static $context = '';
 	
 	public static $db_hostname = 'localhost';
 	public static $db_username = 'ffxiv2_admin';
-	public static $db_password = '';
+	public static $db_password = 'ffxiv2_admin';
 	public static $db_table = 'ffxiv2';
 	
   public static $cache_mode = 'memcached';
